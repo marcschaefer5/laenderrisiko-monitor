@@ -1,0 +1,26 @@
+[
+ {
+  "datum": "2026-09-02",
+  "code": "US",
+  "land": "USA",
+  "z": -2.73
+ },
+ {
+  "datum": "2026-09-02",
+  "code": "TU",
+  "land": "Türkei",
+  "z": -1.9
+ },
+ {
+  "datum": "2026-09-02",
+  "code": "SF",
+  "land": "Südafrika",
+  "z": -1.77
+ },
+ {
+  "datum": "2026-09-02",
+  "code": "MX",
+  "land": "Mexiko",
+  "z": -1.93
+ }
+]
