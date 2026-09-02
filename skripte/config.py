@@ -45,7 +45,12 @@ NORM_FENSTER = 120        # Handelstage fuer den Normalzustand (z-Wert)
 PROGNOSE_HORIZONT = 5     # Handelstage
 PROGNOSE_SCHWELLE = 1.0   # z-Wert, ab dem als "erhoeht" gilt
 AUFF_BEWEGUNG = 2.5       # Vielfaches der ueblichen Tagesstreuung
-AUFF_NIVEAU = 1.5         # z-Wert
+AUFF_NIVEAU = 1.5         # z-Wert, ab dem der Status "hoch" lautet
+                          # (steuert die Statusanzeige, nicht die Auffaelligkeit)
+MIN_BAUSTEIN_TAGE = 250   # Mindesthistorie, damit ein Baustein verwendet wird
+                          # (Yahoo fuehrt manche Symbole ohne Historie)
+FFILL_TAGE = 5            # Tage, ueber die ein fehlender Baustein fortgeschrieben wird
+                          # (Feiertage, Veroeffentlichungsverzoegerung des GPR)
 TAGE_ANZEIGE = 200
 NEWS_TAGE = 45
 NACHLAUF_TAGE = 4         # GDELT-Tage, die je Lauf nachgeladen werden

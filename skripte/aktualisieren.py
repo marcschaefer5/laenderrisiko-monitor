@@ -42,7 +42,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from config import (LAENDER, GPR_URL, GDELT_MASTER, ESKALATION, VOL_FENSTER,
                     NORM_FENSTER, PROGNOSE_HORIZONT, PROGNOSE_SCHWELLE,
                     AUFF_BEWEGUNG, AUFF_NIVEAU, TAGE_ANZEIGE, NEWS_TAGE,
-                    NACHLAUF_TAGE)
+                    NACHLAUF_TAGE, FFILL_TAGE, MIN_BAUSTEIN_TAGE)
 
 WURZEL = Path(__file__).resolve().parent.parent
 DATEN, DOCS = WURZEL / "daten", WURZEL / "docs"
@@ -218,20 +218,34 @@ def marktdaten(voll: bool) -> None:
 
 # ---------------------------------------------------------------- Auswertung
 def risikoreihe(code: str, gpr: pd.DataFrame) -> pd.DataFrame | None:
+    """Setzt den Risikoindex aus den verfuegbaren Bausteinen zusammen.
+
+    Ein Baustein mit zu wenig Historie wird VERWORFEN, nicht das Land. Yahoo
+    fuehrt fuer manche Boersen ein Symbol, liefert dazu aber kaum Daten --
+    ^CASE30 (Aegypten) gab beim ersten Lauf genau einen Tag zurueck. Ohne
+    diese Regel haette Aegypten das Land gekostet statt nur die
+    Marktkomponente.
+    """
     teile = []
     f = DATEN / f"fx_{code}.csv"
     if f.exists():
         fx = pd.read_csv(f, sep=";", parse_dates=["date"]).sort_values("date")
-        r = np.log(fx.close).diff()
-        fx["v"] = r.rolling(VOL_FENSTER).std(ddof=0) * np.sqrt(252)
-        fx["a"] = np.log(fx.close).diff(VOL_FENSTER)
-        za = ((fx.v - fx.v.mean()) / fx.v.std() + (fx.a - fx.a.mean()) / fx.a.std()) / 2
-        teile.append(pd.DataFrame({"date": fx.date, "waehrung": za}))
+        if len(fx) >= MIN_BAUSTEIN_TAGE:
+            r = np.log(fx.close).diff()
+            fx["v"] = r.rolling(VOL_FENSTER).std(ddof=0) * np.sqrt(252)
+            fx["a"] = np.log(fx.close).diff(VOL_FENSTER)
+            za = ((fx.v - fx.v.mean()) / fx.v.std() + (fx.a - fx.a.mean()) / fx.a.std()) / 2
+            teile.append(pd.DataFrame({"date": fx.date, "waehrung": za}))
+        else:
+            log(f"      [INFO] {code}: Währungsreihe zu kurz ({len(fx)} Tage) — Baustein entfällt")
     a = DATEN / f"aktien_{code}.csv"
     if a.exists():
         ak = pd.read_csv(a, sep=";", parse_dates=["date"]).sort_values("date")
-        v = np.log(ak.close).diff().rolling(VOL_FENSTER).std(ddof=0) * np.sqrt(252)
-        teile.append(pd.DataFrame({"date": ak.date, "markt": (v - v.mean()) / v.std()}))
+        if len(ak) >= MIN_BAUSTEIN_TAGE:
+            v = np.log(ak.close).diff().rolling(VOL_FENSTER).std(ddof=0) * np.sqrt(252)
+            teile.append(pd.DataFrame({"date": ak.date, "markt": (v - v.mean()) / v.std()}))
+        else:
+            log(f"      [INFO] {code}: Aktienreihe zu kurz ({len(ak)} Tage) — Baustein entfällt")
     if not teile:
         return None
     d = teile[0]
@@ -239,8 +253,29 @@ def risikoreihe(code: str, gpr: pd.DataFrame) -> pd.DataFrame | None:
         d = d.merge(t, on="date", how="outer")
     d = d.merge(gpr, on="date", how="left").sort_values("date")
     kats = [c for c in ["waehrung", "markt", "geopolitik"] if c in d.columns]
-    d["risiko"] = d[kats].mean(axis=1, skipna=True)
-    return d.dropna(subset=["risiko"]).reset_index(drop=True)
+
+    # Kurze Luecken schliessen, dann nur vollstaendige Tage behalten.
+    #
+    # Grund: Die Bausteine haben unterschiedliche Kalender. Boersen und
+    # Devisenmaerkte haben verschiedene Feiertage, und der GPR-Index wird mit
+    # einem Tag Verzoegerung veroeffentlicht. Wird der Index einfach ueber die
+    # jeweils vorhandenen Bausteine gemittelt, aendert sich seine
+    # ZUSAMMENSETZUNG von Tag zu Tag -- und damit sein Niveau, ohne dass sich
+    # am Risiko etwas geaendert haette. Beim ersten Lauf erzeugte genau das
+    # vier falsche Auffaelligkeiten: am letzten Tag fehlte der GPR, der
+    # zuvor stark positiv war, und der Mittelwert stuerzte ab.
+    #
+    # Deshalb: bis zu FFILL_TAGE Tage vorwaerts fuellen (ein Feiertag oder
+    # eine Veroeffentlichungsverzoegerung aendert das Risiko nicht), und
+    # anschliessend jeden Tag verwerfen, an dem ein Baustein weiterhin fehlt.
+    # Der Index hat damit an jedem ausgewiesenen Tag dieselbe Basis.
+    for k in kats:
+        d[k] = d[k].ffill(limit=FFILL_TAGE)
+    d = d.dropna(subset=kats)
+    if d.empty:
+        return None
+    d["risiko"] = d[kats].mean(axis=1)
+    return d.reset_index(drop=True)
 
 
 def prognose(d: pd.DataFrame) -> tuple[float | None, float | None]:
@@ -306,7 +341,17 @@ def main() -> int:
         sd = d.risiko.rolling(NORM_FENSTER, min_periods=60).std(ddof=0)
         d["z"] = (d.risiko - mu) / sd
         bew = d.z.diff() / d.z.diff().rolling(NORM_FENSTER, min_periods=60).std(ddof=0)
-        d["auffaellig"] = ((bew.abs() > AUFF_BEWEGUNG) | (d.z > AUFF_NIVEAU)).astype(int)
+        # Auffaelligkeit heisst: plotzliche Bewegung NACH OBEN.
+        #
+        # Zwei Einschraenkungen gegenueber der ersten Fassung:
+        # 1. Nur nach oben -- ein ungewoehnlich ruhiger Tag ist fuer einen
+        #    Risikomonitor kein Warnsignal.
+        # 2. Ohne das Niveaukriterium. Ein wochenlang erhoehtes Risiko erzeugte
+        #    sonst dreissig aufeinanderfolgende "Auffaelligkeiten", obwohl es
+        #    ein einziger Zustand ist -- in Brasilien traf das 34 von 200 Tagen.
+        #    Das Niveau wird ohnehin als Status ausgewiesen (ruhig / normal /
+        #    erhoeht / hoch); die Auffaelligkeit meldet die Veraenderung.
+        d["auffaellig"] = (bew > AUFF_BEWEGUNG).astype(int)
         d = d.dropna(subset=["z"])
         if d.empty:
             continue
