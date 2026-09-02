@@ -1,0 +1,80 @@
+name: Täglicher Lauf
+
+# 06:00 Berlin = 04:00 UTC (Sommerzeit) bzw. 05:00 UTC (Winterzeit).
+# Cron laeuft immer in UTC; 04:00 bedeutet also im Winter 05:00 Ortszeit.
+on:
+  schedule:
+    - cron: "0 4 * * *"
+  workflow_dispatch:        # erlaubt den Start von Hand
+
+permissions:
+  contents: write           # noetig, damit der Lauf Ergebnisse zurueckschreiben darf
+
+jobs:
+  aktualisieren:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Abhängigkeiten
+        run: pip install -r requirements.txt
+
+      - name: Daten aktualisieren
+        run: python3 skripte/aktualisieren.py
+
+      - name: Ergebnisse zurückschreiben
+        run: |
+          git config user.name "Länderrisiko-Monitor"
+          git config user.email "actions@github.com"
+          git add daten docs
+          if git diff --staged --quiet; then
+            echo "Keine Änderungen."
+          else
+            git commit -m "Datenstand $(date -u +%Y-%m-%d)"
+            git push
+          fi
+
+      - name: Auffälligkeiten prüfen
+        id: auff
+        run: |
+          if [ -s benachrichtigung.json ] && [ "$(jq 'length' benachrichtigung.json)" != "0" ]; then
+            echo "vorhanden=ja" >> $GITHUB_OUTPUT
+            {
+              echo "text<<ENDE"
+              jq -r '.[] | "\(.land) am \(.datum): Risikostand \(.z)\n" +
+                     (if (.nachrichten|length) > 0
+                      then ([.nachrichten[] | "  - \(.titel)\n    \(.url)"] | join("\n"))
+                      else "  (keine Meldungen ableitbar)" end) + "\n"' benachrichtigung.json
+              echo "ENDE"
+            } >> $GITHUB_OUTPUT
+          else
+            echo "vorhanden=nein" >> $GITHUB_OUTPUT
+          fi
+
+      # Verschickt nur, wenn die drei Secrets gesetzt sind. Ohne sie wird der
+      # Schritt uebersprungen und der Lauf gilt trotzdem als erfolgreich.
+      - name: E-Mail versenden
+        if: steps.auff.outputs.vorhanden == 'ja' && env.MAIL_USER != ''
+        env:
+          MAIL_USER: ${{ secrets.MAIL_USER }}
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.MAIL_USER }}
+          password: ${{ secrets.MAIL_PASSWORT }}
+          from: Länderrisiko-Monitor
+          to: ${{ secrets.MAIL_EMPFAENGER }}
+          subject: "Länderrisiko: neue Auffälligkeiten"
+          body: |
+            Der tägliche Lauf hat neue Auffälligkeiten festgestellt.
+
+            ${{ steps.auff.outputs.text }}
+            Dashboard: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/

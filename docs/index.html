@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Tagesaktuelles Länderrisiko aus Währungsdruck, Marktvolatilität und geopolitischer Spannung.">
+<meta name="color-scheme" content="light dark">
+<title>Länderrisiko-Monitor</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#F4F5F7; --card:#FFFFFF; --sunk:#EBEDF1;
+  --ink:#14171C; --ink2:#5A616B; --ink3:#878E99;
+  --line:#DEE1E7; --line2:#EAECF0;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a;
+  --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --crit:#d03b3b;
+  --surface-viz:#fcfcfb;
+  --shadow:0 1px 2px rgba(15,20,30,.06),0 6px 20px -10px rgba(15,20,30,.16);
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1013; --card:#161A1F; --sunk:#1D2228;
+  --ink:#E9ECF1; --ink2:#A2AAB6; --ink3:#727A87;
+  --line:#272D35; --line2:#1F242B;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70;
+  --surface-viz:#1a1a19;
+  --shadow:0 1px 2px rgba(0,0,0,.5),0 6px 20px -10px rgba(0,0,0,.7);
+}}
+:root[data-theme="dark"]{
+  --bg:#0E1013; --card:#161A1F; --sunk:#1D2228;
+  --ink:#E9ECF1; --ink2:#A2AAB6; --ink3:#727A87;
+  --line:#272D35; --line2:#1F242B;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70;
+  --surface-viz:#1a1a19;
+  --shadow:0 1px 2px rgba(0,0,0,.5),0 6px 20px -10px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;margin:0;-webkit-font-smoothing:antialiased}
+.wrap{max-width:900px;margin:0 auto;padding:0 16px 72px}
+header{padding:28px 0 18px}
+.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin:0 0 10px}
+h1{font-size:clamp(24px,6vw,32px);font-weight:700;letter-spacing:-.02em;margin:0 0 10px;line-height:1.15}
+.sub{color:var(--ink2);font-size:15px;margin:0 0 16px;max-width:60ch}
+.stand{font-family:var(--mono);font-size:12px;color:var(--ink3);display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--good);display:inline-block;margin-right:6px;vertical-align:1px}
+
+details.method{background:var(--card);border:1px solid var(--line);border-radius:8px;margin:0 0 24px;overflow:hidden}
+details.method summary{padding:13px 16px;cursor:pointer;font-size:13.5px;font-weight:500;color:var(--ink2);list-style:none;display:flex;align-items:center;gap:8px}
+details.method summary::-webkit-details-marker{display:none}
+details.method summary::before{content:"›";font-size:17px;color:var(--ink3);transition:transform .15s;display:inline-block}
+details.method[open] summary::before{transform:rotate(90deg)}
+.mbody{padding:0 16px 16px;font-size:13.5px;color:var(--ink2);border-top:1px solid var(--line2)}
+.mbody p{margin:13px 0 0}
+.mbody b{color:var(--ink);font-weight:600}
+
+h2{font-size:13px;font-family:var(--mono);letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);font-weight:500;margin:30px 0 12px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.ccard{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:0;cursor:pointer;text-align:left;font:inherit;color:inherit;overflow:hidden;transition:border-color .12s,transform .12s;position:relative}
+.ccard:hover{border-color:var(--ink3)}
+.ccard:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+.ccard[aria-pressed="true"]{border-color:var(--ink);box-shadow:var(--shadow)}
+.stripe{height:3px;width:100%}
+.cin{padding:12px 14px 13px}
+.cname{font-weight:600;font-size:15px;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:2px}
+.cstat{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:3px;white-space:nowrap}
+.cval{font-family:var(--mono);font-size:26px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin:4px 0 0}
+.cmeta{font-family:var(--mono);font-size:11px;color:var(--ink3);margin-top:2px}
+.spark{display:block;width:100%;height:34px;margin-top:8px}
+.badge{position:absolute;top:11px;right:12px;font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;background:var(--crit);color:#fff;padding:2px 5px;border-radius:3px}
+
+.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);margin-top:14px;overflow:hidden}
+.phead{padding:18px 18px 0;display:flex;flex-wrap:wrap;gap:18px 28px;align-items:flex-start}
+.pt{font-size:21px;font-weight:700;letter-spacing:-.01em;margin:0;flex:1 1 100%}
+.kpi{min-width:96px}
+.klab{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.kval{font-family:var(--mono);font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.knote{font-size:11.5px;color:var(--ink3);margin-top:1px}
+
+.vizwrap{padding:16px 18px 6px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--ink2);margin-bottom:10px}
+.lg{display:flex;align-items:center;gap:6px}
+.lgm{width:14px;height:2.5px;border-radius:2px;display:inline-block}
+svg.chart{display:block;width:100%;height:auto;background:transparent;touch-action:pan-y}
+.tip{position:absolute;pointer-events:none;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:8px 10px;font-family:var(--mono);font-size:11.5px;box-shadow:var(--shadow);opacity:0;transition:opacity .1s;z-index:5;white-space:nowrap}
+.tip b{font-family:var(--sans);font-size:12px}
+.tiprow{display:flex;justify-content:space-between;gap:14px;margin-top:3px}
+
+.news{padding:4px 18px 18px}
+.nday{border-top:1px solid var(--line2);padding:12px 0 2px}
+.ndate{font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.05em;margin-bottom:7px;display:flex;align-items:center;gap:8px}
+.nitem{display:block;color:var(--ink);text-decoration:none;font-size:14px;padding:5px 0;border-bottom:1px solid transparent;line-height:1.4}
+.nitem:hover{color:var(--s1)}
+.ng{font-family:var(--mono);font-size:11px;color:var(--crit);margin-left:7px}
+.empty{color:var(--ink3);font-size:13.5px;padding:14px 0}
+
+footer{margin-top:36px;padding-top:20px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink3);line-height:1.6}
+footer b{color:var(--ink2);font-weight:600}
+.tblbtn{background:none;border:1px solid var(--line);color:var(--ink2);font:inherit;font-size:12px;padding:4px 10px;border-radius:5px;cursor:pointer;margin-left:auto}
+.tblbtn:hover{border-color:var(--ink3)}
+table{border-collapse:collapse;width:100%;font-size:12.5px;font-variant-numeric:tabular-nums;margin-top:10px}
+th,td{text-align:right;padding:5px 8px;border-bottom:1px solid var(--line2);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+thead th{font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);font-weight:500}
+tbody td{font-family:var(--mono)}
+.scroll{overflow-x:auto;max-height:300px;overflow-y:auto}
+
+/* ---------- Länderseite ---------- */
+.navbar{position:sticky;top:0;z-index:10;background:var(--bg);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:12px;padding:12px 0;margin:0 0 18px}
+.back{background:var(--card);border:1px solid var(--line);color:var(--ink);font:inherit;font-size:14px;
+  padding:7px 13px 7px 10px;border-radius:7px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.back:hover{border-color:var(--ink3)}
+.back:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+.navtitle{font-weight:600;font-size:16px}
+.navstat{margin-left:auto;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;
+  text-transform:uppercase;padding:3px 8px;border-radius:4px}
+.hero{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:20px;margin-bottom:12px;box-shadow:var(--shadow)}
+.heroval{font-family:var(--mono);font-size:44px;font-weight:600;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.herolab{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px}
+.heronote{font-size:13.5px;color:var(--ink2);margin-top:9px}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.kbox{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:14px 15px}
+.sect{background:var(--card);border:1px solid var(--line);border-radius:11px;margin-bottom:12px;overflow:hidden}
+.secthead{padding:15px 17px 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.secttitle{font-size:15px;font-weight:600;margin:0}
+.sectnote{font-size:12.5px;color:var(--ink3);padding:2px 17px 0;margin:0 0 6px}
+@media (max-width:520px){.heroval{font-size:38px}.kpis{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+
+<section id="view-uebersicht">
+  <header>
+    <p class="eyebrow">Länderrisiko · täglich aktualisiert</p>
+    <h1>Länderrisiko-Monitor</h1>
+    <p class="sub">Tagesaktuelles Lagebild aus Währungsdruck, Marktvolatilität und geopolitischer Spannung. Jede Zahl mit der Angabe, worauf sie beruht.</p>
+    <div class="stand"><span><span class="dot"></span>Stand <b id="stand"></b></span><span id="anzahl"></span></div>
+  </header>
+
+  <details class="method">
+    <summary>Worauf jede Zahl beruht — bitte einmal lesen</summary>
+    <div class="mbody">
+      <p><b>Risikostand</b> ist ein z-Wert: wie weit das heutige Niveau vom eigenen Normalzustand des Landes der letzten 120 Tage abweicht. 0 bedeutet normal, +2 ungewöhnlich hoch. Er ist <b>beschreibend</b>, keine Vorhersage.</p>
+      <p><b>Auffälligkeit</b> markiert Tage, an denen die Bewegung mehr als das 2,5-fache ihrer üblichen Streuung beträgt oder das Niveau über +1,5 liegt. Eine Messung der Gegenwart, kein Warnsignal für die Zukunft.</p>
+      <p><b>Prognose 7 Tage</b> schätzt die Wahrscheinlichkeit, dass der Risikostand in einer Woche über +1,0 liegt — <b>ausschließlich aus der Eigenhistorie des Risikoindex</b>, nicht aus Nachrichtendaten. Daneben steht die auf einem abgetrennten Testfenster gemessene Güte.</p>
+      <p><b>Keine Monatsprognose.</b> Auf 21 Tage Vorlauf liegt selbst das beste Modell auf Zufallsniveau.</p>
+      <p><b>Nachrichten</b> aus GDELT, ausgewählt nach dem negativsten Goldstein-Wert des Tages, Überschriften aus den Quell-URLs abgeleitet. GDELT liefert hier <b>Kontext, keine Prognose</b>: in 47 geprüften Konstellationen war kein Prognosebeitrag nachweisbar.</p>
+    </div>
+  </details>
+
+  <h2 style="display:flex;align-items:center;gap:12px">Alle Länder
+    <a href="#/historie" class="tblbtn" style="margin-left:auto;text-decoration:none">Auffälligkeiten →</a></h2>
+  <div class="grid" id="grid"></div>
+
+  <footer>
+    <p><b>Datengrundlage.</b> Wechselkurse und Aktienindizes über Yahoo Finance, geopolitische Spannung über den Geopolitical Risk Index von Caldara und Iacoviello, Ereignisdaten aus GDELT 2.1. Februar 2023 bis heute, 1.291 Tage.</p>
+    <p><b>Länderauswahl.</b> Nur Länder mit frei gehandelter, marktgestellter Währung. Ausgeschlossen wurden Länder mit fester Bindung (Mali, Irak) oder amtlich gestelltem Kurs (Libanon, Syrien, Jemen, Sudan, Somalia, Iran, Venezuela, Myanmar), weil deren Kurse kein Landesrisiko abbilden.</p>
+    <p><b>Grenzen.</b> Der Monitor beschreibt und erkennt; er prognostiziert nur kurzfristig und nur aus Marktdaten. Prototyp im Rahmen einer Bachelorarbeit, keine Anlage- oder Risikoberatung.</p>
+  </footer>
+</section>
+
+<section id="view-land" hidden></section>
+<section id="view-historie" hidden></section>
+</div>
+<script>
+(async function(){
+let D;
+try{
+  const r = await fetch("dashboard_data.json?v="+Date.now());
+  if(!r.ok) throw new Error(r.status);
+  D = await r.json();
+}catch(e){
+  document.querySelector(".wrap").innerHTML =
+    '<div style="padding:60px 0;text-align:center;color:var(--ink2)">'+
+    '<h1 style="font-size:20px;margin:0 0 10px">Daten nicht erreichbar</h1>'+
+    '<p style="font-size:14px">Die Datei <code>dashboard_data.json</code> konnte nicht geladen werden. '+
+    'Beim lokalen Öffnen bitte einen kleinen Server nutzen: <code>python3 -m http.server</code>.</p></div>';
+  return;
+}
+const KAT = {waehrung:{n:"Währungsdruck",c:"var(--s1)"},markt:{n:"Marktvolatilität",c:"var(--s2)"},geopolitik:{n:"Geopolitik",c:"var(--s3)"}};
+
+function stufe(z){
+  if(z===null||z===undefined) return {l:"keine Daten",c:"var(--ink3)",bg:"var(--sunk)",i:"–"};
+  if(z>=1.5) return {l:"hoch",c:"#fff",bg:"var(--crit)",i:"▲"};
+  if(z>=0.5) return {l:"erhöht",c:"#3a2a08",bg:"var(--warn)",i:"▲"};
+  if(z>=-0.5) return {l:"normal",c:"var(--ink2)",bg:"var(--sunk)",i:"■"};
+  return {l:"ruhig",c:"#fff",bg:"var(--good)",i:"▼"};
+}
+const fmtD = s => { const [y,m,d]=s.split("-"); return d+"."+m+"."+y; };
+const fmtD2 = s => s.slice(6,8)+"."+s.slice(4,6)+".";
+
+function sparkline(vals){
+  const v=vals.filter(x=>x!==null); if(v.length<2) return "";
+  const mn=Math.min(...v), mx=Math.max(...v), r=(mx-mn)||1, W=200,H=34;
+  const pts=vals.map((x,i)=>x===null?null:[i/(vals.length-1)*W,H-2-((x-mn)/r)*(H-6)]);
+  let d="",started=false;
+  pts.forEach(p=>{ if(!p){started=false;return;} d+=(started?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)+" "; started=true; });
+  const last=pts.filter(Boolean).pop();
+  return '<svg class="spark" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" aria-hidden="true">'+
+    '<path d="'+d+'" fill="none" stroke="var(--ink3)" stroke-width="1.5" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>'+
+    '<circle cx="'+last[0].toFixed(1)+'" cy="'+last[1].toFixed(1)+'" r="2.5" fill="var(--ink)"/></svg>';
+}
+
+const grid=document.getElementById("grid");
+const vU=document.getElementById("view-uebersicht"), vL=document.getElementById("view-land"), vH=document.getElementById("view-historie");
+document.getElementById("stand").textContent=fmtD(D.stand);
+const codes=Object.keys(D.laender);
+const nAuff=codes.filter(c=>D.laender[c].auffaellig.slice(-7).some(x=>x===1)).length;
+document.getElementById("anzahl").textContent=codes.length+" Länder · "+(nAuff?nAuff+" mit Auffälligkeit in den letzten 7 Tagen":"keine Auffälligkeit in den letzten 7 Tagen");
+
+codes.sort((a,b)=>D.laender[b].stand_z-D.laender[a].stand_z).forEach(code=>{
+  const L=D.laender[code], s=stufe(L.stand_z);
+  const recent=L.auffaellig.slice(-7).some(x=>x===1);
+  const a=document.createElement("a");
+  a.className="ccard"; a.href="#/land/"+code; a.dataset.code=code;
+  a.innerHTML='<div class="stripe" style="background:'+s.bg+'"></div>'+
+    (recent?'<span class="badge">auffällig</span>':'')+
+    '<div class="cin"><div class="cname"><span>'+L.name+'</span>'+
+    '<span class="cstat" style="background:'+s.bg+';color:'+s.c+'">'+s.i+' '+s.l+'</span></div>'+
+    '<div class="cval">'+(L.stand_z>0?"+":"")+L.stand_z.toFixed(2)+'</div>'+
+    '<div class="cmeta">'+(L.prognose_7t===null?'Prognose noch nicht verfügbar':'Prognose 7 T · '+Math.round(L.prognose_7t*100)+' %')+'</div>'+
+    sparkline(L.risiko)+'</div>';
+  grid.appendChild(a);
+});
+
+function nachrichtenBlock(L){
+  const tage=Object.keys(L.nachrichten).sort().reverse();
+  if(!tage.length) return '<p class="empty" style="padding:0 17px 16px">Für die letzten Tage liegen keine ableitbaren Überschriften vor.</p>';
+  const auffTage=new Set(L.daten.filter((_,i)=>L.auffaellig[i]===1).map(d=>d.replace(/-/g,"")));
+  return tage.map(t=>{
+    const auff=auffTage.has(t);
+    return '<div class="nday"><div class="ndate">'+fmtD2(t)+
+      (auff?' <span style="color:var(--crit)">· auffälliger Tag</span>':"")+'</div>'+
+      L.nachrichten[t].map(n=>'<a class="nitem" href="'+n.url+'" target="_blank" rel="noopener">'+
+        n.titel+'<span class="ng">'+n.gold+'</span></a>').join("")+'</div>';
+  }).join("");
+}
+
+function landSeite(code){
+  const L=D.laender[code], s=stufe(L.stand_z);
+  const kats=Object.keys(L.kategorien);
+  const idx=codes.indexOf(code);
+  const rang=[...codes].sort((a,b)=>D.laender[b].stand_z-D.laender[a].stand_z).indexOf(code)+1;
+
+  vL.innerHTML='<div class="navbar"><button class="back" id="zurueck">‹ Alle Länder</button>'+
+    '<span class="navtitle">'+L.name+'</span>'+
+    '<span class="navstat" style="background:'+s.bg+';color:'+s.c+'">'+s.i+' '+s.l+'</span></div>'+
+
+    '<div class="hero"><div class="herolab">Risikostand · '+fmtD(L.stand_datum)+'</div>'+
+    '<div class="heroval" style="color:'+(L.stand_z>=0.5?"var(--crit)":"var(--ink)")+'">'+
+      (L.stand_z>0?"+":"")+L.stand_z.toFixed(2)+'</div>'+
+    '<p class="heronote">Abweichung vom eigenen Normalzustand der letzten 120 Tage. '+
+      'Platz '+rang+' von '+codes.length+' im heutigen Vergleich. Beschreibend, keine Vorhersage.</p></div>'+
+
+    '<div class="kpis">'+
+    '<div class="kbox"><div class="klab">Prognose 7 Tage</div><div class="kval">'+Math.round(L.prognose_7t*100)+' %</div>'+
+      '<div class="knote">Güte AUC '+L.prognose_auc.toFixed(2)+' · nur Marktdaten, ohne GDELT</div></div>'+
+    '<div class="kbox"><div class="klab">Auffällige Tage</div><div class="kval">'+L.auffaellig.reduce((a,b)=>a+b,0)+'</div>'+
+      '<div class="knote">von '+L.daten.length+' gezeigten Tagen</div></div></div>'+
+
+    '<div class="sect"><div class="secthead"><h3 class="secttitle">Verlauf nach Kategorie</h3>'+
+      '<button class="tblbtn" id="tbtn">Tabelle</button></div>'+
+      '<p class="sectnote">Alle Kurven als z-Werte, dadurch untereinander vergleichbar.</p>'+
+      '<div class="vizwrap"><div class="legend">'+
+      '<span class="lg"><span class="lgm" style="background:var(--ink)"></span>Gesamtrisiko</span>'+
+      kats.map(k=>'<span class="lg"><span class="lgm" style="background:'+KAT[k].c+'"></span>'+KAT[k].n+'</span>').join("")+
+      '<span class="lg"><span class="lgm" style="background:var(--crit);opacity:.3"></span>auffälliger Tag</span></div>'+
+      '<div style="position:relative" id="cwrap">'+chart(L)+'<div class="tip" id="tip"></div></div>'+
+      '<div id="tbl" hidden>'+tabelle(L)+'</div></div></div>'+
+
+    '<div class="sect"><div class="secthead"><h3 class="secttitle">Aktuelle Ereignisse</h3></div>'+
+      '<p class="sectnote">Meldungen mit dem stärksten Konfliktbezug je Tag, neueste zuerst. '+
+      'Die Zahl rechts ist der Goldstein-Wert — je negativer, desto konfliktträchtiger. '+
+      'Überschriften aus den Quell-URLs abgeleitet.</p>'+
+      '<div class="news">'+nachrichtenBlock(L)+'</div></div>';
+
+  document.getElementById("zurueck").onclick=()=>{location.hash="#/";};
+  const btn=document.getElementById("tbtn"), tbl=document.getElementById("tbl"),
+        viz=document.querySelector("#cwrap");
+  btn.onclick=()=>{ const zeigen=tbl.hidden; tbl.hidden=!zeigen; viz.parentElement.querySelector("#cwrap").hidden=zeigen;
+    btn.textContent=zeigen?"Diagramm":"Tabelle"; };
+  hover(L);
+}
+
+function hover(L){
+  const kats=Object.keys(L.kategorien);
+  const svg=document.querySelector("#cwrap svg"), tip=document.getElementById("tip"),
+        cross=svg.querySelector("#cross"), wrap=document.getElementById("cwrap");
+  const W=760,PL=34,PR=14;
+  function move(ev){
+    const r=svg.getBoundingClientRect();
+    const cx=(ev.touches?ev.touches[0].clientX:ev.clientX)-r.left;
+    let i=Math.round(((cx/r.width*W)-PL)/(W-PL-PR)*(L.daten.length-1));
+    i=Math.max(0,Math.min(L.daten.length-1,i));
+    const px=PL+i/(L.daten.length-1)*(W-PL-PR);
+    cross.setAttribute("x1",px.toFixed(1)); cross.setAttribute("x2",px.toFixed(1));
+    cross.setAttribute("opacity",".55");
+    tip.innerHTML='<b>'+fmtD(L.daten[i])+'</b>'+
+      '<div class="tiprow"><span>Gesamt</span><span>'+(L.risiko[i]===null?"–":(L.risiko[i]>0?"+":"")+L.risiko[i].toFixed(2))+'</span></div>'+
+      kats.map(k=>'<div class="tiprow"><span style="color:'+KAT[k].c+'">'+KAT[k].n+'</span><span>'+
+        (L.kategorien[k][i]===null?"–":(L.kategorien[k][i]>0?"+":"")+L.kategorien[k][i].toFixed(2))+'</span></div>').join("")+
+      (L.auffaellig[i]?'<div class="tiprow" style="color:var(--crit)"><span>auffälliger Tag</span><span></span></div>':"");
+    tip.style.opacity="1";
+    const tw=tip.offsetWidth;
+    tip.style.left=Math.max(0,Math.min(wrap.offsetWidth-tw,cx-tw/2))+"px";
+    tip.style.top="6px";
+  }
+  svg.addEventListener("mousemove",move);
+  svg.addEventListener("touchmove",move,{passive:true});
+  svg.addEventListener("mouseleave",()=>{tip.style.opacity="0";cross.setAttribute("opacity","0")});
+}
+
+function historieSeite(){
+  const h=D.auffaelligkeiten||[];
+  const nachTag={};
+  h.forEach(x=>{ (nachTag[x.datum]=nachTag[x.datum]||[]).push(x); });
+  const tage=Object.keys(nachTag).sort().reverse();
+  let inhalt = tage.length ? tage.map(t=>{
+    const eintr=nachTag[t].sort((a,b)=>b.z-a.z);
+    return '<div class="nday"><div class="ndate">'+fmtD(t)+'</div>'+
+      eintr.map(e=>{
+        const s=stufe(e.z);
+        return '<a class="nitem" href="#/land/'+e.code+'" style="display:flex;justify-content:space-between;gap:12px;align-items:center">'+
+          '<span>'+e.land+'</span>'+
+          '<span class="cstat" style="background:'+s.bg+';color:'+s.c+'">'+(e.z>0?"+":"")+e.z.toFixed(2)+'</span></a>';
+      }).join("")+'</div>';
+  }).join("") : '<p class="empty">Bislang keine Auffälligkeiten erfasst. Die Historie füllt sich mit jedem täglichen Lauf.</p>';
+
+  vH.innerHTML='<div class="navbar"><button class="back" id="zurueck2">‹ Alle Länder</button>'+
+    '<span class="navtitle">Auffälligkeiten</span></div>'+
+    '<div class="sect"><div class="secthead"><h3 class="secttitle">Chronologie</h3></div>'+
+    '<p class="sectnote">Tage, an denen ein Land ungewöhnlich stark von seinem Normalzustand abwich — '+
+    'entweder durch eine Bewegung über dem 2,5-fachen der üblichen Streuung oder durch ein Niveau über +1,5. '+
+    'Antippen öffnet das Land.</p><div class="news">'+inhalt+'</div></div>';
+  document.getElementById("zurueck2").onclick=()=>{location.hash="#/";};
+}
+
+function route(){
+  const m=location.hash.match(/^#\/land\/([A-Z]{2})$/);
+  vU.hidden=true; vL.hidden=true; vH.hidden=true;
+  if(m && D.laender[m[1]]){
+    vL.hidden=false; landSeite(m[1]); window.scrollTo(0,0);
+  }else if(location.hash==="#/historie"){
+    vH.hidden=false; historieSeite(); window.scrollTo(0,0);
+  }else{
+    vU.hidden=false; vL.innerHTML=""; vH.innerHTML="";
+  }
+}
+window.addEventListener("hashchange",route);
+route();
+})();
+</script>
+
+</body>
+</html>
