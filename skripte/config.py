@@ -47,6 +47,7 @@ PROGNOSE_SCHWELLE = 1.0   # z-Wert, ab dem als "erhoeht" gilt
 AUFF_BEWEGUNG = 2.5       # Vielfaches der ueblichen Tagesstreuung
 AUFF_NIVEAU = 1.5         # z-Wert, ab dem der Status "hoch" lautet
                           # (steuert die Statusanzeige, nicht die Auffaelligkeit)
+MAX_BAUSTEIN_ALTER = 30   # Baustein gilt als tot, wenn er so lange nicht mehr fortgeschrieben wurde
 MIN_BAUSTEIN_TAGE = 250   # Mindesthistorie, damit ein Baustein verwendet wird
                           # (Yahoo fuehrt manche Symbole ohne Historie)
 FFILL_TAGE = 5            # Tage, ueber die ein fehlender Baustein fortgeschrieben wird
@@ -54,3 +55,74 @@ FFILL_TAGE = 5            # Tage, ueber die ein fehlender Baustein fortgeschrieb
 TAGE_ANZEIGE = 200
 NEWS_TAGE = 45
 NACHLAUF_TAGE = 4         # GDELT-Tage, die je Lauf nachgeladen werden
+
+
+# ---------------------------------------------------------------- Steckbrief
+# FIPS 10-4 (GDELT) -> ISO 3166-1 alpha-2 (Weltbank). Die beiden Systeme
+# stimmen bei den meisten Laendern NICHT ueberein -- Deutschland ist bei
+# GDELT "GM", bei der Weltbank "DE"; Russland "RS" gegen "RU". Ohne diese
+# Tabelle zieht man Daten des falschen Landes, und zwar lautlos.
+ISO2 = {"IS": "IL", "RS": "RU", "UP": "UA", "NI": "NG", "PK": "PK",
+        "TW": "TW", "TU": "TR", "BR": "BR", "SF": "ZA", "IN": "IN",
+        "MX": "MX", "EG": "EG", "US": "US", "GM": "DE"}
+
+# Kurzeinordnung: worauf die Wirtschaft des Landes ruht und was sie
+# verwundbar macht. Bewusst fest hinterlegt und nicht generiert -- eine
+# Beschreibung, die sich taeglich aendert, ist keine Einordnung.
+UEBERBLICK = {
+    "IS": "Hoch entwickelte, technologiegetriebene Volkswirtschaft mit starkem "
+          "Export- und Rüstungssektor. Das wirtschaftliche Risiko ist weniger "
+          "strukturell als sicherheitspolitisch: regionale Eskalation schlägt "
+          "unmittelbar auf Schekel und Kapitalzuflüsse durch.",
+    "RS": "Rohstoffexporteur mit starker Abhängigkeit von Öl- und Gaseinnahmen. "
+          "Seit 2022 weitgehend vom westlichen Finanzsystem abgeschnitten; "
+          "Wechselkurs und Kapitalverkehr werden administrativ gesteuert, "
+          "wodurch Marktpreise nur eingeschränkt Risiko abbilden.",
+    "UP": "Kriegswirtschaft mit hoher Abhängigkeit von externer Finanzierung. "
+          "Agrarexporte und die Verfügbarkeit der Schwarzmeerrouten bestimmen "
+          "einen großen Teil der Deviseneinnahmen.",
+    "NI": "Größte Volkswirtschaft Afrikas, stark ölabhängig bei gleichzeitig "
+          "breiter informeller Wirtschaft. Devisenknappheit und wiederholte "
+          "Naira-Abwertungen sind das zentrale Unternehmensrisiko.",
+    "PK": "Chronische Zahlungsbilanzprobleme, wiederkehrende IWF-Programme und "
+          "hohe Inflation. Politische Instabilität und Sicherheitslage im "
+          "Grenzgebiet wirken direkt auf Investitionsklima und Rupie.",
+    "TW": "Zentrum der globalen Halbleiterfertigung und damit ein singulärer "
+          "Knotenpunkt internationaler Lieferketten. Das dominierende Risiko "
+          "ist geopolitisch, nicht wirtschaftlich.",
+    "TU": "Große Schwellenvolkswirtschaft mit Industrie- und Tourismusstandbein. "
+          "Unorthodoxe Geldpolitik und wiederkehrende Lira-Krisen machen "
+          "Währungsrisiko zum bestimmenden Faktor.",
+    "BR": "Rohstoff- und Agrarexporteur mit großem Binnenmarkt. Fiskalpolitik "
+          "und Zinsniveau treiben die Real-Volatilität; politische Zyklen "
+          "schlagen deutlich auf die Kapitalmärkte durch.",
+    "SF": "Industrialisierteste Volkswirtschaft Afrikas mit Bergbau als "
+          "Exportbasis. Strukturprobleme — Stromversorgung, Arbeitslosigkeit, "
+          "Staatsunternehmen — begrenzen das Wachstum dauerhaft.",
+    "IN": "Schnell wachsende Volkswirtschaft mit starkem Dienstleistungssektor "
+          "und wachsender Fertigung. Energieimportabhängigkeit und "
+          "Kapitalflussvolatilität sind die Hauptkanäle externer Schocks.",
+    "MX": "Eng mit der US-Wirtschaft verflochten (USMCA); Fertigung und "
+          "Nearshoring tragen das Wachstum. Sicherheitslage und "
+          "US-Handelspolitik sind die beiden großen Unsicherheitsquellen.",
+    "EG": "Bevölkerungsreichstes Land der arabischen Welt, abhängig von "
+          "Suezkanal-Einnahmen, Tourismus und Überweisungen. Wiederholte "
+          "Abwertungen und hohe Inflation prägen das Unternehmensumfeld.",
+    "US": "Größte Volkswirtschaft der Welt und Referenzpunkt für globale "
+          "Kapitalmärkte. Risiko wirkt hier weniger als Länderrisiko denn als "
+          "Ausstrahlung: US-Zins- und Handelspolitik bewegt alle anderen.",
+    "GM": "Exportorientierte Industrievolkswirtschaft mit Schwerpunkt "
+          "Automobil, Maschinenbau und Chemie. Verwundbar über Energiepreise, "
+          "Lieferketten und die Nachfrage aus China.",
+}
+
+# Weltbank-Indikatoren fuer den Steckbrief.
+WB_INDIKATOREN = {
+    "bevoelkerung": ("SP.POP.TOTL", "Bevölkerung"),
+    "flaeche": ("AG.SRF.TOTL.K2", "Fläche"),
+    "bip_kopf": ("NY.GDP.PCAP.CD", "BIP pro Kopf"),
+    "wachstum": ("NY.GDP.MKTP.KD.ZG", "BIP-Wachstum"),
+    "inflation": ("FP.CPI.TOTL.ZG", "Inflation"),
+}
+WB_URL = "https://api.worldbank.org/v2"
+PROFIL_ALTER_TAGE = 30   # Jahresdaten -- oefter abzufragen waere sinnlos

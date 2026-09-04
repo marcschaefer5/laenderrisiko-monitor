@@ -1,0 +1,291 @@
+{
+ "IS": {
+  "bevoelkerung": {
+   "wert": 10122800.0,
+   "jahr": "2025"
+  },
+  "flaeche": {
+   "wert": 22070.0,
+   "jahr": "2023"
+  },
+  "bip_kopf": {
+   "wert": 60336.8477964194,
+   "jahr": "2025"
+  },
+  "wachstum": {
+   "wert": 2.93114966387968,
+   "jahr": "2025"
+  },
+  "inflation": {
+   "wert": 3.0414132155654,
+   "jahr": "2025"
+  }
+ },
+ "RS": {
+  "bevoelkerung": {
+   "wert": 143513328.0,
+   "jahr": "2025"
+  },
+  "flaeche": {
+   "wert": 17125190.0,
+   "jahr": "2023"
+  },
+  "bip_kopf": {
+   "wert": 17546.609375,
+   "jahr": "2025"
+  },
+  "wachstum": {
+   "wert": 1.00117656925738,
+   "jahr": "2025"
+  },
+  "inflation": {
+   "wert": 8.71986939402666,
+   "jahr": "2025"
+  }
+ },
+ "UP": {
+  "bevoelkerung": {
+   "wert": 38980376.0,
+   "jahr": "2025"
+  },
+  "flaeche": {
+   "wert": 603550.0,
+   "jahr": "2023"
+  },
+  "bip_kopf": {
+   "wert": 5865.884765625,
+   "jahr": "2025"
+  },
+  "wachstum": {
+   "wert": 1.82152376756284,
+   "jahr": "2025"
+  },
+  "inflation": {
+   "wert": 12.7303341026903,
+   "jahr": "2025"
+  }
+ },
+ "NI": {
+  "bevoelkerung": {
+   "wert": 237527782.0,
+   "jahr": "2025"
+  },
+  "flaeche": {
+   "wert": 923770.0,
+   "jahr": "2023"
+  },
+  "bip_kopf": {
+   "wert": 1224.25410237743,
+   "jahr": "2025"
+  },
+  "wachstum": {
+   "wert": 4.01336180700973,
+   "jahr": "2025"
+  },
+  "inflation": {
+   "wert": 23.0101235833333,
+   "jahr": "2025"
+  }
+ },
+ "PK": {
+  "bevoelkerung": {
+   "wert": 255219554.0,
+   "jahr": "2025"
+  },
+  "flaeche": {
+   "wert": 796100.0,
+   "jahr": "2023"
+  },
+  "bip_kopf": {
+   "wert": 1595.90912252837,
+   "jahr": "2025"
+  },
+  "wachstum": {
+   "wert": 3.69842668749033,
+   "jahr": "2025"
+  },
+  "inflation": {
+   "wert": 3.54555214890893,
+   "jahr": "2025"
+  }
+ },
+ "TW": {},
+ "TU": {
+  "bevoelkerung": {
+   "wert": 85878556.0,
+   "jahr": "2025"
+  },
+  "flaeche": {
+   "wert": 785350.0,
+   "jahr": "2023"
+  },
+  "bip_kopf": {
+   "wert": 18599.4420922378,
+   "jahr": "2025"
+  },
+  "wachstum": {
+   "wert": 3.60462514082589,
+   "jahr": "2025"
+  },
+  "inflation": {
+   "wert": 34.8811629820306,
+   "jahr": "2025"
+  }
+ },
+ "BR": {
+  "bevoelkerung": {
+   "wert": 212812405.0,
+   "jahr": "2025"
+  },
+  "flaeche": {
+   "wert": 8510420.0,
+   "jahr": "2023"
+  },
+  "bip_kopf": {
+   "wert": 10713.2856869511,
+   "jahr": "2025"
+  },
+  "wachstum": {
+   "wert": 2.2857464902475,
+   "jahr": "2025"
+  },
+  "inflation": {
+   "wert": 5.01675279604836,
+   "jahr": "2025"
+  }
+ },
+ "SF": {
+  "bevoelkerung": {
+   "wert": 64747319.0,
+   "jahr": "2025"
+  },
+  "flaeche": {
+   "wert": 1219090.0,
+   "jahr": "2023"
+  },
+  "bip_kopf": {
+   "wert": 6597.71450918774,
+   "jahr": "2025"
+  },
+  "wachstum": {
+   "wert": 1.11462608103956,
+   "jahr": "2025"
+  },
+  "inflation": {
+   "wert": 3.20550474112603,
+   "jahr": "2025"
+  }
+ },
+ "IN": {
+  "bevoelkerung": {
+   "wert": 1463865525.0,
+   "jahr": "2025"
+  },
+  "flaeche": {
+   "wert": 3287260.0,
+   "jahr": "2023"
+  },
+  "bip_kopf": {
+   "wert": 2702.47987141553,
+   "jahr": "2025"
+  },
+  "wachstum": {
+   "wert": 7.56666179284244,
+   "jahr": "2025"
+  },
+  "inflation": {
+   "wert": 2.39884954182294,
+   "jahr": "2025"
+  }
+ },
+ "MX": {
+  "bevoelkerung": {
+   "wert": 131946900.0,
+   "jahr": "2025"
+  },
+  "flaeche": {
+   "wert": 1957193.9,
+   "jahr": "2023"
+  },
+  "bip_kopf": {
+   "wert": 13889.2339628708,
+   "jahr": "2025"
+  },
+  "wachstum": {
+   "wert": 0.561683456144578,
+   "jahr": "2025"
+  },
+  "inflation": {
+   "wert": 3.80668650726485,
+   "jahr": "2025"
+  }
+ },
+ "EG": {
+  "bevoelkerung": {
+   "wert": 118365995.0,
+   "jahr": "2025"
+  },
+  "flaeche": {
+   "wert": 1001450.0,
+   "jahr": "2023"
+  },
+  "bip_kopf": {
+   "wert": 3085.80712036204,
+   "jahr": "2025"
+  },
+  "wachstum": {
+   "wert": 4.39201068570188,
+   "jahr": "2025"
+  },
+  "inflation": {
+   "wert": 14.0735136645934,
+   "jahr": "2025"
+  }
+ },
+ "US": {
+  "bevoelkerung": {
+   "wert": 341784857.0,
+   "jahr": "2025"
+  },
+  "flaeche": {
+   "wert": 9831510.0,
+   "jahr": "2023"
+  },
+  "bip_kopf": {
+   "wert": 90026.5163005744,
+   "jahr": "2025"
+  },
+  "wachstum": {
+   "wert": 2.16138195623856,
+   "jahr": "2025"
+  },
+  "inflation": {
+   "wert": 2.94952520485207,
+   "jahr": "2024"
+  }
+ },
+ "GM": {
+  "bevoelkerung": {
+   "wert": 83491249.0,
+   "jahr": "2025"
+  },
+  "flaeche": {
+   "wert": 357680.0,
+   "jahr": "2023"
+  },
+  "bip_kopf": {
+   "wert": 60496.4350820414,
+   "jahr": "2025"
+  },
+  "wachstum": {
+   "wert": 0.239578342117881,
+   "jahr": "2025"
+  },
+  "inflation": {
+   "wert": 2.17178770949721,
+   "jahr": "2025"
+  }
+ },
+ "_stand": "2026-09-04",
+ "_quelle": "Weltbank, World Development Indicators"
+}

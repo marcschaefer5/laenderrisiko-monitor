@@ -39,16 +39,20 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import roc_auc_score
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from config import (LAENDER, GPR_URL, GDELT_MASTER, ESKALATION, VOL_FENSTER,
+from gdelt_merkmale import MERKMALE as G_MERKMALE, gdelt_merkmale
+from krisen import krisen
+from weltbank import profil
+from config import (LAENDER, UEBERBLICK, WB_INDIKATOREN, GPR_URL, GDELT_MASTER, ESKALATION, VOL_FENSTER,
                     NORM_FENSTER, PROGNOSE_HORIZONT, PROGNOSE_SCHWELLE,
                     AUFF_BEWEGUNG, AUFF_NIVEAU, TAGE_ANZEIGE, NEWS_TAGE,
-                    NACHLAUF_TAGE, FFILL_TAGE, MIN_BAUSTEIN_TAGE)
+                    NACHLAUF_TAGE, FFILL_TAGE, MIN_BAUSTEIN_TAGE,
+                    MAX_BAUSTEIN_ALTER)
 
 WURZEL = Path(__file__).resolve().parent.parent
 DATEN, DOCS = WURZEL / "daten", WURZEL / "docs"
 DATEN.mkdir(exist_ok=True); DOCS.mkdir(exist_ok=True)
 UA = "Mozilla/5.0 (X11; Linux x86_64)"
-KEEP = ["C1", "C28", "C30", "C34", "C60"]
+KEEP_FEST = ["C1", "C28", "C30", "C34"]
 TARGET = set(LAENDER)
 
 
@@ -70,8 +74,43 @@ def holen(url: str, versuche: int = 3, timeout: int = 90) -> bytes | None:
 
 # ---------------------------------------------------------------- GDELT
 def geo_indizes(n: int) -> tuple[int, int, int]:
-    """Geo-CountryCodes positionsbasiert vom rechten Rand -- wie in D2/D24."""
-    return (n - 24 + 2, n - 16 + 2, n - 8 + 2)
+    """Geo-CountryCodes positionsbasiert vom rechten Rand -- wie in D2/D24.
+
+    Von hinten gerechnet: die letzten beiden Felder sind DATEADDED und
+    SOURCEURL, davor liegen drei Geo-Bloecke à 8 Feldern (Actor1Geo,
+    Actor2Geo, ActionGeo). Der CountryCode ist jeweils das dritte Feld im
+    Block, also Blockanfang + 2.
+
+        dateadded = n - 2
+        ActionGeo beginnt bei dateadded - 8   -> CountryCode = n - 8
+        Actor2Geo beginnt bei dateadded - 16  -> CountryCode = n - 16
+        Actor1Geo beginnt bei dateadded - 24  -> CountryCode = n - 24
+
+    Bei n = 61 sind das 37, 45, 53 -- nachgemessen an einer echten Datei.
+    In einer frueheren Fassung stand hier faelschlich "n - 24 + 2", weil das
+    "+2" aus D2 uebernommen, das "- 2" fuer DATEADDED aber vergessen wurde.
+    Die Indizes zeigten damit auf ADM2Code statt CountryCode. Dort stehen
+    Werte wie "CA037" oder "18585", die nie einem Laendercode entsprechen --
+    also kein Fehler, keine Ausnahme, sondern lautlos null Treffer.
+    """
+    return (n - 24, n - 16, n - 8)
+
+
+def url_spalte(chunk: pd.DataFrame, n: int) -> str | None:
+    """Findet die SOURCEURL-Spalte, statt sie auf C60 festzunageln.
+
+    GDELT-Exportdateien enden mit DATEADDED und SOURCEURL. Die Spaltenzahl
+    ist aber nicht garantiert konstant -- taucht auch nur eine Spalte mehr
+    auf, ist C60 nicht mehr die URL, sondern das Datum. Genau das war der
+    Grund, warum nachrichten.json leer blieb: die Aggregate stimmten, aber
+    slug_zu_titel() bekam Zahlen statt Adressen und gab jedes Mal None
+    zurueck. Deshalb wird die Spalte jetzt am Inhalt erkannt.
+    """
+    for i in range(n - 1, max(n - 6, -1), -1):
+        sp = chunk[f"C{i}"].dropna().astype(str)
+        if len(sp) and sp.str.startswith("http").mean() > 0.5:
+            return f"C{i}"
+    return None
 
 
 def slug_zu_titel(url: str) -> str | None:
@@ -87,6 +126,15 @@ def slug_zu_titel(url: str) -> str | None:
     s = re.sub(r"-?id\d+$|-?\d{6,}$", "", s)
     w = [x for x in s.split("-") if x and not x.isdigit()]
     if len(w) < 4:
+        return None
+    # Kennungen aussortieren. Viele Redaktionssysteme bauen die URL aus einer
+    # UUID ("article_26410ca0-15b1-40bf-9df9-facb65c7a7ae"). Der Slug hat dann
+    # genug Bestandteile, ergibt aber keinen Text. Kriterium: ueberwiegend
+    # Wortteile ohne Vokal oder mit Ziffern darin -- so lesen sich Kennungen,
+    # nicht Ueberschriften.
+    def wortartig(x: str) -> bool:
+        return x.isalpha() and any(v in x.lower() for v in "aeiouäöüy")
+    if sum(wortartig(x) for x in w) < max(3, len(w) * 0.6):
         return None
     t = " ".join(w).strip()
     return t[:1].upper() + t[1:]
@@ -112,7 +160,7 @@ def gdelt_nachladen(tage: int) -> tuple[pd.DataFrame, dict]:
         urls = sorted(set(nach_tag[tag]))
         with ThreadPoolExecutor(max_workers=6) as ex:
             rohe = list(ex.map(holen, urls))
-        teile = []
+        teile, fehler = [], []
         for roh in rohe:
             if roh is None:
                 continue
@@ -134,14 +182,30 @@ def gdelt_nachladen(tage: int) -> tuple[pd.DataFrame, dict]:
                             treffer = g.isin(TARGET).any(axis=1)
                             if not treffer.any():
                                 continue
-                            sub = chunk.loc[treffer, KEEP].copy()
+                            us = url_spalte(chunk, n)
+                            sub = chunk.loc[treffer, KEEP_FEST + ([us] if us else [])].copy()
+                            if us:
+                                sub = sub.rename(columns={us: "surl"})
+                            else:
+                                sub["surl"] = ""
                             sub["G1"], sub["G2"], sub["G3"] = (g.loc[treffer].iloc[:, 0],
                                                                g.loc[treffer].iloc[:, 1],
                                                                g.loc[treffer].iloc[:, 2])
                             teile.append(sub)
-            except Exception:
+            except Exception as e:
+                fehler.append(f"{type(e).__name__}: {e}")
                 continue
+        ok = sum(1 for r in rohe if r is not None)
+        if ok and not teile and not fehler:
+            log(f"      [WARN] {tag}: {ok} Dateien gelesen, aber KEINE Zeile "
+                f"traf ein Zielland -- Geo-Spalten pruefen "
+                f"(skripte/diagnose_gdelt.py)")
+        if fehler:
+            log(f"      [WARN] {tag}: {len(fehler)} Datei(en) uebersprungen "
+                f"-- erste Ursache: {fehler[0][:160]}")
         if not teile:
+            log(f"      [WARN] {tag}: keine verwertbaren Zeilen "
+                f"({ok}/{len(urls)} Dateien geladen)")
             continue
         d = pd.concat(teile, ignore_index=True)
         d["date"] = pd.to_datetime(d.C1, format="%Y%m%d", errors="coerce")
@@ -149,6 +213,26 @@ def gdelt_nachladen(tage: int) -> tuple[pd.DataFrame, dict]:
         d["gold"] = pd.to_numeric(d.C30, errors="coerce")
         d["tone"] = pd.to_numeric(d.C34, errors="coerce")
         d = d.dropna(subset=["date"])
+
+        # Nur Ereignisse aus dem geladenen Zeitfenster behalten.
+        #
+        # C1 (SQLDATE) ist das EREIGNISDATUM, nicht das Meldedatum. Eine Datei
+        # von heute enthaelt regelmaessig Rueckblicke auf Ereignisse von 2016.
+        # Ohne Filter wandern die in die Tagesaggregate und erzeugen dort
+        # Einzeltage in laengst abgeschlossenen Zeitraeumen -- im Bestand
+        # standen dadurch Brasilien und Aegypten mit je zwoelf Tagen, verstreut
+        # ueber ein Jahr, statt mit einer zusammenhaengenden Reihe. Fuer den
+        # taeglichen Nachlauf zaehlt nur, was in den geladenen Tagen passiert
+        # ist; die Historie kommt aus der Erstbefuellung.
+        fenster = pd.Timestamp(min(letzte)) - pd.Timedelta(days=1)
+        vorher = len(d)
+        d = d[d.date >= fenster]
+        if vorher - len(d):
+            log(f"      {tag}: {vorher - len(d):,} Rueckblick-Ereignisse ausserhalb "
+                f"des Fensters verworfen")
+        if d.empty:
+            continue
+
         geo = d[["G1", "G2", "G3"]]
         for code in LAENDER:
             t = d.loc[geo.eq(code).any(axis=1)]
@@ -165,17 +249,18 @@ def gdelt_nachladen(tage: int) -> tuple[pd.DataFrame, dict]:
             # Nachrichten: staerkster Konfliktbezug des Tages
             eintraege, gesehen = [], set()
             for _, r in t.nsmallest(60, "gold").iterrows():
-                titel = slug_zu_titel(str(r.C60))
+                titel = slug_zu_titel(str(r.surl))
                 if not titel or titel.lower() in gesehen:
                     continue
                 gesehen.add(titel.lower())
-                eintraege.append({"titel": titel, "url": str(r.C60),
+                eintraege.append({"titel": titel, "url": str(r.surl),
                                   "gold": round(float(r.gold), 1)})
                 if len(eintraege) >= 5:
                     break
             if eintraege:
                 news[code][tag] = eintraege
-        log(f"      {tag}: {len(d):,} Zeilen verdichtet")
+        log(f"      {tag}: {len(d):,} Zeilen verdichtet, "
+            f"{sum(len(v[tag]) for v in news.values() if tag in v)} Überschriften")
     return (pd.concat(agg, ignore_index=True) if agg else pd.DataFrame()), dict(news)
 
 
@@ -226,26 +311,43 @@ def risikoreihe(code: str, gpr: pd.DataFrame) -> pd.DataFrame | None:
     diese Regel haette Aegypten das Land gekostet statt nur die
     Marktkomponente.
     """
+    def lebt(df: pd.DataFrame, was: str) -> bool:
+        """Prueft, ob eine Reihe noch fortgeschrieben wird.
+
+        Laenge allein reicht nicht: der Moskauer Aktienindex IMOEX.ME hat
+        ueber 600 Tage Historie, endet bei Yahoo aber am 14.06.2024. Weil der
+        Index nur vollstaendige Tage ausweist, hat diese eine tote Reihe die
+        gesamte Russland-Kurve auf 2024 eingefroren. Eine Reihe, die laenger
+        als MAX_BAUSTEIN_ALTER Tage stillsteht, wird deshalb wie ein zu
+        kurzer Baustein behandelt: sie faellt weg, das Land bleibt.
+        """
+        alter = (pd.Timestamp.today().normalize() - df.date.max()).days
+        if alter > MAX_BAUSTEIN_ALTER:
+            log(f"      [INFO] {code}: {was} endet am "
+                f"{df.date.max():%Y-%m-%d} ({alter} Tage alt) — Baustein entfällt")
+            return False
+        return True
+
     teile = []
     f = DATEN / f"fx_{code}.csv"
     if f.exists():
         fx = pd.read_csv(f, sep=";", parse_dates=["date"]).sort_values("date")
-        if len(fx) >= MIN_BAUSTEIN_TAGE:
+        if len(fx) >= MIN_BAUSTEIN_TAGE and lebt(fx, "Währungsreihe"):
             r = np.log(fx.close).diff()
             fx["v"] = r.rolling(VOL_FENSTER).std(ddof=0) * np.sqrt(252)
             fx["a"] = np.log(fx.close).diff(VOL_FENSTER)
             za = ((fx.v - fx.v.mean()) / fx.v.std() + (fx.a - fx.a.mean()) / fx.a.std()) / 2
             teile.append(pd.DataFrame({"date": fx.date, "waehrung": za}))
         else:
-            log(f"      [INFO] {code}: Währungsreihe zu kurz ({len(fx)} Tage) — Baustein entfällt")
+            log(f"      [INFO] {code}: Währungsreihe nicht nutzbar ({len(fx)} Tage) — Baustein entfällt") if len(fx) < MIN_BAUSTEIN_TAGE else None
     a = DATEN / f"aktien_{code}.csv"
     if a.exists():
         ak = pd.read_csv(a, sep=";", parse_dates=["date"]).sort_values("date")
-        if len(ak) >= MIN_BAUSTEIN_TAGE:
+        if len(ak) >= MIN_BAUSTEIN_TAGE and lebt(ak, "Aktienreihe"):
             v = np.log(ak.close).diff().rolling(VOL_FENSTER).std(ddof=0) * np.sqrt(252)
             teile.append(pd.DataFrame({"date": ak.date, "markt": (v - v.mean()) / v.std()}))
         else:
-            log(f"      [INFO] {code}: Aktienreihe zu kurz ({len(ak)} Tage) — Baustein entfällt")
+            log(f"      [INFO] {code}: Aktienreihe nicht nutzbar ({len(ak)} Tage) — Baustein entfällt") if len(ak) < MIN_BAUSTEIN_TAGE else None
     if not teile:
         return None
     d = teile[0]
@@ -278,25 +380,69 @@ def risikoreihe(code: str, gpr: pd.DataFrame) -> pd.DataFrame | None:
     return d.reset_index(drop=True)
 
 
-def prognose(d: pd.DataFrame) -> tuple[float | None, float | None]:
-    d = d.copy()
-    d["z_d1"] = d.z.diff(); d["r_d1"] = d.risiko.diff(); d["r_d5"] = d.risiko.diff(5)
-    F = ["z", "z_d1", "r_d1", "r_d5"]
+def prognose(d: pd.DataFrame, merkmale: list[str]
+             ) -> tuple[float | None, float | None]:
+    """Wahrscheinlichkeit erhoehter Anspannung in PROGNOSE_HORIZONT Tagen.
+
+    Zurueck kommen ZWEI Zahlen: die Vorhersage fuer heute und die AUC aus
+    dem letzten 30-Prozent-Zeitfenster, das im Training nicht vorkam. Die
+    zweite Zahl wird im Dashboard immer neben der ersten ausgewiesen -- eine
+    Prognose ohne ihre gemessene Guete ist eine Behauptung.
+
+    Die Merkmalsliste wird uebergeben, damit dieselbe Funktion das
+    Marktmodell und das GDELT-Modell rechnet. Wuerden beide getrennt
+    implementiert, waere jeder Unterschied im Ergebnis nicht mehr eindeutig
+    auf die Merkmale zurueckzufuehren.
+    """
+    F = [m for m in merkmale if m in d.columns]
+    if not F:
+        return None, None
     dd = d.dropna(subset=F)
     y = (dd.z.shift(-PROGNOSE_HORIZONT) >= PROGNOSE_SCHWELLE).astype(float)
     train = dd.assign(y=y).dropna(subset=["y"])
     if len(train) < 400 or train.y.nunique() < 2:
         return None, None
-    k = int(len(train) * 0.7)
-    guete = None
-    tr, te = train.iloc[:k], train.iloc[k:]
-    if te.y.nunique() > 1:
-        sc = StandardScaler().fit(tr[F])
-        m = LogisticRegression(class_weight="balanced", max_iter=4000).fit(sc.transform(tr[F]), tr.y)
-        guete = round(float(roc_auc_score(te.y, m.predict_proba(sc.transform(te[F]))[:, 1])), 3)
+    # Guete im expandierenden Zeitfenster, NICHT aus einem einzelnen
+    # 70/30-Schnitt. Ein Einmal-Split misst das Modell an genau einer
+    # Zeitperiode; faellt die zufaellig guenstig aus, steht im Dashboard eine
+    # geschoente Zahl. Beim ersten Lauf war das sichtbar: das Ereignismodell
+    # fuer Israel kam auf 0,81, waehrend derselbe Merkmalssatz im
+    # Modellvergleich (vergleich_gdelt.py, expandierendes Fenster) 0,62
+    # erreichte. Zwei verschiedene Zahlen fuer dasselbe Modell sind nicht
+    # erklaerbar -- deshalb rechnen jetzt beide Stellen identisch.
+    y = train.y.to_numpy()
+    X = train[F]
+    vorher = np.full(len(y), np.nan)
+    for a in range(int(len(y) * 0.5), len(y), 20):
+        b = min(a + 20, len(y))
+        if len(np.unique(y[:a])) < 2:
+            continue
+        sc = StandardScaler().fit(X.iloc[:a])
+        mm = LogisticRegression(class_weight="balanced", max_iter=4000)
+        mm.fit(sc.transform(X.iloc[:a]), y[:a])
+        vorher[a:b] = mm.predict_proba(sc.transform(X.iloc[a:b]))[:, 1]
+    gilt = ~np.isnan(vorher)
+    guete = (round(float(roc_auc_score(y[gilt], vorher[gilt])), 3)
+             if gilt.sum() >= 60 and len(np.unique(y[gilt])) > 1 else None)
     sc = StandardScaler().fit(train[F])
     m = LogisticRegression(class_weight="balanced", max_iter=4000).fit(sc.transform(train[F]), train.y)
     return round(float(m.predict_proba(sc.transform(dd[F].tail(1)))[0, 1]), 3), guete
+
+
+def guete_persistenz(d: pd.DataFrame) -> float | None:
+    """Nullmodell: der Score ist das heutige z. Null Parameter, nichts gelernt.
+
+    Steht im Dashboard als Messlatte neben den beiden Modellen. Ein Modell,
+    das diese Zahl nicht schlaegt, hat nichts gelernt, egal wie hoch seine
+    AUC absolut aussieht.
+    """
+    dd = d.dropna(subset=["z"])
+    y = (dd.z.shift(-PROGNOSE_HORIZONT) >= PROGNOSE_SCHWELLE)
+    t = dd.assign(y=y.astype(float)).dropna(subset=["y"])
+    te = t.iloc[int(len(t) * 0.5):]
+    if len(te) < 30 or te.y.nunique() < 2:
+        return None
+    return round(float(roc_auc_score(te.y, te.z)), 3)
 
 
 def main() -> int:
@@ -320,8 +466,9 @@ def main() -> int:
     news = {c: {t: v for t, v in d.items() if t >= grenze} for c, d in news.items()}
     pfad_news.write_text(json.dumps(news, ensure_ascii=False))
 
-    log("[2/4] Marktdaten aktualisieren ...")
+    log("[2/4] Marktdaten und Steckbrief aktualisieren ...")
     marktdaten(args.voll)
+    prof = profil()
 
     log("[3/4] Risikoindex, Auffaelligkeiten, Prognose ...")
     gpr = pd.read_excel(DATEN / "gpr.xls")[["date", "GPRD"]].rename(columns={"GPRD": "gpr"})
@@ -355,14 +502,29 @@ def main() -> int:
         d = d.dropna(subset=["z"])
         if d.empty:
             continue
-        prog, guete = prognose(d)
+        d["z_d1"] = d.z.diff(); d["r_d1"] = d.risiko.diff(); d["r_d5"] = d.risiko.diff(5)
 
         g = gd[gd.code == code].copy() if len(gd) else pd.DataFrame()
         if len(g):
             g["tone_avg"] = np.where(g.tone_cnt > 0, g.tone_sum / g.tone_cnt, np.nan)
             d = d.merge(g[["date", "n_events", "tone_avg"]], on="date", how="left")
+            d = d.merge(gdelt_merkmale(g), on="date", how="left")
         else:
             d["n_events"], d["tone_avg"] = np.nan, np.nan
+
+        # Zwei Prognosen nebeneinander -- das ist die Forschungsfrage der
+        # Arbeit, im Produkt selbst sichtbar gemacht. Das Marktmodell schreibt
+        # den Index aus sich selbst fort, das Ereignismodell nutzt
+        # ausschliesslich GDELT. Beide werden mit ihrer gemessenen AUC
+        # ausgewiesen, damit der Vergleich nicht behauptet, sondern belegt ist.
+        prog, guete = prognose(d, ["z", "z_d1", "r_d1", "r_d5"])
+        prog_g, guete_g = prognose(d, G_MERKMALE)
+        guete_p = guete_persistenz(d)
+
+        # Laufende Lagen aus den Ereignisdaten. Das ist die Aufgabe, fuer die
+        # GDELT taugt: erkennen, was gerade passiert -- nicht vorhersagen,
+        # was kommt.
+        lagen = krisen(g, d.date.max()) if len(g) else []
 
         z = d.tail(TAGE_ANZEIGE)
         kats = [c for c in ["waehrung", "markt", "geopolitik"] if c in z.columns]
@@ -375,6 +537,12 @@ def main() -> int:
             "tone_avg": [None if pd.isna(v) else round(float(v), 2) for v in z.tone_avg],
             "auffaellig": [int(v) for v in z.auffaellig],
             "prognose_7t": prog, "prognose_auc": guete,
+            "steckbrief": {k: prof.get(code, {}).get(k) for k in WB_INDIKATOREN
+                           if prof.get(code, {}).get(k)},
+            "ueberblick": UEBERBLICK.get(code, ""),
+            "krisen": lagen,
+            "prognose_gdelt_7t": prog_g, "prognose_gdelt_auc": guete_g,
+            "prognose_persistenz_auc": guete_p,
             "stand_datum": z.date.iloc[-1].strftime("%Y-%m-%d"),
             "stand_z": round(float(z.z.iloc[-1]), 2),
             "nachrichten": news.get(code, {}),

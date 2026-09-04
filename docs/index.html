@@ -124,12 +124,31 @@ tbody td{font-family:var(--mono)}
 .herolab{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px}
 .heronote{font-size:13.5px;color:var(--ink2);margin-top:9px}
 .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.kpi3{grid-template-columns:1fr 1fr 1fr}
+.kbad{color:var(--ink3)}
 .kbox{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:14px 15px}
+.sbrief{display:flex;flex-wrap:wrap;gap:6px 18px;margin:2px 0 10px}
+.sb{font-size:12px;color:var(--ink3);display:flex;gap:6px;align-items:baseline}
+.sb b{font-weight:600;color:var(--ink2);font-family:var(--mono);font-variant-numeric:tabular-nums}
+.sb i{font-style:normal;font-size:10.5px;opacity:.7}
+.ueber{font-size:13px;color:var(--ink2);line-height:1.55;margin:0 0 16px;max-width:70ch}
+.sbquelle{font-size:11px;color:var(--ink3);margin:-6px 0 12px}
+.krise{display:flex;gap:12px;align-items:flex-start;padding:12px 15px;border-bottom:1px solid var(--line)}
+.krise:last-child{border-bottom:none}
+.kdot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex:0 0 8px}
+.ktitel{font-weight:600;font-size:13.5px;display:flex;flex-wrap:wrap;gap:8px;align-items:baseline}
+.kstufe{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  border:1px solid var(--line);border-radius:4px;padding:1px 5px;color:var(--ink3)}
+.klaufend{border-color:var(--crit);color:var(--crit)}
+.kzeit{font-family:var(--mono);font-size:11px;color:var(--ink3);margin-top:2px}
+.ktext{font-size:12.5px;color:var(--ink2);margin-top:4px;line-height:1.45}
+.kzahl{font-family:var(--mono);font-size:11.5px;color:var(--ink3);margin-top:3px}
 .sect{background:var(--card);border:1px solid var(--line);border-radius:11px;margin-bottom:12px;overflow:hidden}
 .secthead{padding:15px 17px 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .secttitle{font-size:15px;font-weight:600;margin:0}
 .sectnote{font-size:12.5px;color:var(--ink3);padding:2px 17px 0;margin:0 0 6px}
-@media (max-width:520px){.heroval{font-size:38px}.kpis{grid-template-columns:1fr}}
+@media (max-width:760px){.kpi3{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.heroval{font-size:38px}.kpis,.kpi3{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -293,6 +312,78 @@ function nachrichtenBlock(L){
   }).join("");
 }
 
+// Laufende und zurueckliegende Lagen. Bewusst MIT Ende-Datum und mit dem
+// Rohanteil neben dem z-Wert: eine Lage kann abgeklungen sein, obwohl das
+// Niveau hoch bleibt -- weil das hohe Niveau die Normallage des Landes ist.
+function krisenBlock(L){
+  const K = L.krisen || [];
+  if(!K.length) return '<p class="empty" style="padding:0 17px 16px">'+
+    'Keine auff\u00e4lligen Lagen erkannt. Das hei\u00dft nicht "ruhig", sondern '+
+    '"nicht ungew\u00f6hnlich f\u00fcr dieses Land".</p>';
+  const farbe = {konflikt:'var(--crit)', protest:'#c8863c', zwang:'#7a6ea8'};
+  return K.map(function(k){
+    return '<div class="krise"><span class="kdot" style="background:'+(farbe[k.art]||'var(--ink3)')+
+      ';opacity:'+(k.laufend?1:.35)+'"></span><div style="flex:1">'+
+      '<div class="ktitel">'+k.name+
+        '<span class="kstufe'+(k.laufend?' klaufend':'')+'">'+(k.laufend?'l\u00e4uft \u00b7 ':'')+k.stufe+'</span></div>'+
+      '<div class="kzeit">'+fmtD(k.von)+' \u2013 '+(k.laufend?'heute':fmtD(k.bis))+' \u00b7 '+k.tage+' Tage</div>'+
+      '<div class="ktext">'+k.beschreibung+'</div>'+
+      '<div class="kzahl">Anteil '+String(k.anteil).replace('.',',')+' % gegen '+
+        String(k.anteil_normal).replace('.',',')+' % \u00fcblich \u00b7 Spitze '+
+        String(k.spitze_z).replace('.',',')+' \u03c3 am '+fmtD(k.spitze_am)+'</div>'+
+      '</div></div>';
+  }).join("");
+}
+
+// Steckbrief. Bewusst klein und in gedaempftem Grau: Kontext, kein
+// Blickfang. Jede Zahl traegt ihr Berichtsjahr -- die Weltbank liefert je
+// nach Land unterschiedlich aktuelle Staende, und eine Zahl ohne Jahr ist
+// eine Zahl unbekannten Alters.
+function zahl(n, k){
+  if(n>=1e9) return (n/1e9).toFixed(k===undefined?1:k).replace('.',',')+' Mrd.';
+  if(n>=1e6) return (n/1e6).toFixed(1).replace('.',',')+' Mio.';
+  if(n>=1e3) return Math.round(n).toLocaleString('de-DE');
+  return n.toFixed(1).replace('.',',');
+}
+function steckbrief(L){
+  const S = L.steckbrief || {};
+  const F = [
+    ['bevoelkerung','Bevölkerung', v=>zahl(v)],
+    ['flaeche','Fläche', v=>zahl(v)+' km\u00b2'],
+    ['bip_kopf','BIP pro Kopf', v=>Math.round(v).toLocaleString('de-DE')+' US$'],
+    ['wachstum','BIP-Wachstum', v=>(v>0?'+':'')+v.toFixed(1).replace('.',',')+' %'],
+    ['inflation','Inflation', v=>(v>0?'+':'')+v.toFixed(1).replace('.',',')+' %'],
+  ];
+  const teile = F.filter(f=>S[f[0]]).map(function(f){
+    const e=S[f[0]];
+    return '<span class="sb">'+f[1]+' <b>'+f[2](e.wert)+'</b> <i>'+e.jahr+'</i></span>';
+  });
+  let h = teile.length
+    ? '<div class="sbrief">'+teile.join('')+'</div>'+
+      '<p class="sbquelle">Quelle: Weltbank, World Development Indicators \u00b7 '+
+      'Jahr je Kennzahl angegeben.</p>'
+    : '<p class="sbquelle">Für dieses Land liegen keine Weltbank-Kennzahlen vor \u2014 '+
+      'Taiwan ist kein Mitglied der Weltbank und in ihrer Datenbank nicht enthalten.</p>';
+  if(L.ueberblick) h += '<p class="ueber">'+L.ueberblick+'</p>';
+  return h;
+}
+
+function fmtAuc(a){return a==null?'\u2014':a.toFixed(2).replace('.',',');}
+
+// Prognosekachel. Die Guete steht bewusst direkt unter der Prozentzahl und
+// nicht im Kleingedruckten: eine Prognose ohne ihre gemessene Trennschaerfe
+// ist eine Behauptung. Liegt die AUC unter 0,55, wird die Kachel gedaempft
+// dargestellt und ausdruecklich als nicht belastbar bezeichnet.
+function prognoseBox(titel, p, auc, erlaeuterung){
+  if(p===null||p===undefined) return '<div class="kbox"><div class="klab">'+titel+'</div>'+
+    '<div class="kval kbad">\u2014</div><div class="knote">Noch zu wenig Historie f\u00fcr dieses Modell.</div></div>';
+  var schwach = (auc==null || auc < 0.55);
+  return '<div class="kbox"><div class="klab">'+titel+'</div>'+
+    '<div class="kval'+(schwach?' kbad':'')+'">'+Math.round(p*100)+' %</div>'+
+    '<div class="knote">AUC '+fmtAuc(auc)+(schwach?' \u2014 nicht belastbar, Zufallsniveau':'')+
+    '<br>'+erlaeuterung+'</div></div>';
+}
+
 function landSeite(code){
   const L=D.laender[code], s=stufe(L.stand_z);
   const kats=Object.keys(L.kategorien);
@@ -303,17 +394,36 @@ function landSeite(code){
     '<span class="navtitle">'+L.name+'</span>'+
     '<span class="navstat" style="background:'+s.bg+';color:'+s.c+'">'+s.i+' '+s.l+'</span></div>'+
 
+    steckbrief(L)+
+
     '<div class="hero"><div class="herolab">Risikostand · '+fmtD(L.stand_datum)+'</div>'+
     '<div class="heroval" style="color:'+(L.stand_z>=0.5?"var(--crit)":"var(--ink)")+'">'+
       (L.stand_z>0?"+":"")+L.stand_z.toFixed(2)+'</div>'+
     '<p class="heronote">Abweichung vom eigenen Normalzustand der letzten 120 Tage. '+
       'Platz '+rang+' von '+codes.length+' im heutigen Vergleich. Beschreibend, keine Vorhersage.</p></div>'+
 
-    '<div class="kpis">'+
-    '<div class="kbox"><div class="klab">Prognose 7 Tage</div><div class="kval">'+Math.round(L.prognose_7t*100)+' %</div>'+
-      '<div class="knote">Güte AUC '+L.prognose_auc.toFixed(2)+' · nur Marktdaten, ohne GDELT</div></div>'+
+    '<div class="sect"><div class="secthead"><h3 class="secttitle">Krisen</h3></div>'+
+      '<p class="sectnote">Aus den GDELT-Ereignisdaten erkannte Lagen, gemessen an der '+
+      'Normallage dieses Landes über 180 Tage. Eine Lage beginnt, wenn ihr Anteil fünf Tage '+
+      'in Folge 1,5 Standardabweichungen darüber liegt, und endet erst nach sieben Tagen '+
+      'darunter — deshalb zerfällt ein langer Konflikt nicht in viele Einzelmeldungen. '+
+      'Erkennung der Gegenwart, keine Vorhersage.</p>'+
+      krisenBlock(L)+'</div>'+
+
+    '<div class="kpis kpi3">'+
+    prognoseBox('Marktmodell', L.prognose_7t, L.prognose_auc,
+                'Fortschreibung des Index aus sich selbst.')+
+    prognoseBox('Ereignismodell', L.prognose_gdelt_7t, L.prognose_gdelt_auc,
+                'Ausschließlich GDELT-Ereignisdaten.')+
     '<div class="kbox"><div class="klab">Auffällige Tage</div><div class="kval">'+L.auffaellig.reduce((a,b)=>a+b,0)+'</div>'+
       '<div class="knote">von '+L.daten.length+' gezeigten Tagen</div></div></div>'+
+    '<p class="sectnote" style="margin:-4px 0 14px">'+
+      'Beide Prognosen schätzen dieselbe Zielgröße: Anspannung mindestens 1 Standardabweichung '+
+      'über dem eigenen 120-Tage-Mittel, in 5 Handelstagen. Die AUC misst, wie gut das Modell '+
+      'zwischen Tagen mit und ohne Folgeanspannung trennt (0,50 = Münzwurf). '+
+      'Messlatte ohne Modell — einfach das heutige Niveau fortschreiben: AUC '+
+      (L.prognose_persistenz_auc==null?'nicht berechenbar':fmtAuc(L.prognose_persistenz_auc))+'. '+
+      'Ein Modell, das diese Zahl nicht schlägt, hat nichts gelernt.</p>'+
 
     '<div class="sect"><div class="secthead"><h3 class="secttitle">Verlauf nach Kategorie</h3>'+
       '<button class="tblbtn" id="tbtn">Tabelle</button></div>'+
