@@ -1,9 +1,21 @@
 [
  {
+  "datum": "2026-09-06",
+  "code": "IN",
+  "land": "Indien",
+  "z": 0.04
+ },
+ {
   "datum": "2026-09-05",
   "code": "IN",
   "land": "Indien",
   "z": 0.04
+ },
+ {
+  "datum": "2026-09-05",
+  "code": "BR",
+  "land": "Brasilien",
+  "z": -1.8
  },
  {
   "datum": "2026-09-04",
