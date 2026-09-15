@@ -1,5 +1,17 @@
 [
  {
+  "datum": "2026-09-15",
+  "code": "TU",
+  "land": "Türkei",
+  "z": -1.74
+ },
+ {
+  "datum": "2026-09-15",
+  "code": "BR",
+  "land": "Brasilien",
+  "z": -2.59
+ },
+ {
   "datum": "2026-09-14",
   "code": "IN",
   "land": "Indien",
