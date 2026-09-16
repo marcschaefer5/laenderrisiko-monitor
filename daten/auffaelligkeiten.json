@@ -1,9 +1,33 @@
 [
  {
+  "datum": "2026-09-16",
+  "code": "IN",
+  "land": "Indien",
+  "z": -0.45
+ },
+ {
+  "datum": "2026-09-15",
+  "code": "US",
+  "land": "USA",
+  "z": -2.38
+ },
+ {
   "datum": "2026-09-15",
   "code": "TU",
   "land": "Türkei",
   "z": -1.74
+ },
+ {
+  "datum": "2026-09-15",
+  "code": "IS",
+  "land": "Israel",
+  "z": -2.47
+ },
+ {
+  "datum": "2026-09-15",
+  "code": "IN",
+  "land": "Indien",
+  "z": -2.3
  },
  {
   "datum": "2026-09-15",
