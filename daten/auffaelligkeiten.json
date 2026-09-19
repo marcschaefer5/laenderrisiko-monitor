@@ -1,5 +1,11 @@
 [
  {
+  "datum": "2026-09-19",
+  "code": "IN",
+  "land": "Indien",
+  "z": 1.25
+ },
+ {
   "datum": "2026-09-18",
   "code": "IS",
   "land": "Israel",
