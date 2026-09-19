@@ -1,0 +1,62 @@
+{
+ "MY|niveau|2026-09-01": {
+  "stufe": "kritisch",
+  "gemeldet_am": "2026-09-11",
+  "land": "Malaysia",
+  "titel": "Risikoniveau anhaltend erhöht"
+ },
+ "MY|baustein|2026-09-11": {
+  "stufe": "hoch",
+  "gemeldet_am": "2026-09-11",
+  "land": "Malaysia",
+  "titel": "Marktvolatilität außergewöhnlich hoch"
+ },
+ "SF|sprung|2026-09-11": {
+  "stufe": "kritisch",
+  "gemeldet_am": "2026-09-13",
+  "land": "Südafrika",
+  "titel": "Sprunghafter Anstieg des Risikoindex"
+ },
+ "SF|sprung|2026-09-10": {
+  "stufe": "kritisch",
+  "gemeldet_am": "2026-09-13",
+  "land": "Südafrika",
+  "titel": "Sprunghafter Anstieg des Risikoindex"
+ },
+ "SF|niveau|2026-09-10": {
+  "stufe": "kritisch",
+  "gemeldet_am": "2026-09-13",
+  "land": "Südafrika",
+  "titel": "Risikoniveau anhaltend erhöht"
+ },
+ "SA|sprung|2026-07-14": {
+  "stufe": "kritisch",
+  "gemeldet_am": "2026-09-13",
+  "land": "Saudi-Arabien",
+  "titel": "Sprunghafter Anstieg des Risikoindex"
+ },
+ "UP|nachrichtenlage|2026-09-09": {
+  "stufe": "hoch",
+  "gemeldet_am": "2026-09-13",
+  "land": "Ukraine",
+  "titel": "Meldungsaufkommen stark erhöht"
+ },
+ "EG|niveau|2026-09-07": {
+  "stufe": "hoch",
+  "gemeldet_am": "2026-09-13",
+  "land": "Ägypten",
+  "titel": "Risikoniveau anhaltend erhöht"
+ },
+ "GM|nachrichtenlage|2026-09-03": {
+  "stufe": "hoch",
+  "gemeldet_am": "2026-09-13",
+  "land": "Deutschland",
+  "titel": "Meldungsaufkommen stark erhöht"
+ },
+ "SA|nachrichtenlage|2026-07-15": {
+  "stufe": "hoch",
+  "gemeldet_am": "2026-09-13",
+  "land": "Saudi-Arabien",
+  "titel": "Gewaltanteil der Meldungen erhöht"
+ }
+}

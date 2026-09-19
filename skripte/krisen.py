@@ -36,6 +36,8 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+from tagesgueltigkeit import gueltig
+
 BASIS_FENSTER = 180      # Referenzzeitraum fuer die Normallage
 MIN_BASIS = 90           # so viele Tage muessen belegt sein, sonst kein Urteil
 GLATT = 7                # Glaettung, damit einzelne Meldetage nichts ausloesen
@@ -43,7 +45,17 @@ AN_SCHWELLE = 1.5
 AUS_SCHWELLE = 0.5
 MIN_TAGE = 5
 AUS_TAGE = 7
-MIN_EREIGNISSE = 30      # Tage mit zu duenner Abdeckung zaehlen nicht
+
+# Ab wann eine abgeschlossene Episode nicht mehr zur LAGE gehoert.
+#
+# Ein Warnwerkzeug zeigt, was jetzt gilt. Eine Protestwelle, die vor
+# vierhundert Tagen endete, ist Geschichte des Landes und kein Teil seiner
+# heutigen Lage -- steht sie ungetrennt in derselben Liste, verwaessert sie
+# genau die Aussage, um die es geht. Sie wird deshalb nicht geloescht, sondern
+# als historisch gekennzeichnet und in der Oberflaeche eingeklappt.
+AKTUELL_TAGE = 180
+MAX_AKTUELL = 6          # so viele laufende/aktuelle Episoden werden gezeigt
+MAX_HISTORISCH = 8       # so viele aeltere bleiben zum Nachschlagen
 
 # Ereignis-Kategorien aus den CAMEO-Wurzeln.
 KATEGORIEN = {
@@ -115,14 +127,18 @@ def krisen(g: pd.DataFrame, heute: pd.Timestamp) -> list[dict]:
     # Angebrochene Tage ausschliessen.
     #
     # Der taegliche Lauf startet um 04:00 UTC; der laufende Tag ist dann erst
-    # zu einem Bruchteil gemeldet (heute 21.666 statt 68.281 Zeilen). Ein
-    # solcher Tag hat verzerrte Anteile und kann eine laufende Lage
-    # faelschlich beenden -- also genau an dem Tag ein falsches Negativ
-    # erzeugen, an dem es darauf ankommt. Kriterium wie in der
-    # Datenqualitaetspruefung der Arbeit (D27): unter 50 % der ueblichen
-    # Abdeckung gilt der Tag als ungueltig, nicht als ereignisarm.
-    ueblich = n.rolling(7, min_periods=3).median().shift(1)
-    genug = (n >= MIN_EREIGNISSE) & ((n >= 0.5 * ueblich) | ueblich.isna())
+    # zu einem Bruchteil gemeldet. Ein solcher Tag hat verzerrte Anteile und
+    # kann eine laufende Lage faelschlich beenden -- also genau an dem Tag ein
+    # falsches Negativ erzeugen, an dem es darauf ankommt.
+    #
+    # Die Regel stand hier einmal als eigene Fassung (50 % des Medians der
+    # letzten sieben Tage). Sie stand damit NUR hier: die Merkmalsbildung fuer
+    # den Ereignisbaustein des Index hatte keine solche Pruefung, dieselbe
+    # Erntelucke konnte also keine Episode ausloesen, aber sehr wohl eine
+    # Lagemeldung. Die Definition liegt deshalb jetzt in tagesgueltigkeit.py
+    # und wird von beiden Stellen benutzt -- Vergleich je Wochentag, weil die
+    # Tagesmenge zwischen Donnerstag und Sonntag um Faktor zwei schwankt.
+    genug = gueltig(d.set_index("date").n_events).to_numpy()
 
     ergebnis = []
     for schluessel, k in KATEGORIEN.items():
@@ -132,13 +148,16 @@ def krisen(g: pd.DataFrame, heute: pd.Timestamp) -> list[dict]:
         sd = anteil.rolling(BASIS_FENSTER, min_periods=MIN_BASIS).std(ddof=0)
         z = ((anteil - mu) / sd.replace(0, np.nan)).rolling(GLATT, min_periods=4).mean()
         for e in _episoden(z, d.date):
-            laufend = (heute - e["bis"]).days <= AUS_TAGE
+            seit_ende = (heute - e["bis"]).days
+            laufend = seit_ende <= AUS_TAGE
             fenster = (d.date >= e["von"]) & (d.date <= e["bis"])
             ergebnis.append({
                 "art": schluessel,
                 "name": k["name"],
                 "beschreibung": k["text"],
                 "laufend": bool(laufend),
+                "alter_tage": int(max(seit_ende, 0)),
+                "historisch": bool(not laufend and seit_ende > AKTUELL_TAGE),
                 "von": e["von"].strftime("%Y-%m-%d"),
                 "bis": e["bis"].strftime("%Y-%m-%d"),
                 "tage": e["tage"],
@@ -149,6 +168,10 @@ def krisen(g: pd.DataFrame, heute: pd.Timestamp) -> list[dict]:
                 "anteil_normal": round(float(mu[fenster].mean() * 100), 1),
             })
 
-    # Laufende zuerst, innerhalb dessen die juengsten.
+    # Laufende zuerst, innerhalb dessen die juengsten. Danach getrennt
+    # zugeschnitten: die aktuelle Lage vollstaendig, die Historie nur als
+    # Nachschlagewerk.
     ergebnis.sort(key=lambda x: (x["laufend"], x["bis"]), reverse=True)
-    return ergebnis[:8]
+    aktuell = [e for e in ergebnis if not e["historisch"]][:MAX_AKTUELL]
+    historisch = [e for e in ergebnis if e["historisch"]][:MAX_HISTORISCH]
+    return aktuell + historisch

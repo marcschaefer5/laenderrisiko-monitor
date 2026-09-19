@@ -1,0 +1,6 @@
+{
+ "ab": "2026-09-07",
+ "was": "Handlungsort statt beliebiger Erwaehnung, Akteur des Landes verlangt, Duplikate je Quelle entfernt",
+ "wirkung": "Ereigniszahl sinkt um rund 70 bis 80 Prozent, Anteile bleiben nahezu unveraendert",
+ "hinweis": "Fuer eine bruchfreie Reihe die Historie mit gdelt_historie.py neu laden."
+}

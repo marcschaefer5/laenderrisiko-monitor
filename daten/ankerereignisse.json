@@ -1,0 +1,25 @@
+{
+  "hinweis": "Extern datierte Landeskrisen als Prüfmaßstab für die Indexgewichte. WICHTIG: Die Datierung stammt aus allgemeiner Kenntnis und ist VOR der Verwendung zu prüfen; jeder Eintrag braucht in 'quelle' eine belegbare Fundstelle und dann 'geprueft': true. Die Kalibrierung rechnet nur mit geprüften Ankern, sonst warnt sie und rechnet mit allen. Die Anker dürfen NICHT aus den Daten abgeleitet sein, die sie prüfen sollen — das wäre ein Zirkelschluss.",
+  "anker": [
+    {"land": "IS", "von": "2023-10-07", "bis": "2023-11-15", "was": "Hamas-Angriff und Beginn des Gaza-Kriegs", "quelle": "", "geprueft": false},
+    {"land": "IS", "von": "2024-04-13", "bis": "2024-04-22", "was": "Erster direkter iranischer Raketenangriff", "quelle": "", "geprueft": false},
+    {"land": "IS", "von": "2024-09-27", "bis": "2024-10-10", "was": "Eskalation Libanon, zweiter iranischer Angriff", "quelle": "", "geprueft": false},
+    {"land": "RS", "von": "2023-06-23", "bis": "2023-06-27", "was": "Aufstand der Wagner-Gruppe", "quelle": "", "geprueft": false},
+    {"land": "RS", "von": "2024-03-22", "bis": "2024-03-29", "was": "Anschlag Crocus City Hall", "quelle": "", "geprueft": false},
+    {"land": "UP", "von": "2023-06-06", "bis": "2023-06-14", "was": "Zerstörung des Kachowka-Staudamms", "quelle": "", "geprueft": false},
+    {"land": "UP", "von": "2024-08-06", "bis": "2024-08-20", "was": "Kursk-Offensive", "quelle": "", "geprueft": false},
+    {"land": "TU", "von": "2023-02-06", "bis": "2023-02-20", "was": "Erdbeben in Südostanatolien", "quelle": "", "geprueft": false},
+    {"land": "TU", "von": "2023-05-28", "bis": "2023-06-16", "was": "Präsidentschaftswahl und anschließender Lira-Absturz", "quelle": "", "geprueft": false},
+    {"land": "NI", "von": "2023-05-29", "bis": "2023-06-16", "was": "Ende der Benzinsubvention, landesweite Proteste", "quelle": "", "geprueft": false},
+    {"land": "NI", "von": "2024-08-01", "bis": "2024-08-12", "was": "#EndBadGovernance-Proteste", "quelle": "", "geprueft": false},
+    {"land": "PK", "von": "2023-05-09", "bis": "2023-05-22", "was": "Verhaftung Imran Khans und Unruhen", "quelle": "", "geprueft": false},
+    {"land": "PK", "von": "2024-02-08", "bis": "2024-02-16", "was": "Parlamentswahl mit landesweiter Netzabschaltung", "quelle": "", "geprueft": false},
+    {"land": "EG", "von": "2024-03-06", "bis": "2024-03-18", "was": "Freigabe des Wechselkurses, IWF-Programm", "quelle": "", "geprueft": false},
+    {"land": "TW", "von": "2024-01-13", "bis": "2024-01-19", "was": "Präsidentschaftswahl", "quelle": "", "geprueft": false},
+    {"land": "TW", "von": "2024-05-20", "bis": "2024-05-27", "was": "Amtseinführung und Militärübungen", "quelle": "", "geprueft": false},
+    {"land": "SF", "von": "2024-05-29", "bis": "2024-06-14", "was": "Wahl und Koalitionsbildung", "quelle": "", "geprueft": false},
+    {"land": "MX", "von": "2024-06-02", "bis": "2024-06-14", "was": "Präsidentschaftswahl, Peso-Abwertung", "quelle": "", "geprueft": false},
+    {"land": "IN", "von": "2024-06-04", "bis": "2024-06-11", "was": "Wahlergebnis, Kurseinbruch und Erholung", "quelle": "", "geprueft": false},
+    {"land": "BR", "von": "2024-12-01", "bis": "2024-12-20", "was": "Fiskalpaket und Real-Absturz", "quelle": "", "geprueft": false}
+  ]
+}

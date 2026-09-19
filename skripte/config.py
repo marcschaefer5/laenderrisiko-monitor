@@ -12,11 +12,27 @@ Die Laendercodes folgen FIPS 10-4, weil GDELT dieses Schema verwendet:
 Deutschland ist GM (nicht DE), Suedafrika SF, die Ukraine UP.
 """
 
-# code -> (Anzeigename, FX-Symbol, Aktien-Symbol oder None)
+# code -> (Anzeigename, FX-Symbol, Aktien-Symbol)
+#
+# Ein Symbolfeld darf auch eine LISTE sein. Dann werden die Eintraege der
+# Reihe nach probiert, bis einer eine brauchbare Reihe liefert -- lang genug
+# und noch fortgeschrieben. Grund: Yahoo fuehrt fuer manche Boersen zwar ein
+# Kuerzel, aber keine Daten. ^TASI (Tadawul) war beim ersten Lauf gar nicht
+# abrufbar und hat Saudi-Arabien komplett gekostet, ^CASE30 (Kairo) gibt genau
+# einen Tag zurueck. Statt solche Faelle einzeln von Hand nachzupflegen,
+# bekommt jedes Land eine Ausweichliste; der Lauf protokolliert, welches
+# Symbol tatsaechlich verwendet wurde.
+#
+# Zur Einordnung der Ausweichsymbole: KSA und EGPT sind in New York
+# gehandelte Fonds auf den jeweiligen Markt. Sie sind keine Indizes, aber
+# genau das, was ein auslaendischer Investor tatsaechlich haelt -- und da in
+# den Index nur die VOLATILITAET eingeht, nicht das Niveau, ist der Ersatz
+# vertretbar. Bei Saudi-Arabien kommt hinzu, dass der Rial fest am Dollar
+# haengt: eine Dollar-Notierung verzerrt die Schwankung dort nicht.
 LAENDER = {
     # Konflikt- und Schwellenlaender der urspruenglichen Untersuchung
     "IS": ("Israel",       "USDILS=X", "^TA125.TA"),
-    "RS": ("Russland",     "USDRUB=X", "IMOEX.ME"),
+    "RS": ("Russland",     "USDRUB=X", ["IMOEX.ME", "ERUS"]),
     "UP": ("Ukraine",      "USDUAH=X", None),
     "NI": ("Nigeria",      "USDNGN=X", None),
     "PK": ("Pakistan",     "USDPKR=X", None),
@@ -27,10 +43,25 @@ LAENDER = {
     "SF": ("Südafrika",    "USDZAR=X", "^J203.JO"),
     "IN": ("Indien",       "USDINR=X", "^BSESN"),
     "MX": ("Mexiko",       "USDMXN=X", "^MXX"),
-    "EG": ("Ägypten",      "USDEGP=X", "^CASE30"),
+    "EG": ("Ägypten",      "USDEGP=X", ["^CASE30", "EGPT"]),
+    # Erweiterung fuer die Kartenansicht: Anrainer der grossen Seewege.
+    #
+    # Aufgenommen wurde nur, was die Waehrungsregel oben besteht. Das schliesst
+    # die naheliegenden Kandidaten teilweise aus, und zwar aus einem Grund, der
+    # sich nennen laesst: Panama rechnet in US-Dollar und hat gar keine eigene
+    # Waehrung; Jemen und Dschibuti haben amtlich gestellte beziehungsweise
+    # gebundene Kurse; Marokkos Dirham haengt an einem Korb. Deren Kurse zeigen
+    # die Ankerwaehrung oder eine Verwaltungsentscheidung, nicht das
+    # Landesrisiko -- sie waeren im Index ein stiller Nullbeitrag mit dem
+    # Anschein von Information. Die betreffenden Nadeloehre bleiben auf der
+    # Karte deshalb grau; das ist eine ausgewiesene Abdeckungsluecke.
+    "MY": ("Malaysia",     "USDMYR=X", "^KLSE"),    # Strasse von Malakka
+    "ID": ("Indonesien",   "USDIDR=X", "^JKSE"),    # Strasse von Malakka, Sundastrasse
     # Referenzlaender: Waehrung entfaellt, Marktvolatilitaet traegt
     "US": ("USA",          None,       "^GSPC"),
     "GM": ("Deutschland",  None,       "^GDAXI"),
+    "SP": ("Spanien",      None,       "^IBEX"),    # Strasse von Gibraltar; Euro
+    "SA": ("Saudi-Arabien",None,       ["^TASI.SR", "^TASI", "KSA"]),  # Rotes Meer; Rial am Dollar
 }
 
 GPR_URL = "https://www.matteoiacoviello.com/gpr_files/data_gpr_daily_recent.xls"
@@ -64,7 +95,8 @@ NACHLAUF_TAGE = 4         # GDELT-Tage, die je Lauf nachgeladen werden
 # Tabelle zieht man Daten des falschen Landes, und zwar lautlos.
 ISO2 = {"IS": "IL", "RS": "RU", "UP": "UA", "NI": "NG", "PK": "PK",
         "TW": "TW", "TU": "TR", "BR": "BR", "SF": "ZA", "IN": "IN",
-        "MX": "MX", "EG": "EG", "US": "US", "GM": "DE"}
+        "MX": "MX", "EG": "EG", "US": "US", "GM": "DE",
+        "MY": "MY", "ID": "ID", "SP": "ES", "SA": "SA"}
 
 # Kurzeinordnung: worauf die Wirtschaft des Landes ruht und was sie
 # verwundbar macht. Bewusst fest hinterlegt und nicht generiert -- eine
@@ -111,6 +143,22 @@ UEBERBLICK = {
     "US": "Größte Volkswirtschaft der Welt und Referenzpunkt für globale "
           "Kapitalmärkte. Risiko wirkt hier weniger als Länderrisiko denn als "
           "Ausstrahlung: US-Zins- und Handelspolitik bewegt alle anderen.",
+    "MY": "Offene Exportwirtschaft mit Elektronik-, Halbleiter- und "
+          "Palmölsektor. Die Lage an der Straße von Malakka macht das Land zu "
+          "einem Umschlagpunkt des Ost-West-Verkehrs; Risiko wirkt vor allem "
+          "über Rohstoffpreise und die Nachfrage aus China.",
+    "ID": "Größte Volkswirtschaft Südostasiens, rohstoffreich und stark "
+          "binnenmarktgetrieben. Der Archipel kontrolliert mit Malakka- und "
+          "Sundastraße zwei der wichtigsten Seewege; Rupiah-Volatilität und "
+          "Kapitalabflüsse sind die zentralen externen Kanäle.",
+    "SP": "Große Volkswirtschaft des Euroraums mit Tourismus, Landwirtschaft "
+          "und Automobilfertigung. Der Wechselkurs entfällt als Risikokanal, "
+          "weil die Währung der Euro ist; die Lage an der Straße von Gibraltar "
+          "macht das Land zum Anrainer des Ein- und Ausgangs des Mittelmeers.",
+    "SA": "Ölexporteur mit staatlich getragenem Umbauprogramm. Der Rial ist "
+          "fest an den Dollar gebunden, wodurch der Wechselkurs kein Risiko "
+          "abbildet; die Anspannung zeigt sich am Aktienmarkt und an der "
+          "Sicherheitslage entlang des Roten Meeres.",
     "GM": "Exportorientierte Industrievolkswirtschaft mit Schwerpunkt "
           "Automobil, Maschinenbau und Chemie. Verwundbar über Energiepreise, "
           "Lieferketten und die Nachfrage aus China.",

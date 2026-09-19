@@ -1,0 +1,14 @@
+{
+ "ab": "2024-12-01",
+ "was": "Die Ereignismenge von GDELT sinkt Anfang Dezember 2024 dauerhaft um etwa den Faktor fuenf",
+ "belege": {
+  "median_je_tag_vorher": {"zeitraum": "2024-09 bis 2024-11", "US": 44855, "IS": 8926, "SF": 1716, "GM": 1782},
+  "median_je_tag_nachher": {"zeitraum": "2025-01 bis 2025-03", "US": 15569, "IS": 1630, "SF": 161, "GM": 381},
+  "faktor_median": 4.7,
+  "faktor_spanne": "2,9 (USA) bis 10,7 (Suedafrika)",
+  "gewaltanteil_vorher_prozent": 8.21,
+  "gewaltanteil_nachher_prozent": 7.6
+ },
+ "einordnung": "Kein Fehler der Verarbeitung. Ein unvollstaendig geernteter Tag trifft alle Laender mit demselben Faktor; hier ist der Faktor je Land verschieden (Streuung 1,73), waehrend die CAMEO-Anteile nahezu unveraendert bleiben. Das ist die Handschrift einer veraenderten Quellenzusammensetzung bei GDELT, nicht einer veraenderten Zurechnung.",
+ "folge": "Absolute Ereigniszahlen sind ueber diesen Bruch hinweg nicht vergleichbar. Der Monitor rechnet ausschliesslich mit rollenden z-Werten und Anteilen; beide sind gegen einen Mengenbruch robust, sobald das Referenzfenster (60 bzw. 120 Tage) vollstaendig auf einer Seite des Bruchs liegt, also ab etwa April 2025. Das Grundniveau nutzt 365 Tage und liegt damit seit Dezember 2025 vollstaendig hinter dem Bruch."
+}

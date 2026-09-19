@@ -8,3 +8,4 @@ daten/historie/
 daten/masterfilelist.txt
 daten/*.bak
 daten/_test_dashboard.json
+daten/*.bak*

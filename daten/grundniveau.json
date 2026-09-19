@@ -1,0 +1,420 @@
+{
+ "stand": "2026-09-13",
+ "fenster_tage": 365,
+ "groessen": {
+  "gewalt": "Anteil Gewaltereignisse (CAMEO 18–20)",
+  "zwang": "Anteil Zwangsereignisse (CAMEO 17)",
+  "tonlage": "Tonlage der Berichterstattung",
+  "waehrung": "Währungsvolatilität",
+  "markt": "Marktvolatilität"
+ },
+ "laender": {
+  "IS": {
+   "wert": 80.1,
+   "stufe": "hoch",
+   "viertel": "oberes Viertel",
+   "unsicher": false,
+   "anzahl_groessen": 5,
+   "rang": 2,
+   "grundlagen": {
+    "gewalt": 94.4,
+    "zwang": 61.1,
+    "tonlage": 100.0,
+    "waehrung": 73.3,
+    "markt": 71.4
+   },
+   "roh": {
+    "gewalt": 0.1533,
+    "zwang": 0.0526,
+    "tonlage": 4.1195,
+    "waehrung": 0.0864,
+    "markt": 0.1817
+   },
+   "von": 18
+  },
+  "RS": {
+   "wert": 65.1,
+   "stufe": "hoch",
+   "viertel": "oberes Viertel",
+   "unsicher": false,
+   "anzahl_groessen": 5,
+   "rang": 4,
+   "grundlagen": {
+    "gewalt": 88.9,
+    "zwang": 27.8,
+    "tonlage": 94.4,
+    "waehrung": 100.0,
+    "markt": 14.3
+   },
+   "roh": {
+    "gewalt": 0.1422,
+    "zwang": 0.0445,
+    "tonlage": 3.3986,
+    "waehrung": 0.177,
+    "markt": 0.1058
+   },
+   "von": 18
+  },
+  "UP": {
+   "wert": 60.0,
+   "stufe": "erhöht",
+   "viertel": "drittes Viertel",
+   "unsicher": false,
+   "anzahl_groessen": 4,
+   "rang": 8,
+   "grundlagen": {
+    "gewalt": 100.0,
+    "zwang": 11.1,
+    "tonlage": 88.9,
+    "waehrung": 40.0
+   },
+   "roh": {
+    "gewalt": 0.1698,
+    "zwang": 0.0253,
+    "tonlage": 3.3113,
+    "waehrung": 0.057,
+    "markt": null
+   },
+   "von": 18
+  },
+  "NI": {
+   "wert": 38.6,
+   "stufe": "niedrig",
+   "viertel": "unteres Viertel",
+   "unsicher": false,
+   "anzahl_groessen": 4,
+   "rang": 15,
+   "grundlagen": {
+    "gewalt": 55.6,
+    "zwang": 33.3,
+    "tonlage": 38.9,
+    "waehrung": 26.7
+   },
+   "roh": {
+    "gewalt": 0.0728,
+    "zwang": 0.0457,
+    "tonlage": 1.4913,
+    "waehrung": 0.0501,
+    "markt": null
+   },
+   "von": 18
+  },
+  "PK": {
+   "wert": 61.7,
+   "stufe": "erhöht",
+   "viertel": "drittes Viertel",
+   "unsicher": false,
+   "anzahl_groessen": 4,
+   "rang": 6,
+   "grundlagen": {
+    "gewalt": 83.3,
+    "zwang": 38.9,
+    "tonlage": 77.8,
+    "waehrung": 46.7
+   },
+   "roh": {
+    "gewalt": 0.1007,
+    "zwang": 0.0499,
+    "tonlage": 2.7865,
+    "waehrung": 0.057,
+    "markt": null
+   },
+   "von": 18
+  },
+  "TW": {
+   "wert": 32.7,
+   "stufe": "niedrig",
+   "viertel": "unteres Viertel",
+   "unsicher": false,
+   "anzahl_groessen": 5,
+   "rang": 16,
+   "grundlagen": {
+    "gewalt": 11.1,
+    "zwang": 16.7,
+    "tonlage": 22.2,
+    "waehrung": 13.3,
+    "markt": 100.0
+   },
+   "roh": {
+    "gewalt": 0.0414,
+    "zwang": 0.0358,
+    "tonlage": 1.0796,
+    "waehrung": 0.0477,
+    "markt": 0.2588
+   },
+   "von": 18
+  },
+  "TU": {
+   "wert": 47.4,
+   "stufe": "mittel",
+   "viertel": "zweites Viertel",
+   "unsicher": false,
+   "anzahl_groessen": 5,
+   "rang": 11,
+   "grundlagen": {
+    "gewalt": 33.3,
+    "zwang": 55.6,
+    "tonlage": 55.6,
+    "waehrung": 6.7,
+    "markt": 85.7
+   },
+   "roh": {
+    "gewalt": 0.0545,
+    "zwang": 0.0521,
+    "tonlage": 1.7522,
+    "waehrung": 0.0145,
+    "markt": 0.2119
+   },
+   "von": 18
+  },
+  "BR": {
+   "wert": 60.1,
+   "stufe": "erhöht",
+   "viertel": "drittes Viertel",
+   "unsicher": false,
+   "anzahl_groessen": 5,
+   "rang": 7,
+   "grundlagen": {
+    "gewalt": 22.2,
+    "zwang": 94.4,
+    "tonlage": 33.3,
+    "waehrung": 93.3,
+    "markt": 57.1
+   },
+   "roh": {
+    "gewalt": 0.0499,
+    "zwang": 0.0651,
+    "tonlage": 1.4835,
+    "waehrung": 0.1129,
+    "markt": 0.1656
+   },
+   "von": 18
+  },
+  "SF": {
+   "wert": 80.8,
+   "stufe": "hoch",
+   "viertel": "oberes Viertel",
+   "unsicher": false,
+   "anzahl_groessen": 5,
+   "rang": 1,
+   "grundlagen": {
+    "gewalt": 72.2,
+    "zwang": 83.3,
+    "tonlage": 83.3,
+    "waehrung": 86.7,
+    "markt": 78.6
+   },
+   "roh": {
+    "gewalt": 0.087,
+    "zwang": 0.0625,
+    "tonlage": 2.8265,
+    "waehrung": 0.1092,
+    "markt": 0.1895
+   },
+   "von": 18
+  },
+  "IN": {
+   "wert": 55.5,
+   "stufe": "erhöht",
+   "viertel": "drittes Viertel",
+   "unsicher": false,
+   "anzahl_groessen": 5,
+   "rang": 9,
+   "grundlagen": {
+    "gewalt": 61.1,
+    "zwang": 77.8,
+    "tonlage": 50.0,
+    "waehrung": 60.0,
+    "markt": 28.6
+   },
+   "roh": {
+    "gewalt": 0.0744,
+    "zwang": 0.0621,
+    "tonlage": 1.7321,
+    "waehrung": 0.0671,
+    "markt": 0.1219
+   },
+   "von": 18
+  },
+  "MX": {
+   "wert": 76.2,
+   "stufe": "hoch",
+   "viertel": "oberes Viertel",
+   "unsicher": false,
+   "anzahl_groessen": 5,
+   "rang": 3,
+   "grundlagen": {
+    "gewalt": 77.8,
+    "zwang": 100.0,
+    "tonlage": 72.2,
+    "waehrung": 66.7,
+    "markt": 64.3
+   },
+   "roh": {
+    "gewalt": 0.0957,
+    "zwang": 0.0813,
+    "tonlage": 2.4503,
+    "waehrung": 0.0735,
+    "markt": 0.1668
+   },
+   "von": 18
+  },
+  "EG": {
+   "wert": 39.4,
+   "stufe": "mittel",
+   "viertel": "zweites Viertel",
+   "unsicher": false,
+   "anzahl_groessen": 4,
+   "rang": 14,
+   "grundlagen": {
+    "gewalt": 27.8,
+    "zwang": 22.2,
+    "tonlage": 27.8,
+    "waehrung": 80.0
+   },
+   "roh": {
+    "gewalt": 0.0537,
+    "zwang": 0.04,
+    "tonlage": 1.1022,
+    "waehrung": 0.0913,
+    "markt": null
+   },
+   "von": 18
+  },
+  "MY": {
+   "wert": 22.1,
+   "stufe": "niedrig",
+   "viertel": "unteres Viertel",
+   "unsicher": false,
+   "anzahl_groessen": 5,
+   "rang": 17,
+   "grundlagen": {
+    "gewalt": 5.6,
+    "zwang": 66.7,
+    "tonlage": 11.1,
+    "waehrung": 20.0,
+    "markt": 7.1
+   },
+   "roh": {
+    "gewalt": 0.0362,
+    "zwang": 0.0528,
+    "tonlage": 0.4871,
+    "waehrung": 0.0501,
+    "markt": 0.0886
+   },
+   "von": 18
+  },
+  "ID": {
+   "wert": 45.9,
+   "stufe": "mittel",
+   "viertel": "zweites Viertel",
+   "unsicher": false,
+   "anzahl_groessen": 5,
+   "rang": 12,
+   "grundlagen": {
+    "gewalt": 16.7,
+    "zwang": 50.0,
+    "tonlage": 16.7,
+    "waehrung": 53.3,
+    "markt": 92.9
+   },
+   "roh": {
+    "gewalt": 0.0465,
+    "zwang": 0.0511,
+    "tonlage": 0.6906,
+    "waehrung": 0.0637,
+    "markt": 0.2279
+   },
+   "von": 18
+  },
+  "US": {
+   "wert": 64.5,
+   "stufe": "hoch",
+   "viertel": "oberes Viertel",
+   "unsicher": false,
+   "anzahl_groessen": 4,
+   "rang": 5,
+   "grundlagen": {
+    "gewalt": 66.7,
+    "zwang": 88.9,
+    "tonlage": 66.7,
+    "markt": 35.7
+   },
+   "roh": {
+    "gewalt": 0.0863,
+    "zwang": 0.0637,
+    "tonlage": 2.218,
+    "waehrung": null,
+    "markt": 0.1265
+   },
+   "von": 18
+  },
+  "GM": {
+   "wert": 45.2,
+   "stufe": "mittel",
+   "viertel": "zweites Viertel",
+   "unsicher": false,
+   "anzahl_groessen": 5,
+   "rang": 13,
+   "grundlagen": {
+    "gewalt": 44.4,
+    "zwang": 44.4,
+    "tonlage": 61.1,
+    "waehrung": 33.3,
+    "markt": 42.9
+   },
+   "roh": {
+    "gewalt": 0.0648,
+    "zwang": 0.0511,
+    "tonlage": 1.777,
+    "waehrung": 0.0528,
+    "markt": 0.1506
+   },
+   "von": 18
+  },
+  "SP": {
+   "wert": 54.2,
+   "stufe": "mittel",
+   "viertel": "zweites Viertel",
+   "unsicher": false,
+   "anzahl_groessen": 4,
+   "rang": 10,
+   "grundlagen": {
+    "gewalt": 50.0,
+    "zwang": 72.2,
+    "tonlage": 44.4,
+    "markt": 50.0
+   },
+   "roh": {
+    "gewalt": 0.0652,
+    "zwang": 0.0562,
+    "tonlage": 1.5611,
+    "waehrung": null,
+    "markt": 0.1514
+   },
+   "von": 18
+  },
+  "SA": {
+   "wert": 17.9,
+   "stufe": "niedrig",
+   "viertel": "unteres Viertel",
+   "unsicher": false,
+   "anzahl_groessen": 4,
+   "rang": 18,
+   "grundlagen": {
+    "gewalt": 38.9,
+    "zwang": 5.6,
+    "tonlage": 5.6,
+    "markt": 21.4
+   },
+   "roh": {
+    "gewalt": 0.061,
+    "zwang": 0.0239,
+    "tonlage": 0.248,
+    "waehrung": null,
+    "markt": 0.1158
+   },
+   "von": 18
+  }
+ }
+}
