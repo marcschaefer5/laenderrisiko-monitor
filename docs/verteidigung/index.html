@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Country Risk &#183; Defence</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="stil.css">
+</head>
+<body>
+<div class="wrap">
+
+<nav class="nav">
+  <a href="../index.html">Live monitor</a>
+  <a href="index.html" aria-current="page">Defence</a>
+  <a href="zahlen.html">The numbers</a>
+  <a href="pruefung.html">The check</a>
+</nav>
+
+<header class="top">
+  <p class="eyebrow">Bachelor thesis &#183; DHBW Mannheim &#183; WIMBIT23B &#183; 2026</p>
+  <h1>Can counted news<br>events warn early?</h1>
+  <p class="lede">A country-specific early-warning approach for geopolitical and economic-policy
+  uncertainty, built on GDELT event data and logistic regression, for Germany and the USA.
+  These three pages hold the figures behind the defence: what the submitted thesis measured,
+  what a rebuild against an external target measured afterwards, and what runs daily today.</p>
+</header>
+
+<div class="hero">
+  <div class="fig"><b>0.809</b><span>ROC-AUC Germany</span></div>
+  <div class="fig"><b>0.789</b><span>ROC-AUC USA</span></div>
+  <div class="fig accent"><b>0.497</b><span>after the rebuild</span></div>
+  <div class="fig"><b>14</b><span>countries live today</span></div>
+</div>
+<div class="note accent"><b>Both sets of figures come from the same pipeline.</b>
+The difference is where the target variable comes from: inside the GDELT event series for the
+thesis, outside it &#8212; market volatility, policy uncertainty, geopolitical risk &#8212; for
+the rebuild. A coin flip scores 0.500.</div>
+
+<h2>The research question</h2>
+<blockquote class="quote">To what extent can phases of heightened geopolitical and
+  economic-policy uncertainty be detected early, country-specifically, from news-based event
+  data in GDELT using logistic regression &#8212; and which event categories contribute most
+  to the warning signal?
+  <cite>The question as submitted</cite>
+</blockquote>
+<div class="rows">
+  <div class="row"><span class="lab">Period analysed</span><span class="val dim">01 Feb 2025 &#8211; 31 Jan 2026</span></div>
+  <div class="row"><span class="lab">Countries</span><span class="val">2</span></div>
+  <div class="row"><span class="lab">Data source</span><span class="val dim">GDELT 2.1 event database</span></div>
+  <div class="row"><span class="lab">Method</span><span class="val dim">logistic regression, one model per country</span></div>
+  <div class="row"><span class="lab">Grade</span><span class="val">1.7<span class="unit">87 / 100</span></span></div>
+</div>
+
+<h2>From 40 million events<br>to 730 rows</h2>
+<div class="chain">
+  <div class="step"><b>33,360</b><span>GDELT archives downloaded and read</span></div>
+  <div class="step"><b>40,581,160</b><span>events contained in them</span></div>
+  <div class="step"><b>14,610,442</b><span>touching Germany or the USA</span></div>
+  <div class="step"><b>6,237,331</b><span>matching the theory-driven CAMEO risk thesaurus</span></div>
+  <div class="step"><b>730</b><span>daily rows &#8212; 365 days &#215; 2 countries, 7 features each</span></div>
+</div>
+<div class="note"><b>The last line is not a filter.</b> Millions of individual events become one
+row per country per day, and that row is the entire model input. Every figure on these pages
+rests on those 730 rows.</div>
+
+<h2>Three pages</h2>
+<div class="tiles">
+  <a class="tile" href="../index.html">
+    <div class="t">Live monitor</div>
+    <div class="n">14</div>
+    <div class="d">Countries recomputed every day, entirely from GDELT. Each forecast is shown
+      next to the persistence benchmark &#8212; the comparison the thesis was missing is now
+      part of the interface.</div>
+    <div class="go">Open the monitor &#8594;</div>
+  </a>
+  <a class="tile" href="zahlen.html">
+    <div class="t">The numbers</div>
+    <div class="n">0.809</div>
+    <div class="d">Every figure used in the defence on one sheet: the data reduction, the result,
+      the architecture comparison, the thresholds, the coefficients &#8212; each with the script
+      it came from.</div>
+    <div class="go">Open the sheet &#8594;</div>
+  </a>
+  <a class="tile" href="pruefung.html">
+    <div class="t">The check</div>
+    <div class="n">91</div>
+    <div class="d">The rebuild after submission: an external target, two parameter-free null
+      models, six placebo tests, 91 constellations &#8212; and the one finding that survived
+      them.</div>
+    <div class="go">Open the check &#8594;</div>
+  </a>
+</div>
+
+<h2>What changed<br>after submission</h2>
+<div class="rows">
+  <div class="row"><span class="lab">Target variable</span><span class="val dim">from inside GDELT &#8594; external indices</span></div>
+  <div class="row"><span class="lab">Benchmark</span><span class="val dim">none &#8594; two parameter-free null models</span></div>
+  <div class="row"><span class="lab">Countries</span><span class="val dim">2 &#8594; 14</span></div>
+  <div class="row"><span class="lab">Constellations measured</span><span class="val">91</span></div>
+  <div class="row"><span class="lab">Country-days in the rebuilt panel</span><span class="val">6,683</span></div>
+  <div class="row"><span class="lab">Findings that survived both placebo tests</span><span class="val accent">1</span></div>
+</div>
+<div class="note"><b>The thesis named the circularity of its target as a limitation.</b>
+Closing that gap is what the rebuild did &#8212; and it is where the honest answer changed.
+<a href="pruefung.html" style="color:var(--accent)">The check</a> carries those figures.</div>
+
+<h2>How to read<br>these pages</h2>
+<div class="rows">
+  <div class="row"><span class="lab">ROC-AUC &#8212; probability that a randomly chosen warning day is
+    ranked above a randomly chosen calm day</span><span class="val dim">0.5 = chance, 1.0 = perfect</span></div>
+  <div class="row"><span class="lab">Brier score &#8212; mean squared error of the probability itself</span><span class="val dim">lower is better</span></div>
+  <div class="row"><span class="lab">Bracketed pairs &#8212; 95&#8239;% bootstrap interval</span><span class="val dim">spans zero = nothing shown</span></div>
+  <div class="row"><span class="lab">Standardised coefficients</span><span class="val dim">comparable inside one model, not between two</span></div>
+</div>
+
+<footer>
+  Marc Oliver Sch&#228;fer &#183; WIMBIT23B &#183; DHBW Mannheim<br>
+  Every figure is reproducible from the scripts in
+  <a href="https://github.com/marcschaefer5/laenderrisiko-monitor">github.com/marcschaefer5/laenderrisiko-monitor</a>
+</footer>
+
+</div>
+</body>
+</html>

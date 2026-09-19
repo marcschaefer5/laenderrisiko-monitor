@@ -6,149 +6,494 @@
 <meta name="description" content="Tagesaktuelles Länderrisiko aus Währungsdruck, Marktvolatilität und geopolitischer Spannung.">
 <meta name="color-scheme" content="light dark">
 <title>Länderrisiko-Monitor</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<meta name="description" content="Tagesaktuelles Länderrisiko: Lagemeldungen, Seewege und Nadelöhre für 17 Länder.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;600;700&family=IBM+Plex+Sans:wght@400;450;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
+/* =========================================================================
+   Gestaltung: Lagezentrum auf Seekartenpapier.
+   Die Farben der Meldestufen sind die Positionslichter der Seefahrt --
+   Backbordrot, Bernstein, Steuerbordgrün. Der Akzent ist Kartentinte. Die
+   Karte selbst liegt in BEIDEN Themes auf dunklem Tintengrund mit Gradnetz:
+   eine Seekarte wechselt nicht die Farbe, weil das Umfeld heller wird. Das
+   ist die einzige Stelle, an der die Seite laut wird; alles andere bleibt
+   ruhig.
+   ========================================================================= */
 :root{
-  --bg:#F4F5F7; --card:#FFFFFF; --sunk:#EBEDF1;
-  --ink:#14171C; --ink2:#5A616B; --ink3:#878E99;
-  --line:#DEE1E7; --line2:#EAECF0;
-  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a;
-  --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --crit:#d03b3b;
-  --surface-viz:#fcfcfb;
-  --shadow:0 1px 2px rgba(15,20,30,.06),0 6px 20px -10px rgba(15,20,30,.16);
+  --paper:#F1F0EC; --bg:#F1F0EC; --card:#FBFAF6; --sunk:#E6E5DF;
+  --ink:#15181B; --ink2:#565C61; --ink3:#888E92;
+  --line:#DAD8D0; --line2:#E7E5DE;
+  --acc:#1C4E6B;
+  --s1:#2E6E8E; --s2:#B5762B; --s3:#5E6B7A;
+  --good:#2C7A58; --warn:#BC8829; --serious:#C2603A; --crit:#B23A2E;
+  --surface-viz:#FDFCF9;
+  /* Kartengrund: in beiden Themes gleich. */
+  --sea:#0C1A24; --sea-hoch:#132836; --land:#2C3F4C; --land-linie:#0A151D;
+  --grat:#254456; --karte-ink:#C7D6DE;
+  --shadow:0 1px 1px rgba(20,28,34,.05), 0 8px 24px -14px rgba(20,28,34,.28);
   --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --display:"Archivo Narrow","IBM Plex Sans",system-ui,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --spur:.09em;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0E1013; --card:#161A1F; --sunk:#1D2228;
-  --ink:#E9ECF1; --ink2:#A2AAB6; --ink3:#727A87;
-  --line:#272D35; --line2:#1F242B;
-  --s1:#3987e5; --s2:#d95926; --s3:#199e70;
-  --surface-viz:#1a1a19;
-  --shadow:0 1px 2px rgba(0,0,0,.5),0 6px 20px -10px rgba(0,0,0,.7);
+  --paper:#0E1114; --bg:#0E1114; --card:#161A1E; --sunk:#1E242A;
+  --ink:#E9ECEE; --ink2:#A5ADB3; --ink3:#767E85;
+  --line:#272D33; --line2:#1E2429;
+  --acc:#7FB4D4;
+  --s1:#5A9CBC; --s2:#D69A4A; --s3:#8896A4;
+  --good:#4FA97D; --warn:#D9A34E; --serious:#DE8B62; --crit:#DE7061;
+  --surface-viz:#12171B;
+  --shadow:0 1px 1px rgba(0,0,0,.5), 0 10px 26px -16px rgba(0,0,0,.8);
 }}
 :root[data-theme="dark"]{
-  --bg:#0E1013; --card:#161A1F; --sunk:#1D2228;
-  --ink:#E9ECF1; --ink2:#A2AAB6; --ink3:#727A87;
-  --line:#272D35; --line2:#1F242B;
-  --s1:#3987e5; --s2:#d95926; --s3:#199e70;
-  --surface-viz:#1a1a19;
-  --shadow:0 1px 2px rgba(0,0,0,.5),0 6px 20px -10px rgba(0,0,0,.7);
+  --paper:#0E1114; --bg:#0E1114; --card:#161A1E; --sunk:#1E242A;
+  --ink:#E9ECEE; --ink2:#A5ADB3; --ink3:#767E85;
+  --line:#272D33; --line2:#1E2429;
+  --acc:#7FB4D4;
+  --s1:#5A9CBC; --s2:#D69A4A; --s3:#8896A4;
+  --good:#4FA97D; --warn:#D9A34E; --serious:#DE8B62; --crit:#DE7061;
+  --surface-viz:#12171B;
+  --shadow:0 1px 1px rgba(0,0,0,.5), 0 10px 26px -16px rgba(0,0,0,.8);
 }
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;margin:0;-webkit-font-smoothing:antialiased}
-.wrap{max-width:900px;margin:0 auto;padding:0 16px 72px}
-header{padding:28px 0 18px}
-.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin:0 0 10px}
-h1{font-size:clamp(24px,6vw,32px);font-weight:700;letter-spacing:-.02em;margin:0 0 10px;line-height:1.15}
-.sub{color:var(--ink2);font-size:15px;margin:0 0 16px;max-width:60ch}
-.stand{font-family:var(--mono);font-size:12px;color:var(--ink3);display:flex;gap:16px;flex-wrap:wrap;align-items:center}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--good);display:inline-block;margin-right:6px;vertical-align:1px}
+html{color-scheme:light dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;
+  line-height:1.55;margin:0;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+.wrap{max-width:960px;margin:0 auto;padding-inline:20px;padding-block:0 80px}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
-details.method{background:var(--card);border:1px solid var(--line);border-radius:8px;margin:0 0 24px;overflow:hidden}
-details.method summary{padding:13px 16px;cursor:pointer;font-size:13.5px;font-weight:500;color:var(--ink2);list-style:none;display:flex;align-items:center;gap:8px}
+/* =========================================================================
+   BEWEGUNG
+   Ein Vokabular für die ganze Seite, nicht Effekte je Stelle: eine
+   Beschleunigungskurve, drei Dauern (Bedienung / Wechsel / Aufbau) und die
+   Regel, dass jede Bewegung etwas AUSSAGT. Was aufbaut, baut einmal auf.
+   Was dauerhaft läuft, läuft nur dort, wo ein Zustand offen ist. Alles hinter
+   prefers-reduced-motion; ohne Bewegung ist die Seite vollständig und im
+   Ruhezustand lesbar, weil jede Aufbaubewegung mit fill-mode both auf ihrem
+   Endzustand stehen bleibt.
+   ========================================================================= */
+:root{ --kurve:cubic-bezier(.22,.61,.36,1); --t-bedien:130ms; --t-wechsel:380ms; --t-aufbau:820ms; }
+
+@media (prefers-reduced-motion:no-preference){
+  @keyframes b-auf{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+  @keyframes b-ein{from{opacity:0}to{opacity:1}}
+  @keyframes b-zeichnen{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+  @keyframes b-fuellen{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+  @keyframes b-streifen{0%{transform:scaleY(0);transform-origin:top}
+    60%{transform:scaleY(1);transform-origin:top}100%{transform:scaleY(1);transform-origin:top}}
+  @keyframes b-wischen{from{background-position:0 0}to{background-position:200% 0}}
+
+  /* Lagemeldungen laufen von oben ein, versetzt -- die Liste ist eine
+     Chronologie, also baut sie sich in ihrer Reihenfolge auf. */
+  .lage .mld{animation:b-auf var(--t-wechsel) var(--kurve) both}
+  .lage .mld:nth-child(2){animation-delay:45ms}
+  .lage .mld:nth-child(3){animation-delay:90ms}
+  .lage .mld:nth-child(4){animation-delay:135ms}
+  .lage .mld:nth-child(5){animation-delay:180ms}
+  .lage .mld:nth-child(n+6){animation-delay:220ms}
+  /* Die Signalkante einer NEUEN Meldung fährt einmal aus. Bei einer
+     bestehenden Meldung passiert nichts -- neu ist die Information. */
+  .mld.istneu .mldbar{animation:b-streifen 620ms var(--kurve) both}
+
+  .grid .ccard{animation:b-auf 340ms var(--kurve) both}
+  .grid .ccard:nth-child(2){animation-delay:35ms}
+  .grid .ccard:nth-child(3){animation-delay:70ms}
+  .grid .ccard:nth-child(n+4){animation-delay:100ms}
+
+  /* Kurven zeichnen sich. pathLength="1" macht die Dauer unabhängig von der
+     tatsächlichen Länge, sonst liefe eine kurze Reihe schneller als eine
+     lange -- was aussagen würde, es gäbe dort weniger zu sehen. */
+  .spark path.linie,.chart path.serie,.abchart path.verlauf{
+    stroke-dasharray:1;animation:b-zeichnen var(--t-aufbau) var(--kurve) both}
+  .chart path.serie:nth-of-type(2){animation-delay:70ms}
+  .chart path.serie:nth-of-type(3){animation-delay:140ms}
+  .chart path.serie:nth-of-type(4){animation-delay:210ms}
+  .abchart path.prognose{animation:b-ein 420ms var(--t-aufbau) var(--kurve) both}
+  .spark path.flaeche,.chart .auffmarke,.abchart .band{animation:b-ein 620ms 240ms var(--kurve) both}
+
+  /* Der Grundniveaubalken füllt sich wie eine Anzeige, die einschwingt. */
+  .gfuell{transform-origin:left center;animation:b-fuellen 620ms 120ms var(--kurve) both}
+
+  /* Ansichtswechsel: eine kurze, gerichtete Überblendung. */
+  ::view-transition-old(root){animation:b-ein var(--t-wechsel) reverse var(--kurve) both}
+  ::view-transition-new(root){animation:b-auf var(--t-wechsel) var(--kurve) both}
+
+  /* Aufdecken beim Scrollen. Ein Diagramm wird von links nach rechts
+     freigegeben -- in Leserichtung und in Richtung der Zeitachse, die es
+     zeigt. Listen kommen von unten. Der Ausgangszustand steht nur unter
+     .js-auf, und diese Klasse setzt ausschliesslich JavaScript: ohne
+     JavaScript ist alles sofort da. */
+  @keyframes b-wisch{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 -2% 0 0)}}
+  /* Die Beschneidung liegt auf den KINDERN, nicht auf dem beobachteten
+     Element selbst. Der Grund ist ein Zirkel, der beim Prüfen auffiel: ein
+     IntersectionObserver rechnet clip-path mit. Ein Element, das auf Breite
+     null beschnitten ist, gilt damit als nicht sichtbar -- und wird nie
+     aufgedeckt, weil genau die Beschneidung wegfallen soll, die das Aufdecken
+     verhindert. Der Rahmen bleibt deshalb unbeschnitten und messbar, der
+     Inhalt darin wird aufgezogen. */
+  .js-auf[data-auf="wisch"] > *{clip-path:inset(0 100% 0 0)}
+  .js-auf[data-auf="wisch"].sichtbar > *{animation:b-wisch 900ms var(--kurve) forwards}
+  .js-auf[data-auf="auf"]{opacity:0;transform:translateY(10px)}
+  .js-auf[data-auf="auf"].sichtbar{animation:b-auf 520ms var(--kurve) both}
+  /* Die Kurven zeichnen sich erst, wenn ihr Diagramm im Bild ist -- sonst
+     laeuft der Aufbau ungesehen ab und man sieht nur das Ergebnis. */
+  .js-auf .serie,.js-auf .linie,.js-auf .verlauf,.js-auf .prognose,.js-auf .band,
+  .js-auf .auffmarke,.js-auf .flaeche{animation-play-state:paused}
+  .js-auf.sichtbar .serie,.js-auf.sichtbar .linie,.js-auf.sichtbar .verlauf,
+  .js-auf.sichtbar .prognose,.js-auf.sichtbar .band,.js-auf.sichtbar .auffmarke,
+  .js-auf.sichtbar .flaeche{animation-play-state:running}
+
+  /* Die Karte baut sich einmal in ihrer Lesereihenfolge auf: erst das Netz
+     (worin lese ich), dann das Land (was ist da), dann die Wege, zuletzt die
+     Marken (was ist los). Vier Schritte in gut einer halben Sekunde -- lang
+     genug, dass die Reihenfolge wahrnehmbar ist, kurz genug, dass niemand
+     darauf wartet. */
+  .klage{animation:b-ein 420ms var(--kurve) both}
+  .klage.netz{animation-duration:300ms}
+  .klage.land{animation-delay:120ms}
+  .klage.route{animation-delay:260ms}
+  .klage.marke{animation:b-auf 420ms 380ms var(--kurve) both}
+
+  /* Zoomsprünge auf der Karte gleiten, Ziehen nicht -- beim Ziehen muss die
+     Hand die Karte führen, nicht eine Kurve. */
+  #kzoom.gleiten{transition:transform 520ms var(--kurve)}
+
+  .ccard,.mld,.fbtn,.nitem,.back,.tblbtn{transition:
+    background var(--t-bedien) ease, border-color var(--t-bedien) ease,
+    color var(--t-bedien) ease, transform var(--t-bedien) var(--kurve),
+    box-shadow var(--t-bedien) ease}
+  .nitem{background-image:linear-gradient(90deg,transparent,transparent);}
+  .fbtn:active,.back:active,.tblbtn:active{transform:translateY(1px)}
+}
+
+/* Bewegung auf der Karte. Jede Animation zeigt einen ZUSTAND: der Halo atmet,
+   wo eine Meldung offen ist, der Kranz pulst an einem betroffenen Nadelöhr,
+   die Strichfolge läuft auf einer betroffenen Route. Wo nichts los ist,
+   bewegt sich nichts -- damit ist Bewegung selbst eine Information und nicht
+   Dekoration. Alles nur, wenn der Betrachter Bewegung zulässt. */
+@media (prefers-reduced-motion:no-preference){
+  @keyframes k-atem{0%,100%{opacity:.16}50%{opacity:.44}}
+  @keyframes k-puls{0%{transform:scale(.72);opacity:.75}70%{transform:scale(1.7);opacity:0}
+    100%{transform:scale(1.7);opacity:0}}
+  @keyframes k-fluss{to{stroke-dashoffset:-64}}
+  .khalo{animation:k-atem 3.6s ease-in-out infinite}
+  .knadelpuls{transform-box:fill-box;transform-origin:center;
+    animation:k-puls 2.8s cubic-bezier(.2,.6,.3,1) infinite}
+  .kfluss{stroke-dasharray:5 27;animation:k-fluss 2.4s linear infinite}
+}
+/* Ohne Bewegung bleibt die Strichfolge als ruhige Markierung stehen. */
+@media (prefers-reduced-motion:reduce){ .kfluss{stroke-dasharray:5 27} }
+
+/* ---------- Kopf ---------- */
+header{padding:40px 0 22px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--acc);margin:0 0 12px}
+h1{font-family:var(--display);font-size:clamp(30px,6.5vw,46px);font-weight:700;letter-spacing:-.015em;
+  line-height:1.02;margin:0 0 12px;text-wrap:balance;text-transform:uppercase}
+.sub{color:var(--ink2);font-size:15.5px;margin:0 0 18px;max-width:62ch}
+.stand{font-family:var(--mono);font-size:11.5px;color:var(--ink3);display:flex;gap:8px 20px;
+  flex-wrap:wrap;align-items:center;letter-spacing:.02em}
+.stand b{color:var(--ink2);font-weight:500}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--good);display:inline-block;
+  margin-right:7px;vertical-align:1.5px;box-shadow:0 0 0 3px color-mix(in srgb,var(--good) 22%,transparent)}
+
+details.method{border-bottom:1px solid var(--line);margin:0}
+details.method summary{padding:14px 0;cursor:pointer;font-family:var(--mono);font-size:11.5px;
+  letter-spacing:var(--spur);text-transform:uppercase;color:var(--ink3);list-style:none;
+  display:flex;align-items:center;gap:9px}
 details.method summary::-webkit-details-marker{display:none}
-details.method summary::before{content:"›";font-size:17px;color:var(--ink3);transition:transform .15s;display:inline-block}
-details.method[open] summary::before{transform:rotate(90deg)}
-.mbody{padding:0 16px 16px;font-size:13.5px;color:var(--ink2);border-top:1px solid var(--line2)}
-.mbody p{margin:13px 0 0}
+details.method summary::before{content:"+";font-family:var(--mono);font-size:14px;color:var(--acc)}
+details.method[open] summary::before{content:"–"}
+details.method summary:hover{color:var(--ink)}
+.mbody{padding:0 0 18px;font-size:14px;color:var(--ink2);max-width:70ch}
+.mbody p{margin:12px 0 0}
 .mbody b{color:var(--ink);font-weight:600}
+.mbody a{color:var(--acc)}
 
-h2{font-size:13px;font-family:var(--mono);letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);font-weight:500;margin:30px 0 12px}
+h2{font-family:var(--display);font-size:15px;letter-spacing:var(--spur);text-transform:uppercase;
+  color:var(--ink);font-weight:600;margin:38px 0 4px;display:flex;align-items:center;gap:12px}
+h2::after{content:"";flex:1;height:1px;background:var(--line)}
 
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
-.ccard{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:0;cursor:pointer;text-align:left;font:inherit;color:inherit;overflow:hidden;transition:border-color .12s,transform .12s;position:relative}
-.ccard:hover{border-color:var(--ink3)}
-.ccard:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
-.ccard[aria-pressed="true"]{border-color:var(--ink);box-shadow:var(--shadow)}
-.stripe{height:3px;width:100%}
-.cin{padding:12px 14px 13px}
-.cname{font-weight:600;font-size:15px;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:2px}
-.cstat{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:3px;white-space:nowrap}
-.cval{font-family:var(--mono);font-size:26px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin:4px 0 0}
-.cmeta{font-family:var(--mono);font-size:11px;color:var(--ink3);margin-top:2px}
-.spark{display:block;width:100%;height:34px;margin-top:8px}
-.badge{position:absolute;top:11px;right:12px;font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;background:var(--crit);color:#fff;padding:2px 5px;border-radius:3px}
+/* ---------- Lagemeldungen ---------- */
+.lagekopf{display:flex;gap:14px;flex-wrap:wrap;align-items:baseline;margin:10px 0 12px}
+.lagezahl{font-family:var(--mono);font-size:11.5px;color:var(--ink3);letter-spacing:.02em}
+.filter{display:flex;gap:7px;margin:0 0 12px;flex-wrap:wrap}
+.fbtn{background:transparent;border:1px solid var(--line);color:var(--ink2);font:inherit;
+  font-family:var(--mono);font-size:11px;letter-spacing:.04em;padding:5px 11px;border-radius:2px;
+  cursor:pointer;transition:border-color .12s,color .12s,background .12s}
+.fbtn:hover{border-color:var(--ink3);color:var(--ink)}
+.fbtn[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 
-.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);margin-top:14px;overflow:hidden}
-.phead{padding:18px 18px 0;display:flex;flex-wrap:wrap;gap:18px 28px;align-items:flex-start}
-.pt{font-size:21px;font-weight:700;letter-spacing:-.01em;margin:0;flex:1 1 100%}
-.kpi{min-width:96px}
-.klab{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
-.kval{font-family:var(--mono);font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
-.knote{font-size:11.5px;color:var(--ink3);margin-top:1px}
+.lage{display:flex;flex-direction:column;gap:1px;background:var(--line2);
+  border:1px solid var(--line2);border-radius:3px;overflow:hidden}
+.mld{display:grid;grid-template-columns:3px 1fr;background:var(--card);text-decoration:none;
+  color:inherit;transition:background .12s}
+a.mld:hover{background:color-mix(in srgb,var(--acc) 5%,var(--card))}
+.mldbar{width:3px;height:100%}
+.mldin{padding:13px 16px 14px;min-width:0}
+.mldtop{display:flex;gap:9px;align-items:baseline;flex-wrap:wrap}
+.mldland{font-family:var(--display);font-size:16px;font-weight:600;letter-spacing:.01em}
+.mldtitel{font-size:14.5px;color:var(--ink)}
+.mldzeit{font-family:var(--mono);font-size:10.5px;color:var(--ink3);margin-left:auto;white-space:nowrap}
+.mldtext{font-size:13px;color:var(--ink2);margin-top:5px;line-height:1.5;max-width:82ch}
+.chip{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;
+  padding:2px 6px;border-radius:2px;white-space:nowrap}
+.chipneu{background:var(--crit);color:#fff}
+.leer{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--good);
+  border-radius:3px;padding:20px 18px;color:var(--ink2);font-size:14px;max-width:78ch}
+.leer b{color:var(--ink)}
 
-.vizwrap{padding:16px 18px 6px}
-.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--ink2);margin-bottom:10px}
-.lg{display:flex;align-items:center;gap:6px}
-.lgm{width:14px;height:2.5px;border-radius:2px;display:inline-block}
-svg.chart{display:block;width:100%;height:auto;background:transparent;touch-action:pan-y}
-/* Direktbeschriftung der Kurven nur, wenn Platz ist. Auf schmalen Schirmen
-   uebernehmen Legende und Tabellenansicht die Identifikation der Serien. */
-@media (max-width:640px){ .serienlabel{display:none} }
-.tip{position:absolute;pointer-events:none;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:8px 10px;font-family:var(--mono);font-size:11.5px;box-shadow:var(--shadow);opacity:0;transition:opacity .1s;z-index:5;white-space:nowrap}
-.tip b{font-family:var(--sans);font-size:12px}
-.tiprow{display:flex;justify-content:space-between;gap:14px;margin-top:3px}
+/* ---------- Länderraster ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(224px,1fr));gap:10px;margin-top:12px}
+.ccard{background:var(--card);border:1px solid var(--line);border-radius:3px;padding:0;cursor:pointer;
+  text-align:left;font:inherit;color:inherit;text-decoration:none;overflow:hidden;position:relative;
+  transition:border-color .12s,box-shadow .12s,transform .12s}
+.ccard:hover{border-color:var(--ink3);box-shadow:var(--shadow);transform:translateY(-1px)}
+.stripe{height:2px;width:100%}
+.cin{padding:13px 15px 14px}
+.cname{font-family:var(--display);font-weight:600;font-size:17px;letter-spacing:.01em;
+  display:flex;align-items:center;justify-content:space-between;gap:8px}
+.cstat{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+  padding:2px 6px;border-radius:2px;white-space:nowrap}
+.cval{font-family:var(--mono);font-size:30px;font-weight:500;letter-spacing:-.03em;margin:6px 0 0;
+  line-height:1}
+.cmeta{font-family:var(--mono);font-size:10.5px;color:var(--ink3);margin-top:5px}
+.cwarn{font-size:12.5px;color:var(--ink2);margin-top:7px;display:flex;gap:7px;align-items:baseline;
+  line-height:1.4}
+.cwarnpunkt{width:5px;height:5px;border-radius:50%;flex:0 0 5px;margin-top:6px}
+.gbalken{display:flex;align-items:center;gap:8px;margin-top:9px;font-family:var(--mono);
+  font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3)}
+.glab{flex:0 0 auto}
+.gschiene{flex:1;height:4px;border-radius:2px;background:var(--sunk);overflow:hidden;min-width:36px}
+.gfuell{display:block;height:100%;border-radius:2px}
+.gwert{flex:0 0 auto;color:var(--ink2)}
+.spark{display:block;width:100%;height:38px;margin-top:10px}
+.badge{position:absolute;top:12px;right:13px;font-family:var(--mono);font-size:9px;letter-spacing:.08em;
+  text-transform:uppercase;background:var(--crit);color:#fff;padding:2px 5px;border-radius:2px}
 
-.news{padding:4px 18px 18px}
-.nday{border-top:1px solid var(--line2);padding:12px 0 2px}
-.ndate{font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.05em;margin-bottom:7px;display:flex;align-items:center;gap:8px}
-.nitem{display:block;color:var(--ink);text-decoration:none;font-size:14px;padding:5px 0;border-bottom:1px solid transparent;line-height:1.4}
-.nitem:hover{color:var(--s1)}
-.ng{font-family:var(--mono);font-size:11px;color:var(--crit);margin-left:7px}
+/* ---------- Abschnitte ---------- */
+.sect{background:var(--card);border:1px solid var(--line);border-radius:3px;margin-bottom:12px;
+  overflow:hidden}
+.sect.nachrang{background:transparent;border-style:dashed}
+.secthead{padding:16px 18px 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.secttitle{font-family:var(--display);font-size:14px;letter-spacing:var(--spur);text-transform:uppercase;
+  font-weight:600;margin:0}
+.sectnote{font-size:13px;color:var(--ink3);padding:6px 18px 0;margin:0 0 8px;max-width:82ch;line-height:1.5}
+.sectnote b{color:var(--ink2)}
+.sectnote a{color:var(--acc)}
 .empty{color:var(--ink3);font-size:13.5px;padding:14px 0}
+.tblbtn{background:transparent;border:1px solid var(--line);color:var(--ink2);font:inherit;
+  font-family:var(--mono);font-size:11px;letter-spacing:.04em;padding:4px 10px;border-radius:2px;
+  cursor:pointer;margin-left:auto;text-decoration:none}
+.tblbtn:hover{border-color:var(--ink3);color:var(--ink)}
 
-footer{margin-top:36px;padding-top:20px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink3);line-height:1.6}
-footer b{color:var(--ink2);font-weight:600}
-.tblbtn{background:none;border:1px solid var(--line);color:var(--ink2);font:inherit;font-size:12px;padding:4px 10px;border-radius:5px;cursor:pointer;margin-left:auto}
-.tblbtn:hover{border-color:var(--ink3)}
-table{border-collapse:collapse;width:100%;font-size:12.5px;font-variant-numeric:tabular-nums;margin-top:10px}
-th,td{text-align:right;padding:5px 8px;border-bottom:1px solid var(--line2);white-space:nowrap}
+/* ---------- Tabellen ---------- */
+.scroll{overflow-x:auto;max-height:340px;overflow-y:auto}
+table{border-collapse:collapse;width:100%;font-size:12.5px;margin-top:8px}
+th,td{text-align:right;padding:7px 10px;border-bottom:1px solid var(--line2);white-space:nowrap}
 th:first-child,td:first-child{text-align:left}
-thead th{font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);font-weight:500}
+thead th{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--ink3);font-weight:500;background:var(--sunk);position:sticky;top:0}
 tbody td{font-family:var(--mono)}
-.scroll{overflow-x:auto;max-height:300px;overflow-y:auto}
+tbody tr:hover{background:color-mix(in srgb,var(--acc) 4%,transparent)}
+
+/* ---------- Diagramme ---------- */
+.vizwrap{padding:14px 18px 8px}
+.legend{display:flex;gap:8px 18px;flex-wrap:wrap;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.03em;color:var(--ink3);margin-bottom:12px}
+.lg{display:flex;align-items:center;gap:7px}
+.lgm{width:16px;height:2px;border-radius:1px;display:inline-block}
+svg.chart{display:block;width:100%;height:auto;touch-action:pan-y}
+@media (max-width:640px){ .serienlabel{display:none} }
+svg.abchart{display:block;width:100%;height:auto}
+.abnote{font-size:12px;color:var(--ink3);padding:0 18px 16px;margin:0;line-height:1.55;max-width:84ch}
+.abnote a{color:var(--acc)}
+.mono{font-family:var(--mono);font-size:.92em}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--paper);border-radius:2px;
+  padding:9px 11px;font-family:var(--mono);font-size:11px;box-shadow:var(--shadow);opacity:0;
+  transition:opacity .1s;z-index:5;white-space:nowrap}
+.tip b{font-family:var(--display);font-size:12px;letter-spacing:.04em}
+.tiprow{display:flex;justify-content:space-between;gap:16px;margin-top:3px}
+
+/* ---------- Karte: das Instrument ---------- */
+.kartenband{margin:0 -20px;padding:0}
+@media (min-width:1040px){ .kartenband{margin-inline:calc((960px - 100vw)/2 + 20px);
+  max-width:1240px;margin-left:auto;margin-right:auto} }
+.kartenrahmen{background:var(--sea);border:1px solid var(--land-linie);border-radius:3px;
+  overflow:hidden;position:relative;box-shadow:var(--shadow)}
+svg.karte{display:block;width:100%;height:auto;cursor:grab;touch-action:none}
+svg.karte a{cursor:pointer}
+/* Beim Überfahren wächst das Land leicht aus der Fläche heraus.
+   transform-box:fill-box setzt den Drehpunkt in die Mitte der GEOMETRIE und
+   nicht in den Ursprung des SVG -- ohne das würde ein Land beim Vergrößern
+   quer über die Karte wandern. Gesetzt wird ausschließlich auf den Kindern:
+   die Marken tragen ihre Position in einem transform-Attribut, und eine
+   CSS-Transformation auf demselben Element würde es ersetzen und die Marke aus
+   der Karte schieben. */
+svg.karte .flaeche{transform-box:fill-box;transform-origin:center;
+  transition:transform 170ms var(--kurve), fill-opacity 170ms ease, stroke-width 170ms ease}
+svg.karte a:hover .flaeche{transform:scale(1.045);fill-opacity:1;stroke-width:2.2}
+svg.karte .kmark circle{transform-box:fill-box;transform-origin:center;
+  transition:transform 170ms var(--kurve)}
+svg.karte a:hover .kmark circle{transform:scale(1.35)}
+@media (prefers-reduced-motion:reduce){
+  svg.karte .flaeche,svg.karte .kmark circle{transition:none}
+  svg.karte a:hover .flaeche{transform:none;fill-opacity:1;stroke-width:2.2}
+  svg.karte a:hover .kmark circle{transform:none}
+}
+.kbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:12px 14px;
+  background:var(--sea-hoch);border-top:1px solid var(--land-linie)}
+.kbar .fbtn{border-color:#2E4B5C;color:#9FB6C2;background:transparent;padding:4px 9px}
+.kbar .fbtn:hover{border-color:var(--karte-ink);color:#EAF2F6}
+.ksprung{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:#7A94A2;margin-left:6px}
+.kartenfuss{display:flex;gap:8px 20px;flex-wrap:wrap;align-items:center;padding:12px 14px;
+  background:var(--sea);border-top:1px solid #16293505;font-family:var(--mono);font-size:10.5px;
+  color:#8DA6B2;letter-spacing:.03em}
+.kartenfuss .lg{gap:7px}
+.kartenfuss .lgm{height:2px}
+.kartenfuss .lgm.rund{width:8px;height:8px;border-radius:50%}
+.kartenfuss .lgm.hohl{background:transparent;border:1.2px solid var(--karte-ink);opacity:.6}
+.kartenfuss .lgm.kachel{width:13px;height:9px;border-radius:1px}
+.kartenfuss+.kartenfuss{border-top:1px solid #1B303D}
+.klegtitel{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#6F8896;
+  min-width:132px}
+details.awahlbox{margin:0 18px 12px;border:1px solid var(--line);border-radius:3px;
+  background:var(--surface-viz)}
+details.awahlbox summary{list-style:none;cursor:pointer;padding:10px 14px;font-family:var(--mono);
+  font-size:11px;letter-spacing:.04em;color:var(--ink2);display:flex;align-items:center;gap:9px}
+details.awahlbox summary::-webkit-details-marker{display:none}
+details.awahlbox summary::before{content:"▸";color:var(--acc);font-size:10px}
+details.awahlbox[open] summary::before{content:"▾"}
+details.awahlbox summary:hover{color:var(--ink)}
+.awahl{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:0 14px 14px}
+.awahl .fbtn{padding:4px 10px}
+.ksprungliste{display:flex;gap:6px;overflow-x:auto;flex:1;min-width:0;
+  scrollbar-width:thin;padding-bottom:2px}
+.ksprungliste .fbtn{white-space:nowrap;flex:0 0 auto}
+.kbar{flex-wrap:nowrap}
+.cstatgruppe{display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 
 /* ---------- Länderseite ---------- */
-.navbar{position:sticky;top:0;z-index:10;background:var(--bg);border-bottom:1px solid var(--line);
-  display:flex;align-items:center;gap:12px;padding:12px 0;margin:0 0 18px}
-.back{background:var(--card);border:1px solid var(--line);color:var(--ink);font:inherit;font-size:14px;
-  padding:7px 13px 7px 10px;border-radius:7px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.navbar{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--line);display:flex;align-items:center;
+  gap:12px;padding:12px 0;margin:0 0 20px}
+.back{background:var(--card);border:1px solid var(--line);color:var(--ink);font:inherit;font-size:13.5px;
+  padding:7px 13px;border-radius:2px;cursor:pointer}
 .back:hover{border-color:var(--ink3)}
-.back:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
-.navtitle{font-weight:600;font-size:16px}
-.navstat{margin-left:auto;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;
-  text-transform:uppercase;padding:3px 8px;border-radius:4px}
-.hero{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:20px;margin-bottom:12px;box-shadow:var(--shadow)}
-.heroval{font-family:var(--mono);font-size:44px;font-weight:600;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
-.herolab{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px}
-.heronote{font-size:13.5px;color:var(--ink2);margin-top:9px}
+.navtitle{font-family:var(--display);font-weight:600;font-size:18px;letter-spacing:.01em}
+.navstat{margin-left:auto;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;
+  text-transform:uppercase;padding:3px 8px;border-radius:2px}
+.hero{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--acc);
+  border-radius:3px;padding:22px;margin-bottom:12px;box-shadow:var(--shadow)}
+.hero.instrument{display:grid;grid-template-columns:minmax(150px,1.05fr) minmax(150px,1.25fr) minmax(150px,1fr);
+  gap:26px 30px;align-items:start}
+.hzelle{min-width:0;display:flex;flex-direction:column;gap:7px}
+.hz-spark{border-left:1px solid var(--line2);border-right:1px solid var(--line2);padding:0 26px}
+.hz-spark .spark{height:52px;margin:0}
+.hdelta{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.03em}
+/* Hinweis im Kopf, wenn der jüngste Tag nicht beurteilbar ist. Bewusst in der
+   Warnfarbe und direkt am Wert: die Information "dieser Wert ist nicht von
+   heute" verliert ihren Sinn, wenn sie weiter unten steht. */
+.hwarn{font-family:var(--mono);font-size:10px;color:var(--warn);letter-spacing:.03em;
+  margin-top:6px;line-height:1.45;max-width:30ch}
+.datenz{font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.02em;
+  padding-top:10px!important;border-top:1px dotted var(--line)}
+.einheit{font-family:var(--sans);font-size:.36em;color:var(--ink3);margin-left:6px;
+  letter-spacing:0;vertical-align:.5em}
+.hzelle .gross{font-family:var(--display);font-size:27px;font-weight:600;letter-spacing:.01em;
+  text-transform:uppercase;line-height:1}
+.hero.instrument .heronote{grid-column:1/-1;margin:2px 0 0;padding-top:16px;
+  border-top:1px solid var(--line2);font-size:12.5px;color:var(--ink3);max-width:86ch}
+.hero.instrument .heronote a{color:var(--acc)}
+.hero.instrument .gschiene{height:6px;width:100%;flex:0 0 auto;max-width:260px}
+@media (max-width:820px){ .hero.instrument{grid-template-columns:1fr 1fr;gap:20px}
+  .hz-spark{border:0;padding:0;grid-column:1/-1;border-top:1px solid var(--line2);padding-top:16px} }
+@media (max-width:520px){ .hero.instrument{grid-template-columns:1fr} }
+.herolab{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink3);margin-bottom:10px}
+.heroval{font-family:var(--mono);font-size:52px;font-weight:500;letter-spacing:-.04em;line-height:.95}
+.heronote{font-size:13.5px;color:var(--ink2);margin-top:12px;max-width:72ch}
+.gkasten{margin-top:18px;padding-top:16px;border-top:1px solid var(--line2);display:flex;
+  align-items:center;gap:10px;flex-wrap:wrap}
+.gkasten .glab{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink3)}
+.gstufe{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  color:#fff;padding:2px 7px;border-radius:2px}
+.gzahl{font-family:var(--mono);font-size:11px;color:var(--ink3)}
+.gzeile{flex:1 1 100%;font-size:12.5px;color:var(--ink3);margin:6px 0 0;line-height:1.5;max-width:76ch}
+.gzeile a{color:var(--acc)}
 .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.kpi3{grid-template-columns:1fr 1fr 1fr}
+.kpi3{grid-template-columns:repeat(3,1fr)}
+.kbox{background:var(--card);border:1px solid var(--line);border-radius:3px;padding:14px 16px}
+.klab{font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--ink3);margin-bottom:5px}
+.kval{font-family:var(--mono);font-size:24px;font-weight:500;letter-spacing:-.02em}
 .kbad{color:var(--ink3)}
-.kbox{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:14px 15px}
-.sbrief{display:flex;flex-wrap:wrap;gap:6px 18px;margin:2px 0 10px}
+.knote{font-size:11.5px;color:var(--ink3);margin-top:3px;line-height:1.45}
+.sbrief{display:flex;flex-wrap:wrap;gap:7px 20px;margin:2px 0 10px}
 .sb{font-size:12px;color:var(--ink3);display:flex;gap:6px;align-items:baseline}
-.sb b{font-weight:600;color:var(--ink2);font-family:var(--mono);font-variant-numeric:tabular-nums}
-.sb i{font-style:normal;font-size:10.5px;opacity:.7}
-.ueber{font-size:13px;color:var(--ink2);line-height:1.55;margin:0 0 16px;max-width:70ch}
-.sbquelle{font-size:11px;color:var(--ink3);margin:-6px 0 12px}
-.krise{display:flex;gap:12px;align-items:flex-start;padding:12px 15px;border-bottom:1px solid var(--line)}
+.sb b{font-weight:500;color:var(--ink2);font-family:var(--mono)}
+.sb i{font-style:normal;font-size:10px;opacity:.7}
+.ueber{font-size:13.5px;color:var(--ink2);line-height:1.6;margin:0 0 16px;max-width:72ch}
+.sbquelle{font-size:11px;color:var(--ink3);margin:-6px 0 14px}
+
+.krise{display:flex;gap:13px;align-items:flex-start;padding:14px 18px;border-bottom:1px solid var(--line2)}
+.krise.klauft{background:color-mix(in srgb,var(--crit) 4%,transparent)}
+details.kalt,details.gauf{border-top:1px solid var(--line2)}
+details.kalt summary,details.gauf summary{list-style:none;cursor:pointer;padding:12px 18px;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink3);
+  display:flex;align-items:center;gap:9px}
+details.kalt summary::-webkit-details-marker,details.gauf summary::-webkit-details-marker{display:none}
+details.kalt summary::before,details.gauf summary::before{content:"+";color:var(--acc);font-size:13px}
+details.kalt[open] summary::before,details.gauf[open] summary::before{content:"–"}
+details.kalt summary:hover,details.gauf summary:hover{color:var(--ink)}
+details.gauf{margin-top:14px;grid-column:1/-1}
+.gliste{display:flex;flex-direction:column;gap:7px;padding:2px 0 10px}
+.grow{display:grid;grid-template-columns:150px 1fr 34px;gap:12px;align-items:center;
+  font-size:12.5px;color:var(--ink2)}
+.grow .gschiene{height:6px;max-width:none}
+.grow .gzahl{text-align:right}
+.grow.leer2{color:var(--ink3)}
+.gnote{font-family:var(--mono);font-size:10.5px;color:var(--ink3)}
+@media (max-width:560px){ .grow{grid-template-columns:1fr 44px;gap:4px}
+  .grow .gschiene{grid-column:1/-1} }
 .krise:last-child{border-bottom:none}
-.kdot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex:0 0 8px}
-.ktitel{font-weight:600;font-size:13.5px;display:flex;flex-wrap:wrap;gap:8px;align-items:baseline}
-.kstufe{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
-  border:1px solid var(--line);border-radius:4px;padding:1px 5px;color:var(--ink3)}
+.kdot{width:7px;height:7px;border-radius:50%;margin-top:7px;flex:0 0 7px}
+.ktitel{font-family:var(--display);font-weight:600;font-size:15px;display:flex;flex-wrap:wrap;gap:9px;
+  align-items:baseline;letter-spacing:.01em}
+.kstufe{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;
+  border:1px solid var(--line);border-radius:2px;padding:1px 5px;color:var(--ink3)}
 .klaufend{border-color:var(--crit);color:var(--crit)}
-.kzeit{font-family:var(--mono);font-size:11px;color:var(--ink3);margin-top:2px}
-.ktext{font-size:12.5px;color:var(--ink2);margin-top:4px;line-height:1.45}
-.kzahl{font-family:var(--mono);font-size:11.5px;color:var(--ink3);margin-top:3px}
-.sect{background:var(--card);border:1px solid var(--line);border-radius:11px;margin-bottom:12px;overflow:hidden}
-.secthead{padding:15px 17px 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.secttitle{font-size:15px;font-weight:600;margin:0}
-.sectnote{font-size:12.5px;color:var(--ink3);padding:2px 17px 0;margin:0 0 6px}
-@media (max-width:760px){.kpi3{grid-template-columns:1fr 1fr}}
-@media (max-width:520px){.heroval{font-size:38px}.kpis,.kpi3{grid-template-columns:1fr}}
+.kzeit{font-family:var(--mono);font-size:10.5px;color:var(--ink3);margin-top:3px}
+.ktext{font-size:12.5px;color:var(--ink2);margin-top:5px;line-height:1.5}
+.kzahl{font-family:var(--mono);font-size:11px;color:var(--ink3);margin-top:4px}
+
+.news{padding:2px 18px 18px}
+.nday{border-top:1px solid var(--line2);padding:13px 0 3px}
+.ndate{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.09em;
+  margin-bottom:8px;display:flex;align-items:center;gap:9px}
+.nitem{display:block;color:var(--ink);text-decoration:none;font-size:14px;padding:5px 0;line-height:1.45}
+.nitem:hover{color:var(--acc)}
+.ng{font-family:var(--mono);font-size:10.5px;color:var(--crit);margin-left:8px}
+.lit{display:grid;gap:1px;background:var(--line2);border:1px solid var(--line2);border-radius:3px}
+.lrow{background:var(--card);padding:15px 18px;display:grid;grid-template-columns:220px 1fr;gap:18px}
+.lrow .who{font-family:var(--display);font-size:15px;color:var(--ink);font-weight:600}
+.lrow .who span{display:block;font-family:var(--mono);font-weight:400;font-size:11px;color:var(--ink3);
+  margin-top:3px}
+.lrow p{margin:0;font-size:13.5px;color:var(--ink2)}
+
+footer{margin-top:44px;padding-top:22px;border-top:1px solid var(--line);font-size:12.5px;
+  color:var(--ink3);line-height:1.65;max-width:78ch}
+footer b{color:var(--ink2);font-weight:600}
+footer a{color:var(--acc)}
+footer p{margin:0 0 10px}
+
+@media (max-width:780px){ .kbar{flex-wrap:wrap} .kpi3{grid-template-columns:1fr 1fr} .lrow{grid-template-columns:1fr;gap:8px} }
+@media (max-width:520px){ .heroval{font-size:42px} .kpis,.kpi3{grid-template-columns:1fr}
+  h2{margin-top:30px} .mldzeit{margin-left:0} }
 </style>
 </head>
 <body>
@@ -158,36 +503,57 @@ tbody td{font-family:var(--mono)}
 
 <section id="view-uebersicht">
   <header>
-    <p class="eyebrow">Länderrisiko · täglich aktualisiert</p>
+    <p class="eyebrow">Länderrisiko · täglich aktualisiert · <a href="verteidigung/index.html" style="color:inherit">Verteidigung</a></p>
     <h1>Länderrisiko-Monitor</h1>
-    <p class="sub">Tagesaktuelles Lagebild aus Währungsdruck, Marktvolatilität und geopolitischer Spannung. Jede Zahl mit der Angabe, worauf sie beruht.</p>
+    <p class="sub">Ein Warnwerkzeug: der Monitor meldet, was in einem Land gerade eingetreten ist — ein Sprung im Risikoindex, ein anhaltend erhöhtes Niveau, eine laufende Lage in den Ereignisdaten. Die Fortschreibung der Reihen steht bewusst dahinter. Jede Zahl mit der Angabe, worauf sie beruht.</p>
     <div class="stand"><span><span class="dot"></span>Stand <b id="stand"></b></span><span id="anzahl"></span></div>
   </header>
 
   <details class="method">
-    <summary>Worauf jede Zahl beruht — bitte einmal lesen</summary>
+    <summary>Worauf jede Zahl beruht</summary>
     <div class="mbody">
       <p><b>Risikostand</b> ist ein z-Wert: wie weit das heutige Niveau vom eigenen Normalzustand des Landes der letzten 120 Tage abweicht. 0 bedeutet normal, +2 ungewöhnlich hoch. Er ist <b>beschreibend</b>, keine Vorhersage.</p>
+      <p><b>Zwei Indizes, und warum.</b> Der <b>Zustandsindex</b> enthält die Ereignislage und trägt Anzeige und Meldungen — er sagt, wie die Lage heute ist. Der <b>Marktindex</b> ist derselbe Index ohne Ereignislage und trägt alle Prognoserechnungen. Der Grund ist ein Zirkelschluss: die Prognoseprüfung fragt, ob GDELT-Merkmale künftige Anspannung vorhersagen. Enthielte die Zielgröße selbst einen aus GDELT gebildeten Baustein, sagte das Ereignismodell zu einem Teil seine eigene Eingabe voraus. Nachgemessen hat das die Trennschärfe des Ereignismodells um durchschnittlich 0,022 AUC geschmeichelt, in Nigeria um 0,096.</p>
+      <p><b>Vier Bausteine.</b> Ereignislage (länderspezifisch, aus den GDELT-Ereignisdaten: der stärkste der drei Anteile Gewalt, Zwang, Protest gegen die eigene Normallage), Währungsdruck, Marktvolatilität und das globale geopolitische Umfeld. Der Gesamtwert ist das gewichtete Mittel — <b>mit einer Eskalationsklausel</b>: bricht ein einzelner Baustein aus, greift er mit 70&nbsp;% seines Werts durch, damit ihn die ruhigen Bausteine nicht wegmitteln. Das globale Umfeld hat bewusst nur ein kleines Gewicht, weil es zwischen Ländern nicht trennt: seine Spanne zwischen zwei Ländern am selben Tag beträgt 0,005 Standardabweichungen, die des Währungsbausteins 1,84.</p>
+      <p><b>Eine Skala für alle vier.</b> Die Bausteine werden vor der Gewichtung rollend über 120 Handelstage normiert. Vorher hatten sie drei verschiedene Nullpunkte — Währung und Markt über die gesamte eigene Reihe standardisiert, der GPR über seine Historie, die Ereignislage rollend über 60 Tage —, mit Mittelwerten von 0,00 / 0,00 / +0,83 / +0,60. Ein gewichtetes Mittel daraus war nicht in Standardabweichungen lesbar, und die Eskalationsklausel griff bevorzugt beim globalen Umfeld. Nebeneffekt der Umstellung: die alte Standardisierung benutzte auch Tage <i>nach</i> dem Stichtag — jetzt gilt für Markt- und Ereignisbausteine dieselbe Regel, nur Information bis zum Stichtag.</p>
+      <p><b>Welche Tage zählen.</b> Ereignisanteile sind Quotienten; ein halb geerntet Tag hat einen zu kleinen Nenner und damit einen überhöhten Anteil. Ein Tag gilt deshalb erst als gemessen, wenn er mindestens 30 Ereignisse und 40&nbsp;% der üblichen Menge desselben Wochentags enthält. In den Kursreihen werden große Bewegungen, die sich am Folgetag wieder auflösen, als Fehlnotierung ersetzt; eine Bewegung am letzten Tag ist noch nicht entscheidbar und löst keine Meldung aus. Fehlt ein sonst vorhandener Baustein nur heute, wird der Index <b>nicht</b> aus den übrigen hochgerechnet — der Tag gilt als nicht beurteilbar, und der Kopf der Länderseite nennt Stichtag und Grund. Zahlen und Belege unter <a href="#/rechnungen">Rechnungen</a>, Abschnitt 0.</p>
       <p><b>Auffälligkeit</b> markiert Tage, an denen die Bewegung mehr als das 2,5-fache ihrer üblichen Streuung beträgt oder das Niveau über +1,5 liegt. Eine Messung der Gegenwart, kein Warnsignal für die Zukunft.</p>
+      <p><b>Lagemeldung</b> ist die erste Ebene des Monitors. Gemeldet wird ein eingetretener Zustand, immer mit Anfangsdatum: ein Tagessprung über dem 2,5-fachen der üblichen Streuung, ein Niveau, das mindestens 1,5 Standardabweichungen über der Normallage liegt, eine einzelne Komponente außerhalb des Rahmens, oder eine laufende Episode aus den Ereignisdaten. Meldungen, deren Zustand höchstens drei Tage alt ist, gelten als neu.</p>
+      <p><b>Ausblick</b> ist die zweite Ebene und ausdrücklich nachrangig. Jede Reihe wird autoregressiv aus ihrer eigenen Historie fünf Handelstage fortgeschrieben; eine zweite Variante bekommt zusätzlich die GDELT-Merkmale. Beide werden gegen die einfachste denkbare Regel geprüft — den heutigen Wert beibehalten. Die Prüfzahlen stehen gesammelt unter <a href="#/rechnungen">Rechnungen</a>, nicht in den Lageansichten.</p>
       <p><b>Prognose 7 Tage</b> schätzt die Wahrscheinlichkeit, dass der Risikostand in einer Woche über +1,0 liegt — <b>ausschließlich aus der Eigenhistorie des Risikoindex</b>, nicht aus Nachrichtendaten. Daneben steht die auf einem abgetrennten Testfenster gemessene Güte.</p>
       <p><b>Keine Monatsprognose.</b> Auf 21 Tage Vorlauf liegt selbst das beste Modell auf Zufallsniveau.</p>
       <p><b>Nachrichten</b> aus GDELT, ausgewählt nach dem negativsten Goldstein-Wert des Tages, Überschriften aus den Quell-URLs abgeleitet. GDELT liefert hier <b>Kontext, keine Prognose</b>: in 47 geprüften Konstellationen war kein Prognosebeitrag nachweisbar.</p>
     </div>
   </details>
 
+  <h2 style="display:flex;align-items:center;gap:12px">Karte
+    <a href="#/karte" class="tblbtn" style="margin-left:auto;text-decoration:none">Nadelöhre und Lesehilfe →</a></h2>
+  <div id="karte-start"></div>
+
+  <h2 style="display:flex;align-items:center;gap:12px">Lagemeldungen
+    <a href="#/historie" class="tblbtn" style="margin-left:auto;text-decoration:none">Chronologie →</a></h2>
+  <div class="lagekopf"><span class="lagezahl" id="lagezahl"></span></div>
+  <div class="filter" id="lagefilter"></div>
+  <div class="lage" id="lage"></div>
+
   <h2 style="display:flex;align-items:center;gap:12px">Alle Länder
-    <a href="#/historie" class="tblbtn" style="margin-left:auto;text-decoration:none">Auffälligkeiten →</a></h2>
+    <a href="#/rechnungen" class="tblbtn" style="margin-left:auto;text-decoration:none">Rechnungen →</a></h2>
   <div class="grid" id="grid"></div>
 
   <footer>
     <p><b>Datengrundlage.</b> Wechselkurse und Aktienindizes über Yahoo Finance, geopolitische Spannung über den Geopolitical Risk Index von Caldara und Iacoviello, Ereignisdaten aus GDELT 2.1. Februar 2023 bis heute, 1.291 Tage.</p>
     <p><b>Länderauswahl.</b> Nur Länder mit frei gehandelter, marktgestellter Währung. Ausgeschlossen wurden Länder mit fester Bindung (Mali, Irak) oder amtlich gestelltem Kurs (Libanon, Syrien, Jemen, Sudan, Somalia, Iran, Venezuela, Myanmar), weil deren Kurse kein Landesrisiko abbilden.</p>
-    <p><b>Grenzen.</b> Der Monitor beschreibt und erkennt; er prognostiziert nur kurzfristig und nur aus Marktdaten. Prototyp im Rahmen einer Bachelorarbeit, keine Anlage- oder Risikoberatung.</p>
+    <p><b>Rechnungen.</b> Jede Zahl, die der Monitor zeigt, ist an einer Messlatte geprüft — die
+    Prüfungen selbst stehen gesammelt unter <a href="#/rechnungen" style="color:var(--s1)">Rechnungen</a>
+    und nicht in den Lageansichten, damit dort das Ergebnis steht und nicht der Rechenweg.</p>
+    <p><b>Grenzen.</b> Der Monitor beschreibt und erkennt; er prognostiziert nur kurzfristig, und jede Fortschreibung steht neben dem Fehler der Beibehaltungsregel. Prototyp im Rahmen einer Bachelorarbeit, keine Anlage- oder Risikoberatung.</p>
   </footer>
 </section>
 
 <section id="view-land" hidden></section>
 <section id="view-historie" hidden></section>
+<section id="view-rechnungen" hidden></section>
+<section id="view-karte" hidden></section>
 </div>
 <script>
 (async function(){
@@ -204,7 +570,15 @@ try{
     'Beim lokalen Öffnen bitte einen kleinen Server nutzen: <code>python3 -m http.server</code>.</p></div>';
   return;
 }
-const KAT = {waehrung:{n:"Währungsdruck",c:"var(--s1)"},markt:{n:"Marktvolatilität",c:"var(--s2)"},geopolitik:{n:"Geopolitik",c:"var(--s3)"}};
+const KAT = {ereignis:{n:"Ereignislage",k:"Ereignis",c:"var(--crit)"},
+             waehrung:{n:"Währungsdruck",k:"Währung",c:"var(--s1)"},
+             markt:{n:"Marktvolatilität",k:"Markt",c:"var(--s2)"},
+             geopolitik:{n:"Geopolitik (global)",k:"Geopolitik",c:"var(--s3)"}};
+
+// Woher die aktuelle Ansicht betreten wurde. Ohne das führt der
+// Zurück-Knopf immer auf die Übersicht, auch wenn man von der Karte kam.
+let HERKUNFT = "#/";
+const ZURUECK = {"#/":"Alle Länder","#/karte":"Karte","#/historie":"Chronologie","#/rechnungen":"Rechnungen"};
 
 function stufe(z){
   if(z===null||z===undefined) return {l:"keine Daten",c:"var(--ink3)",bg:"var(--sunk)",i:"–"};
@@ -214,6 +588,104 @@ function stufe(z){
   return {l:"ruhig",c:"#fff",bg:"var(--good)",i:"▼"};
 }
 const fmtD = s => { const [y,m,d]=s.split("-"); return d+"."+m+"."+y; };
+
+// Zwei Achsen, zwei Codierungen. Das Grundniveau ist strukturell und langsam,
+// also trägt es die FLÄCHE in gedämpften Erdtönen. Die Meldestufe ist ein
+// Ereignis, also trägt sie die MARKE in Signalfarbe. Würden beide dieselbe
+// Skala benutzen, wäre auf der Karte nicht mehr zu unterscheiden, ob ein Land
+// grundsätzlich riskant ist oder gerade etwas passiert.
+const GRUND = {
+  niedrig:{f:"#3A7A83", n:"niedrig"}, mittel:{f:"#76795A", n:"mittel"},
+  "erhöht":{f:"#96683E", n:"erhöht"}, hoch:{f:"#8A4038", n:"hoch"}
+};
+const grundOf = c => (D.laender[c]||{}).grundniveau || null;
+function grundFarbe(c){
+  const g=grundOf(c);
+  return g && GRUND[g.stufe] ? GRUND[g.stufe].f : "var(--land)";
+}
+function grundText(c){
+  const g=grundOf(c);
+  if(!g) return "Grundniveau noch nicht berechenbar";
+  return "Grundniveau: "+(g.viertel||g.stufe)+" der überwachten Länder · Platz "+
+    g.rang+" von "+g.von+(g.unsicher?" (vorläufig, "+g.anzahl_groessen+" von 5 Größen)":"");
+}
+
+// Woraus das Grundniveau kommt. Die Frage "erhöht -- warum und auf welcher
+// Basis" muss auf der Länderseite selbst beantwortet sein und nicht erst in
+// den Rechnungen: sonst steht dort eine Einordnung ohne Begründung.
+const GRUNDLAGE_NAME = {gewalt:"Gewaltanteil", zwang:"Zwangsanteil",
+  tonlage:"Tonlage", waehrung:"Währungsvolatilität", markt:"Marktvolatilität"};
+function grundAufschluesselung(code){
+  const g=grundOf(code);
+  if(!g || !g.grundlagen) return "";
+  const zeilen=Object.keys(GRUNDLAGE_NAME).map(k=>{
+    const v=g.grundlagen[k];
+    if(v==null) return '<div class="grow leer2"><span>'+GRUNDLAGE_NAME[k]+
+      '</span><span class="gnote">liegt nicht vor</span></div>';
+    const f=(GRUND[g.stufe]||{}).f||"var(--ink3)";
+    return '<div class="grow"><span>'+GRUNDLAGE_NAME[k]+'</span>'+
+      '<span class="gschiene"><span class="gfuell" style="width:'+Math.round(v)+
+        '%;background:'+f+'"></span></span>'+
+      '<span class="gzahl">'+Math.round(v)+'</span></div>';
+  }).join("");
+  // Der stärkste Einzelrang wird ausdrücklich genannt. Ohne das entsteht ein
+  // scheinbarer Widerspruch: die Ukraine hat den höchsten Gewaltanteil der
+  // Gruppe (Rang 100) und liegt im Grundniveau trotzdem nur auf Platz 7 --
+  // weil ein Mittelwert über fünf Ränge einen Spitzenwert verdünnt und
+  // fehlende Größen ihn zusätzlich drücken. Das ist erklärbar, aber nicht
+  // selbsterklärend.
+  const vorhanden=Object.keys(GRUNDLAGE_NAME).filter(k=>g.grundlagen[k]!=null);
+  const spitze=vorhanden.reduce((a,k)=>g.grundlagen[k]>g.grundlagen[a]?k:a, vorhanden[0]);
+  const hinweis = spitze && g.grundlagen[spitze] >= 75 && g.wert < g.grundlagen[spitze] - 15
+    ? ' Auffällig: der höchste Einzelrang liegt bei '+Math.round(g.grundlagen[spitze])+
+      ' ('+GRUNDLAGE_NAME[spitze]+'), das Grundniveau darunter bei '+g.wert.toFixed(0)+
+      ' — ein Mittelwert über fünf Ränge verdünnt einen Spitzenwert, und fehlende Größen '+
+      'drücken ihn zusätzlich. Für die Frage „wo ist gerade etwas los" ist deshalb die '+
+      'Abweichung zuständig, nicht das Grundniveau.'
+    : '';
+  return '<div class="gliste">'+zeilen+'</div>'+
+    '<p class="gzeile">Jede Größe als Rangplatz zwischen den überwachten Ländern, 0 bis 100, '+
+    'gemittelt über ein Jahr. 100 heißt: der höchste Wert dieser Gruppe. Das Grundniveau ist '+
+    'der Mittelwert dieser Ränge — deshalb sagt es, wo ein Land <b>innerhalb</b> der Gruppe '+
+    'steht, und nichts darüber hinaus.'+hinweis+'</p>';
+}
+
+
+// Farbskala der Meldungsstufen. Bewusst nur drei Stufen: mehr Abstufungen
+// suggerieren eine Genauigkeit, die die zugrunde liegenden Schwellen nicht
+// hergeben.
+const STUFE={kritisch:{c:"var(--crit)",l:"kritisch"},
+             hoch:{c:"var(--serious)",l:"hoch"},
+             beachten:{c:"var(--warn)",l:"beachten"}};
+
+// Alle Meldungen. D.lage kommt aus dem taeglichen Lauf; fehlt sie -- etwa in
+// einer aelteren Datenfassung -- werden die Landesmeldungen zusammengelegt,
+// damit die Ansicht nicht von einem einzelnen Feld abhaengt.
+function alleMeldungen(){
+  if(D.lage && Array.isArray(D.lage.meldungen) && D.lage.meldungen.length) return D.lage.meldungen;
+  const aus=[];
+  Object.keys(D.laender).forEach(c=>{ (D.laender[c].warnungen||[]).forEach(m=>aus.push(m)); });
+  const r={kritisch:3,hoch:2,beachten:1};
+  return aus.sort((a,b)=>(b.neu-a.neu)||(r[b.stufe]-r[a.stufe])||(a.datum<b.datum?1:-1));
+}
+
+function tageHer(datum){
+  const t=Math.round((new Date(D.stand)-new Date(datum))/864e5);
+  return t<=0?"heute":t===1?"seit gestern":"seit "+t+" Tagen";
+}
+
+function meldungHTML(m, mitLand){
+  const st=STUFE[m.stufe]||STUFE.beachten;
+  return '<a class="mld'+(m.neu?' istneu':'')+'" href="#/land/'+m.code+'">'+
+    '<span class="mldbar" style="background:'+st.c+'"></span>'+
+    '<span class="mldin"><span class="mldtop">'+
+      (mitLand?'<span class="mldland">'+m.land+'</span>':'')+
+      '<span class="mldtitel">'+m.titel+'</span>'+
+      (m.neu?'<span class="chip chipneu">neu</span>':'')+
+      '<span class="chip" style="border:1px solid '+st.c+';color:'+st.c+'">'+st.l+'</span>'+
+      '<span class="mldzeit">'+(m.seit?fmtD(m.seit)+' \u00b7 '+tageHer(m.seit):fmtD(m.datum))+'</span>'+
+    '</span><span class="mldtext">'+m.text+'</span></span></a>';
+}
 const fmtD2 = s => s.slice(6,8)+"."+s.slice(4,6)+".";
 
 function sparkline(vals){
@@ -223,35 +695,201 @@ function sparkline(vals){
   let d="",started=false;
   pts.forEach(p=>{ if(!p){started=false;return;} d+=(started?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)+" "; started=true; });
   const last=pts.filter(Boolean).pop();
+  // Fläche unter der Kurve plus betonter Endpunkt: die Karte soll auf einen
+  // Blick zeigen, wohin die Reihe zuletzt gelaufen ist, nicht nur dass sie
+  // schwankt. Die Nulllinie steht mit, damit "über" und "unter" ablesbar sind.
+  const yNull = mn<=0 && mx>=0 ? (H-2-((0-mn)/r)*(H-6)) : null;
+  const erste=pts.find(Boolean);
+  const flaeche='<path class="flaeche" d="'+d+'L'+last[0].toFixed(1)+' '+H+'L'+erste[0].toFixed(1)+
+    ' '+H+'Z" fill="var(--ink3)" opacity=".17"/>';
   return '<svg class="spark" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" aria-hidden="true">'+
-    '<path d="'+d+'" fill="none" stroke="var(--ink3)" stroke-width="1.5" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>'+
-    '<circle cx="'+last[0].toFixed(1)+'" cy="'+last[1].toFixed(1)+'" r="2.5" fill="var(--ink)"/></svg>';
+    (yNull!==null?'<line x1="0" y1="'+yNull.toFixed(1)+'" x2="'+W+'" y2="'+yNull.toFixed(1)+
+      '" stroke="var(--line)" stroke-width="1" vector-effect="non-scaling-stroke"/>':'')+
+    flaeche+
+    '<path class="linie" pathLength="1" d="'+d+'" fill="none" stroke="var(--ink2)" stroke-width="1.5" '+
+      'vector-effect="non-scaling-stroke" stroke-linejoin="round"/>'+
+    '<circle cx="'+last[0].toFixed(1)+'" cy="'+last[1].toFixed(1)+'" r="2.6" fill="var(--ink)"/></svg>';
 }
 
 const grid=document.getElementById("grid");
-const vU=document.getElementById("view-uebersicht"), vL=document.getElementById("view-land"), vH=document.getElementById("view-historie");
+const vU=document.getElementById("view-uebersicht"), vL=document.getElementById("view-land"), vH=document.getElementById("view-historie"), vR=document.getElementById("view-rechnungen"), vK=document.getElementById("view-karte");
 document.getElementById("stand").textContent=fmtD(D.stand);
 const codes=Object.keys(D.laender);
 const nAuff=codes.filter(c=>D.laender[c].auffaellig.slice(-7).some(x=>x===1)).length;
-document.getElementById("anzahl").textContent=codes.length+" Länder · "+(nAuff?nAuff+" mit Auffälligkeit in den letzten 7 Tagen":"keine Auffälligkeit in den letzten 7 Tagen");
 
-codes.sort((a,b)=>D.laender[b].stand_z-D.laender[a].stand_z).forEach(code=>{
+// ---------------------------------------------------------------- Auswahl
+// Eigene Länder markieren. Im Lieferkettenfall ist die Frage nicht "wo ist
+// weltweit etwas los", sondern "ist etwas dort los, wo ich einkaufe". Die
+// Auswahl filtert deshalb Lagetafel, Karte und Nadelöhrliste.
+//
+// Gespeichert wird im Browser des Betrachters, nicht im Datenstand: es ist
+// eine Sicht, keine Messung. Jeder Zugriff ist in try/catch gefasst, weil
+// die Ablage im privaten Fenster oder bei gesperrten Seitendaten fehlt oder
+// beim Lesen selbst eine Ausnahme wirft.
+const AUSWAHL_KEY = "lrm.meine_laender";
+
+function auswahlLesen(){
+  try{
+    const roh=localStorage.getItem(AUSWAHL_KEY);
+    if(!roh) return new Set();
+    return new Set(JSON.parse(roh).filter(c=>D.laender[c]));
+  }catch(e){ return new Set(); }
+}
+function auswahlSchreiben(s){
+  try{ localStorage.setItem(AUSWAHL_KEY, JSON.stringify([...s])); }catch(e){}
+}
+let MEINE = auswahlLesen();
+const meinesLand = c => MEINE.size===0 || MEINE.has(c);
+
+function auswahlChips(id){
+  const sortiert=[...codes].sort((a,b)=>D.laender[a].name.localeCompare(D.laender[b].name,"de"));
+  return '<details class="awahlbox"'+(MEINE.size?' open':'')+'><summary>'+
+    (MEINE.size?'Meine Länder — '+[...MEINE].map(c=>D.laender[c].name).join(", ")
+              :'Meine Länder wählen')+'</summary>'+
+    '<div class="awahl" id="'+id+'">'+
+    sortiert.map(c=>'<button class="fbtn" data-land="'+c+'" aria-pressed="'+MEINE.has(c)+'">'+
+      D.laender[c].name+'</button>').join("")+
+    (MEINE.size?'<button class="fbtn" data-land="_leer" style="border-color:var(--crit);color:var(--crit)">Auswahl aufheben</button>':'')+
+    '</div></details>'+
+    '<p class="sectnote" style="padding-top:0">'+(MEINE.size
+      ? '<b>'+MEINE.size+' '+(MEINE.size===1?'Land':'Länder')+' ausgewählt.</b> Karte, Lagemeldungen '+
+        'und Nadelöhre zeigen bevorzugt, was diese Länder betrifft. Die Auswahl liegt im Browser '+
+        'dieses Geräts und verändert nichts an den Daten.'
+      : 'Ohne Auswahl gilt der volle Umfang. Ein Klick auf ein Land beschränkt die Ansicht darauf — '+
+        'für den Lieferkettenfall die eigentliche Frage: ist etwas dort los, wo eingekauft wird.')+'</p>';
+}
+
+function auswahlBinden(id, danach){
+  const box=document.getElementById(id);
+  if(!box) return;
+  box.addEventListener("click",e=>{
+    const b=e.target.closest("[data-land]"); if(!b) return;
+    if(b.dataset.land==="_leer") MEINE=new Set();
+    else if(MEINE.has(b.dataset.land)) MEINE.delete(b.dataset.land);
+    else MEINE.add(b.dataset.land);
+    auswahlSchreiben(MEINE);
+    danach();
+  });
+}
+
+// ---------------------------------------------------------------- Lagetafel
+const MELD=alleMeldungen();
+const MELD_JE_LAND={};
+MELD.forEach(m=>{ (MELD_JE_LAND[m.code]=MELD_JE_LAND[m.code]||[]).push(m); });
+let lageFilter="neu";
+
+document.getElementById("anzahl").textContent=codes.length+" Länder · "+
+  (MELD.length?MELD.filter(m=>m.neu).length+" neue Meldungen":"keine neue Meldung");
+
+function lageZeichnen(){
+  const box=document.getElementById("lage"), zahl=document.getElementById("lagezahl");
+  const neuZahl=MELD.filter(m=>m.neu).length;
+  const kritZahl=MELD.filter(m=>m.stufe==="kritisch").length;
+  zahl.textContent=MELD.length
+    ? MELD.length+" offene Meldungen in "+Object.keys(MELD_JE_LAND).length+" Ländern · "
+      +neuZahl+" davon neu · "+kritZahl+" kritisch"
+    : "keine offenen Meldungen";
+  let liste = lageFilter==="neu" ? MELD.filter(m=>m.neu) : MELD;
+  if(lageFilter==="meine") liste = MELD.filter(m=>MEINE.has(m.code));
+  if(!liste.length){
+    // Eine ruhige Lage ist ein Ergebnis, keine Luecke -- deshalb wird sie
+    // benannt und nicht durch eine leere Flaeche ersetzt.
+    box.innerHTML='<div class="leer"><b>Keine '+(lageFilter==="meine"?"Meldung für die ausgewählten Länder":
+      (lageFilter==="neu"?"neuen ":"")+
+      '')+(lageFilter==="meine"?'':'Meldungen')+' zum Stand '+fmtD(D.stand)+'.</b><br>'+
+      (lageFilter==="meine"
+        ? 'Die ausgewählten Länder überschreiten derzeit keine der hinterlegten Schwellen'+
+          (MELD.length?'; für die übrigen Länder liegen '+MELD.length+' Meldungen vor':'')+'. '
+        : 'Kein Land überschreitet derzeit '+(lageFilter==="neu"?'seit höchstens drei Tagen ':'')+
+          'eine der hinterlegten Schwellen. ')+
+      (lageFilter==="neu"&&MELD.length?'Über den Filter sind '+MELD.length+' länger bestehende Meldungen erreichbar. ':'')+
+      'Die Chronologie zeigt, wann zuletzt etwas gemeldet wurde.</div>';
+    return;
+  }
+  box.innerHTML=liste.map(m=>meldungHTML(m,true)).join("");
+}
+
+function lageFilterBauen(){
+  if(lageFilter==="meine" && !MEINE.size) lageFilter="neu";
+  const f=document.getElementById("lagefilter");
+  const opt=[["neu","Neu (\u2264 3 Tage)"],["alle","Alle offenen"]];
+  if(MEINE.size) opt.push(["meine","Nur meine Länder ("+MEINE.size+")"]);
+  f.innerHTML=opt.map(o=>'<button class="fbtn" data-f="'+o[0]+'" aria-pressed="'+(o[0]===lageFilter)+'">'+o[1]+'</button>').join("");
+  // Der Zuhoerer haengt an der Leiste, nicht an den Knoepfen: die Leiste wird
+  // neu gezeichnet, sobald sich die Auswahl aendert, die Knoepfe darin also
+  // ausgetauscht. Ein Zuhoerer pro Knopf waere danach verloren.
+  if(!f.dataset.gebunden){
+    f.dataset.gebunden="1";
+    f.addEventListener("click",e=>{
+      const b=e.target.closest(".fbtn"); if(!b) return;
+      lageFilter=b.dataset.f;
+      [...f.children].forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.f===lageFilter)));
+      lageZeichnen();
+    });
+  }
+}
+lageFilterBauen();
+lageZeichnen();
+
+// Sortierung: gemeldete Laender zuerst, innerhalb dessen nach Stufe, danach
+// erst nach Indexstand. In einem Warnwerkzeug gehoert nach oben, wo etwas
+// eingetreten ist -- nicht, wo der Index zufaellig am hoechsten steht.
+const RANG={kritisch:3,hoch:2,beachten:1};
+function landRang(c){
+  const m=(MELD_JE_LAND[c]||[]);
+  if(!m.length) return 0;
+  return Math.max(...m.map(x=>(RANG[x.stufe]||1)*2+(x.neu?1:0)));
+}
+codes.sort((a,b)=>landRang(b)-landRang(a)||D.laender[b].stand_z-D.laender[a].stand_z).forEach(code=>{
   const L=D.laender[code], s=stufe(L.stand_z);
   const recent=L.auffaellig.slice(-7).some(x=>x===1);
   const a=document.createElement("a");
   a.className="ccard"; a.href="#/land/"+code; a.dataset.code=code;
   a.innerHTML='<div class="stripe" style="background:'+s.bg+'"></div>'+
-    (recent?'<span class="badge">auffällig</span>':'')+
     '<div class="cin"><div class="cname"><span>'+L.name+'</span>'+
-    '<span class="cstat" style="background:'+s.bg+';color:'+s.c+'">'+s.i+' '+s.l+'</span></div>'+
+    '<span class="cstatgruppe">'+
+      (recent?'<span class="chip chipneu">auffällig</span>':'')+
+      '<span class="cstat" style="background:'+s.bg+';color:'+s.c+'">'+s.i+' '+s.l+'</span>'+
+    '</span></div>'+
     '<div class="cval">'+(L.stand_z>0?"+":"")+L.stand_z.toFixed(2)+'</div>'+
-    '<div class="cmeta">'+(L.prognose_7t===null?'Prognose noch nicht verfügbar':'Prognose 7 T · '+Math.round(L.prognose_7t*100)+' %')+'</div>'+
+    kartenMeldung(code)+
+    grundBalken(code)+
     sparkline(L.risiko)+'</div>';
   grid.appendChild(a);
 });
 
+// Auf der Karte steht die dringlichste Meldung des Landes, nicht die
+// Prognose. Die Karte beantwortet damit die Frage, die ein Warnwerkzeug
+// zuerst beantworten muss: ist hier etwas passiert?
+function kartenMeldung(code){
+  const m=(MELD_JE_LAND[code]||[])[0];
+  if(!m) return '<div class="cmeta">keine offene Meldung</div>';
+  const st=STUFE[m.stufe]||STUFE.beachten;
+  const weitere=(MELD_JE_LAND[code].length-1);
+  return '<div class="cwarn"><span class="cwarnpunkt" style="background:'+st.c+'"></span>'+
+    '<span>'+m.titel+'<br><span style="font-family:var(--mono);font-size:10.5px;color:var(--ink3)">'+
+    tageHer(m.seit||m.datum)+(weitere>0?' \u00b7 +'+weitere+' weitere':'')+'</span></span></div>';
+}
+
+// Grundniveau auf der Karte: ein Balken, keine zweite große Zahl. Die große
+// Zahl bleibt die Abweichung -- sie ist der Warnanlass. Das Grundniveau ist
+// der Kontext dazu und wird entsprechend leiser gesetzt.
+function grundBalken(code){
+  const g=grundOf(code);
+  if(!g) return '<div class="gbalken"><span class="glab">Grundniveau</span>'+
+    '<span class="gwert">noch nicht berechenbar</span></div>';
+  const f=(GRUND[g.stufe]||{}).f||"var(--ink3)";
+  return '<div class="gbalken" title="'+grundText(code)+'">'+
+    '<span class="glab">Grundniveau</span>'+
+    '<span class="gschiene"><span class="gfuell" style="width:'+g.wert.toFixed(0)+
+      '%;background:'+f+'"></span></span>'+
+    '<span class="gwert">'+g.stufe+(g.unsicher?' *':'')+'</span></div>';
+}
+
+const letzterWert = a => { for(let i=a.length-1;i>=0;i--) if(a[i]!==null&&a[i]!==undefined) return a[i]; return null; };
+
 function chart(L){
-  const W=760,H=250,PL=34,PR=14,PT=12,PB=26;
+  const W=760,H=250,PL=36,PR=86,PT=12,PB=26;
   const kats=Object.keys(L.kategorien);
   let all=[]; kats.forEach(k=>L.kategorien[k].forEach(v=>{if(v!==null)all.push(v)}));
   L.risiko.forEach(v=>{if(v!==null)all.push(v)});
@@ -264,23 +902,50 @@ function chart(L){
 
   let g="";
   [-3,-2,-1,0,1,2,3].filter(t=>t>y0&&t<y1).forEach(t=>{
-    g+='<line x1="'+PL+'" y1="'+Y(t).toFixed(1)+'" x2="'+(W-PR)+'" y2="'+Y(t).toFixed(1)+'" stroke="var(--line)" stroke-width="1" stroke-dasharray="'+(t===0?"":"2 4")+'"/>'+
-       '<text x="'+(PL-7)+'" y="'+(Y(t)+3.5).toFixed(1)+'" text-anchor="end" font-family="var(--mono)" font-size="10" fill="var(--ink3)">'+(t>0?"+":"")+t+'</text>';
+    g+='<line x1="'+PL+'" y1="'+Y(t).toFixed(1)+'" x2="'+(W-PR)+'" y2="'+Y(t).toFixed(1)+
+       '" stroke="var(--line)" stroke-width="1" stroke-dasharray="'+(t===0?"":"2 4")+
+       '" opacity="'+(t===0?1:.75)+'"/>'+
+       '<text x="'+(PL-8)+'" y="'+(Y(t)+3.5).toFixed(1)+'" text-anchor="end" '+
+       'font-family="var(--mono)" font-size="9.5" fill="var(--ink3)">'+(t>0?"+":"")+t+
+       (t===0?"":"σ")+'</text>';
   });
   let ticks="";
   const step=Math.max(1,Math.floor(L.daten.length/5));
   for(let i=0;i<L.daten.length;i+=step){
     ticks+='<text x="'+X(i).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-family="var(--mono)" font-size="10" fill="var(--ink3)">'+fmtD(L.daten[i]).slice(0,6)+'</text>';
   }
-  let auf="";
-  L.auffaellig.forEach((a,i)=>{ if(a===1) auf+='<line x1="'+X(i).toFixed(1)+'" y1="'+PT+'" x2="'+X(i).toFixed(1)+'" y2="'+(H-PB)+'" stroke="var(--crit)" stroke-width="1" opacity=".16"/>'; });
+  const heuteX = X(L.daten.length-1);
+  let auf='<line x1="'+heuteX.toFixed(1)+'" y1="'+PT+'" x2="'+heuteX.toFixed(1)+'" y2="'+(H-PB)+
+    '" stroke="var(--ink3)" stroke-width="1" stroke-dasharray="2 3" opacity=".55"/>'+
+    '<text x="'+heuteX.toFixed(1)+'" y="'+(PT+9)+'" text-anchor="end" dx="-4" '+
+    'font-family="var(--mono)" font-size="9" fill="var(--ink3)">heute</text>';
+  L.auffaellig.forEach((a,i)=>{ if(a===1) auf+='<line class="auffmarke" x1="'+X(i).toFixed(1)+'" y1="'+PT+
+    '" x2="'+X(i).toFixed(1)+'" y2="'+(H-PB)+'" stroke="var(--crit)" stroke-width="1" opacity=".16"/>'; });
 
-  let lines='<path d="'+path(L.risiko)+'" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linejoin="round" opacity=".92"/>';
-  kats.forEach(k=>{ lines+='<path d="'+path(L.kategorien[k])+'" fill="none" stroke="'+KAT[k].c+'" stroke-width="2" stroke-linejoin="round"/>'; });
-  // Keine Direktbeschriftung: am rechten Rand enden die Kurven oft dicht
-  // beieinander, die Beschriftungen wuerden sich ueberlagern. Identitaet
-  // tragen die Legende darueber und die Tabellenansicht.
-  const labels="";
+  let lines='<path class="serie" pathLength="1" d="'+path(L.risiko)+'" fill="none" stroke="var(--ink)" '+
+    'stroke-width="2.5" stroke-linejoin="round" opacity=".92"/>';
+  kats.forEach(k=>{ lines+='<path class="serie" pathLength="1" d="'+path(L.kategorien[k])+
+    '" fill="none" stroke="'+KAT[k].c+'" stroke-width="2" stroke-linejoin="round"/>'; });
+  // Direktbeschriftung am rechten Rand -- aber mit Auseinanderschieben.
+  // Frueher stand hier nichts, weil die Kurven dort oft dicht beieinander
+  // enden und sich die Beschriftungen ueberlagerten. Das laesst sich loesen,
+  // statt darauf zu verzichten: die Endpunkte werden nach Hoehe sortiert und
+  // solange auseinandergeschoben, bis zwischen zweien mindestens ZEILE Pixel
+  // liegen. Eine Kurve ohne Namen am Ende zwingt sonst zum Abgleich mit der
+  // Legende, und genau das kostet beim Lesen die meiste Zeit.
+  const ZEILE = 12;
+  const enden = [{n:"Gesamt", c:"var(--ink)", v:letzterWert(L.risiko)}]
+    .concat(kats.map(k=>({n:KAT[k].k||KAT[k].n, c:KAT[k].c, v:letzterWert(L.kategorien[k])})))
+    .filter(e=>e.v!==null)
+    .map(e=>({...e, y:Y(e.v)}))
+    .sort((a,b)=>a.y-b.y);
+  for(let i=1;i<enden.length;i++)
+    if(enden[i].y - enden[i-1].y < ZEILE) enden[i].y = enden[i-1].y + ZEILE;
+  const ueber = enden.length ? enden[enden.length-1].y - (H-PB-2) : 0;
+  if(ueber > 0) enden.forEach(e=>{ e.y -= ueber; });
+  const labels = enden.map(e=>
+    '<text class="serienlabel" x="'+(W-PR+4)+'" y="'+e.y.toFixed(1)+'" dy="3.2" '+
+    'font-family="var(--mono)" font-size="9.5" fill="'+e.c+'">'+e.n+'</text>').join("");
   return '<svg class="chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Risikoverlauf '+L.name+'">'+
     g+auf+ticks+lines+labels+
     '<rect x="'+PL+'" y="'+PT+'" width="'+(W-PL-PR)+'" height="'+(H-PT-PB)+'" fill="transparent"/>'+
@@ -317,22 +982,43 @@ function nachrichtenBlock(L){
 // Niveau hoch bleibt -- weil das hohe Niveau die Normallage des Landes ist.
 function krisenBlock(L){
   const K = L.krisen || [];
+  const aktuell = K.filter(k=>!k.historisch);
+  const alt = K.filter(k=>k.historisch);
   if(!K.length) return '<p class="empty" style="padding:0 17px 16px">'+
-    'Keine auff\u00e4lligen Lagen erkannt. Das hei\u00dft nicht "ruhig", sondern '+
-    '"nicht ungew\u00f6hnlich f\u00fcr dieses Land".</p>';
-  const farbe = {konflikt:'var(--crit)', protest:'#c8863c', zwang:'#7a6ea8'};
-  return K.map(function(k){
-    return '<div class="krise"><span class="kdot" style="background:'+(farbe[k.art]||'var(--ink3)')+
-      ';opacity:'+(k.laufend?1:.35)+'"></span><div style="flex:1">'+
-      '<div class="ktitel">'+k.name+
-        '<span class="kstufe'+(k.laufend?' klaufend':'')+'">'+(k.laufend?'l\u00e4uft \u00b7 ':'')+k.stufe+'</span></div>'+
-      '<div class="kzeit">'+fmtD(k.von)+' \u2013 '+(k.laufend?'heute':fmtD(k.bis))+' \u00b7 '+k.tage+' Tage</div>'+
-      '<div class="ktext">'+k.beschreibung+'</div>'+
-      '<div class="kzahl">Anteil '+String(k.anteil).replace('.',',')+' % gegen '+
-        String(k.anteil_normal).replace('.',',')+' % \u00fcblich \u00b7 Spitze '+
-        String(k.spitze_z).replace('.',',')+' \u03c3 am '+fmtD(k.spitze_am)+'</div>'+
-      '</div></div>';
-  }).join("");
+    'Für dieses Land wurde in den Ereignisdaten keine Episode erkannt.</p>';
+  const teil = liste => liste.map(kriseZeile).join("");
+  return (aktuell.length
+      ? teil(aktuell)
+      : '<p class="empty" style="padding:0 17px 12px">Zurzeit keine laufende oder kürzlich '+
+        'beendete Episode. Was länger zurückliegt, steht unten.</p>')+
+    (alt.length
+      ? '<details class="kalt"><summary>'+alt.length+' ältere Episoden, vor mehr als '+
+        '180 Tagen beendet</summary>'+teil(alt)+'</details>'
+      : '');
+}
+
+// Eine Episodenzeile. Bei einer abgeschlossenen Episode steht, wie lange sie
+// her ist -- ohne diese Angabe wirkt eine Protestwelle von 2024 wie ein
+// heutiger Befund.
+function kriseZeile(k){
+  const farbe = {konflikt:'var(--crit)', protest:'#C2603A', zwang:'#7A6EA8'};
+  const her = k.laufend ? '' :
+    ' · vor ' + (k.alter_tage>=365
+      ? (k.alter_tage/365).toFixed(1).replace('.',',')+' Jahren'
+      : k.alter_tage + ' Tagen') + ' beendet';
+  return '<div class="krise'+(k.laufend?' klauft':'')+'">'+
+    '<span class="kdot" style="background:'+(farbe[k.art]||'var(--ink3)')+
+      ';opacity:'+(k.laufend?1:.35)+'"></span><div style="flex:1;min-width:0">'+
+    '<div class="ktitel">'+k.name+
+      '<span class="kstufe'+(k.laufend?' klaufend':'')+'">'+
+      (k.laufend?'läuft · ':'')+k.stufe+'</span></div>'+
+    '<div class="kzeit">'+fmtD(k.von)+' – '+(k.laufend?'heute':fmtD(k.bis))+' · '+
+      k.tage+' Tage'+her+'</div>'+
+    '<div class="ktext">'+k.beschreibung+'</div>'+
+    '<div class="kzahl">Anteil '+String(k.anteil).replace('.',',')+' % gegen '+
+      String(k.anteil_normal).replace('.',',')+' % üblich · Spitze '+
+      String(k.spitze_z).replace('.',',')+' σ am '+fmtD(k.spitze_am)+'</div>'+
+    '</div></div>';
 }
 
 // Steckbrief. Bewusst klein und in gedaempftem Grau: Kontext, kein
@@ -374,14 +1060,199 @@ function fmtAuc(a){return a==null?'\u2014':a.toFixed(2).replace('.',',');}
 // nicht im Kleingedruckten: eine Prognose ohne ihre gemessene Trennschaerfe
 // ist eine Behauptung. Liegt die AUC unter 0,55, wird die Kachel gedaempft
 // dargestellt und ausdruecklich als nicht belastbar bezeichnet.
-function prognoseBox(titel, p, auc, erlaeuterung){
-  if(p===null||p===undefined) return '<div class="kbox"><div class="klab">'+titel+'</div>'+
-    '<div class="kval kbad">\u2014</div><div class="knote">Noch zu wenig Historie f\u00fcr dieses Modell.</div></div>';
-  var schwach = (auc==null || auc < 0.55);
-  return '<div class="kbox"><div class="klab">'+titel+'</div>'+
-    '<div class="kval'+(schwach?' kbad':'')+'">'+Math.round(p*100)+' %</div>'+
-    '<div class="knote">AUC '+fmtAuc(auc)+(schwach?' \u2014 nicht belastbar, Zufallsniveau':'')+
-    '<br>'+erlaeuterung+'</div></div>';
+// Fortschreibungsdiagramm: die letzten Tage der Reihe, daran die
+// fortgeschriebenen Punkte mit Streuungsband. Bewusst getrennt gezeichnet --
+// eine durchgezogene Linie ueber die Nahtstelle hinweg wuerde Beobachtung und
+// Fortschreibung optisch gleichsetzen.
+// Erste Ebene auf der Landesseite: was ist hier eingetreten. Steht vor allen
+// Diagrammen, weil ein Warnwerkzeug zuerst diese Frage beantwortet.
+function landMeldungen(code){
+  const m=MELD_JE_LAND[code]||[];
+  if(!m.length) return '<div class="sect"><div class="secthead">'+
+    '<h3 class="secttitle">Lagemeldungen</h3></div>'+
+    '<p class="sectnote" style="padding-bottom:15px">Für dieses Land liegt zum Stand '+fmtD(D.stand)+
+    ' keine offene Meldung vor: weder Indexstand noch Bewegung, Einzelkomponente oder Ereignislage '+
+    'überschreiten eine der hinterlegten Schwellen.</p></div>';
+  return '<div class="sect"><div class="secthead"><h3 class="secttitle">Lagemeldungen</h3>'+
+    '<span class="chip" style="border:1px solid var(--line);color:var(--ink3)">'+m.length+
+    (m.length===1?' Meldung':' Meldungen')+'</span></div>'+
+    '<p class="sectnote">Eingetretene Zustände mit Anfangsdatum. Keine Vorhersage.</p>'+
+    '<div class="lage" style="padding:4px 15px 15px">'+m.map(x=>meldungHTML(x,false)).join("")+'</div></div>';
+}
+
+function ausblickChart(L, ab){
+  if(!ab || !ab.punkte) return "";
+  const hist=L.risiko.slice(-45).filter(v=>v!==null);
+  if(hist.length<5) return "";
+  const W=700,H=170,PL=34,PR=54,PT=12,PB=22;
+  const n=hist.length, h=ab.punkte.length, ges=n+h;
+  let all=hist.concat(ab.punkte);
+  ab.band.forEach(b=>{all.push(b[0]);all.push(b[1])});
+  const mn=Math.min(...all), mx=Math.max(...all), pad=(mx-mn)*0.1||1;
+  const y0=mn-pad, y1=mx+pad;
+  const X=i=>PL+i/(ges-1)*(W-PL-PR);
+  const Y=v=>PT+(1-(v-y0)/(y1-y0))*(H-PT-PB);
+  let g="";
+  [-3,-2,-1,0,1,2,3].filter(t=>t>y0&&t<y1).forEach(t=>{
+    g+='<line x1="'+PL+'" y1="'+Y(t).toFixed(1)+'" x2="'+(W-PR)+'" y2="'+Y(t).toFixed(1)+
+       '" stroke="var(--line)" stroke-width="1" stroke-dasharray="'+(t===0?"":"2 4")+'"/>'+
+       '<text x="'+(PL-7)+'" y="'+(Y(t)+3.5).toFixed(1)+'" text-anchor="end" font-family="var(--mono)" font-size="10" fill="var(--ink3)">'+(t>0?"+":"")+t+'</text>';
+  });
+  let hp=""; hist.forEach((v,i)=>{ hp+=(i?"L":"M")+X(i).toFixed(1)+" "+Y(v).toFixed(1)+" "; });
+  let ob="", ub=[];
+  ab.band.forEach((b,i)=>{ ob+=(i?"L":"M")+X(n+i).toFixed(1)+" "+Y(b[1]).toFixed(1)+" "; });
+  for(let i=ab.band.length-1;i>=0;i--) ub.push("L"+X(n+i).toFixed(1)+" "+Y(ab.band[i][0]).toFixed(1));
+  const flaeche='<path class="band" d="M'+X(n-1).toFixed(1)+' '+Y(hist[n-1]).toFixed(1)+' '+ob+
+    ub.join(" ")+' L'+X(n-1).toFixed(1)+' '+Y(hist[n-1]).toFixed(1)+' Z" fill="var(--s1)" opacity=".13"/>';
+  let pp="M"+X(n-1).toFixed(1)+" "+Y(hist[n-1]).toFixed(1)+" ";
+  ab.punkte.forEach((v,i)=>{ pp+="L"+X(n+i).toFixed(1)+" "+Y(v).toFixed(1)+" "; });
+  const trenn='<line x1="'+X(n-1).toFixed(1)+'" y1="'+PT+'" x2="'+X(n-1).toFixed(1)+'" y2="'+(H-PB)+
+    '" stroke="var(--ink3)" stroke-width="1" stroke-dasharray="3 3" opacity=".6"/>'+
+    '<text x="'+(X(n-1)+4).toFixed(1)+'" y="'+(PT+10)+'" font-family="var(--mono)" font-size="9.5" fill="var(--ink3)">heute</text>';
+  const ende=ab.punkte[h-1];
+  return '<svg class="abchart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Fortschreibung '+L.name+'">'+
+    g+flaeche+trenn+
+    '<path class="verlauf" pathLength="1" d="'+hp+'" fill="none" stroke="var(--ink)" stroke-width="2" '+
+      'stroke-linejoin="round" opacity=".9"/>'+
+    '<path class="prognose" d="'+pp+'" fill="none" stroke="var(--s1)" stroke-width="2" '+
+      'stroke-dasharray="4 3" stroke-linejoin="round"/>'+
+    '<circle cx="'+X(ges-1).toFixed(1)+'" cy="'+Y(ende).toFixed(1)+'" r="3" fill="var(--s1)"/>'+
+    '<text x="'+(X(ges-1)+7).toFixed(1)+'" y="'+(Y(ende)+3.5).toFixed(1)+'" font-family="var(--mono)" font-size="11" fill="var(--s1)">'+
+    (ende>0?"+":"")+ende.toFixed(2)+'</text></svg>';
+}
+
+function zahlD(x,k){ return x==null?"\u2014":x.toFixed(k===undefined?3:k).replace(".",","); }
+
+// Ruecktesttabelle. Entscheidend ist die letzte Spalte: schlaegt die
+// Fortschreibung die Regel "letzten Wert beibehalten"? Wo sie das nicht tut,
+// steht es dort, statt dass die Prognose kommentarlos ausgewiesen wird.
+function ausblickTabelle(L){
+  const AB=L.ausblick||{};
+  const zeilen=[["gesamt","Gesamtindex, Eigenhistorie"],
+                ["waehrung","Währungsdruck"],["markt","Marktvolatilität"],
+                ["geopolitik","Geopolitische Spannung"],
+                ["gdelt","Gesamtindex + GDELT-Merkmale"]]
+    .filter(z=>AB[z[0]]);
+  if(!zeilen.length) return '<p class="empty" style="padding:0 17px 16px">Für dieses Land reicht die Historie noch nicht für eine Fortschreibung.</p>';
+  return '<div class="scroll" style="padding:0 17px 4px"><table class="abtab"><thead><tr>'+
+    '<th>Reihe</th><th>heute</th><th>in 5 Tagen</th><th>Fehler Modell</th><th>Fehler Beibehaltung</th><th>Urteil</th>'+
+    '</tr></thead><tbody>'+
+    zeilen.map(z=>{
+      const a=AB[z[0]], gut=a.besser_als_naiv;
+      const urteil = a.mae==null ? "kein Rücktest"
+        : gut ? "besser ("+Math.round(a.vorsprung*100)+" %)" : "nicht besser";
+      return '<tr><td>'+z[1]+'</td><td>'+zahlD(a.letzter,2)+'</td><td>'+zahlD(a.punkte[a.punkte.length-1],2)+'</td>'+
+        '<td>'+zahlD(a.mae)+'</td><td>'+zahlD(a.mae_naiv)+'</td>'+
+        '<td style="color:'+(gut?"var(--good)":"var(--ink3)")+'">'+urteil+'</td></tr>';
+    }).join("")+'</tbody></table></div>';
+}
+
+// Auf der Landesseite steht das Ergebnis, nicht die Rechnung: ein Satz mit dem
+// fortgeschriebenen Wert und, in einem Halbsatz, ob die Fortschreibung im
+// Ruecktest ueberhaupt besser war als die Beibehaltungsregel. Die Zahlen dazu
+// stehen gesammelt unter „Rechnungen".
+function ausblickSatz(L){
+  const a=(L.ausblick||{}).gesamt;
+  if(!a) return '<p class="abnote">Für dieses Land reicht die Historie noch nicht für eine '+
+    'Fortschreibung.</p>';
+  const ende=a.punkte[a.punkte.length-1];
+  const urteil = a.besser_als_naiv===null ? 'ohne Rücktest'
+    : a.besser_als_naiv ? 'im Rücktest genauer als die einfache Beibehaltung des heutigen Werts'
+                        : 'im Rücktest <b>nicht</b> genauer als die einfache Beibehaltung des heutigen Werts';
+  const zm=(L.z_markt===null||L.z_markt===undefined)?null:L.z_markt;
+  return '<p class="abnote">Fortgeschrieben auf <b>'+(ende>0?"+":"")+ende.toFixed(2).replace(".",",")+
+    '</b> in fünf Handelstagen, von heute '+(a.letzter>0?"+":"")+a.letzter.toFixed(2).replace(".",",")+
+    ' — beides im <b>Marktindex</b>. '+
+    (zm!==null && Math.abs(zm-L.stand_z)>=0.3
+      ? 'Das ist eine andere Größe als der Wert im Kopf dieser Seite: der Zustandsindex steht bei '+
+        (L.stand_z>0?"+":"")+L.stand_z.toFixed(2).replace(".",",")+' σ und enthält zusätzlich die '+
+        'Ereignislage, der Marktindex bei '+(zm>0?"+":"")+zm.toFixed(2).replace(".",",")+' σ ohne sie. '
+      : '')+
+    'Diese Fortschreibung ist '+urteil+'. '+
+    'Die geprüften Zahlen dazu stehen unter <a href="#/rechnungen" style="color:var(--s1)">Rechnungen</a>.</p>';
+}
+
+// Auf der Länderseite steht das Grundniveau direkt unter der Abweichung, weil
+// die beiden nur zusammen eine Aussage ergeben: "heute ruhig" heißt in einem
+// Land mit hohem Grundniveau etwas anderes als in einem mit niedrigem.
+// Der Kopf einer Länderseite als Instrument: links die schnelle Achse
+// (Abweichung von der eigenen Normallage), rechts die langsame (Grundniveau),
+// dazwischen der Verlauf der letzten sechzig Tage. Die beiden Achsen stehen
+// nebeneinander, weil nur ihr Zusammenspiel eine Aussage ergibt -- "heute
+// ruhig" heißt in einem Land mit hohem Grundniveau etwas anderes.
+// Datenstand eines Landes in einem Satz.
+//
+// Drei Daten fallen auseinander und das ist keine Panne, sondern die
+// Eigenschaft der Quellen: Kurse melden heute, GDELT liefert den laufenden Tag
+// nur angebrochen, und unvollständig geerntete Tage gelten als nicht gemessen.
+// Der Zustandswert im Kopf bezieht sich deshalb auf den letzten Tag, an dem
+// ALLE vorhandenen Bausteine belegt waren. Ohne diese Zeile liest man ihn als
+// heutigen Wert -- und das wäre die eine Fehllesung, die ein Warnwerkzeug
+// nicht zulassen darf.
+function datenStand(L){
+  const t=[];
+  if(L.gdelt_stand) t.push('Ereignisdaten bis '+fmtD(L.gdelt_stand)+
+    (L.gdelt_rand>0?' ('+L.gdelt_rand+(L.gdelt_rand===1?' Tag':' Tage')+' älter als die Kursreihe)':''));
+  if(L.reihe_bis && L.reihe_bis!==L.stand_datum) t.push('Kurse bis '+fmtD(L.reihe_bis));
+  if(L.gdelt_verworfen) t.push(L.gdelt_verworfen+' Tage als unvollständig verworfen');
+  return t.length? t.join(' · ') : '';
+}
+
+// Warum die Tage nach dem Stichtag nicht bewertet sind. Zwei verschiedene
+// Gründe, und sie dürfen nicht zu einem Satz verschmelzen: ein fehlender
+// Baustein (die Messung liegt nicht vor) löst sich nur mit neuen Daten auf,
+// eine noch unbestätigte Kursbewegung löst sich am Folgetag von selbst auf.
+const BNAME={ereignis:"Ereignislage",waehrung:"Währungsdruck",markt:"Marktvolatilität",geopolitik:"Geopolitik"};
+function nichtBeurteilbar(L){
+  const g=(L.unvollstaendig_grund||[]).map(k=>BNAME[k]||k);
+  const t=[];
+  if(g.length) t.push((g.length===1?'Baustein fehlt: ':'Bausteine fehlen: ')+g.join(", ")+
+    (L.gdelt_stand&&g.indexOf("Ereignislage")>=0?' (Ereignisdaten enden am '+fmtD(L.gdelt_stand)+')':''));
+  if(L.kurs_offen_am) t.push('Kursbewegung vom '+fmtD(L.kurs_offen_am)+
+    ' noch nicht bestätigt — der Folgetag entscheidet, ob sie Bestand hat');
+  return (L.unvollstaendig_tage===1?'Der jüngste Tag ist':'Die '+L.unvollstaendig_tage+
+    ' jüngsten Tage sind')+' nicht beurteilbar. '+(t.length?t.join('; ')+'.':'');
+}
+
+function kopfInstrument(L, code, rang){
+  const g=grundOf(code), f=g?((GRUND[g.stufe]||{}).f||"var(--ink3)"):"var(--ink3)";
+  const z=L.stand_z, farbe = z>=1.5?"var(--crit)":z>=0.5?"var(--warn)":"var(--ink)";
+  const letzte=L.risiko.slice(-60);
+  const vorwoche = L.risiko.slice(-6)[0];
+  const delta = (vorwoche===null||vorwoche===undefined)?null:z-vorwoche;
+  return '<div class="hero instrument">'+
+    '<div class="hzelle hz-wert">'+
+      '<div class="herolab">Risikostand · '+fmtD(L.stand_datum)+'</div>'+
+      '<div class="heroval" style="color:'+farbe+'">'+(z>0?"+":"")+z.toFixed(2)+
+        '<span class="einheit">σ</span></div>'+
+      '<div class="hdelta">'+(delta===null?'&nbsp;':
+        (delta>=0?'▲ +':'▼ ')+delta.toFixed(2)+' gegenüber fünf Handelstagen')+'</div>'+
+      (L.unvollstaendig_tage>0 ? '<div class="hwarn">'+nichtBeurteilbar(L)+'</div>' : '')+
+    '</div>'+
+    '<div class="hzelle hz-spark">'+
+      '<div class="herolab">60 Tage</div>'+sparkline(letzte)+
+      '<div class="hdelta">Platz '+rang+' von '+codes.length+' im heutigen Vergleich</div>'+
+    '</div>'+
+    '<div class="hzelle hz-grund">'+
+      '<div class="herolab">Grundniveau</div>'+
+      (g? '<div class="gross" style="color:'+f+'">'+g.stufe+'</div>'+
+          '<div class="hdelta">'+(g.viertel||"")+' der 18 überwachten Länder</div>'+
+          '<span class="gschiene"><span class="gfuell" style="width:'+g.wert.toFixed(0)+
+            '%;background:'+f+'"></span></span>'+
+          '<div class="hdelta">'+g.wert.toFixed(0)+' / 100 · Platz '+g.rang+' von '+g.von+
+            (g.unsicher?' · vorläufig':'')+'</div>'
+        : '<div class="gross" style="color:var(--ink3)">—</div>'+
+          '<div class="hdelta">noch nicht berechenbar</div>')+
+    '</div>'+
+    '<p class="heronote">Links die schnelle Achse: Abweichung vom eigenen Normalzustand der '+
+      'letzten 120 Handelstage, in Standardabweichungen. Rechts die langsame: das Grundniveau '+
+      'gegenüber den anderen überwachten Ländern, gemittelt über ein Jahr. Beides beschreibend, '+
+      'keine Vorhersage.</p>'+
+    (datenStand(L)? '<p class="heronote datenz">Datenstand: '+datenStand(L)+'. '+
+      'Der Wert links gilt für den letzten Tag, an dem alle vorhandenen Bausteine belegt waren.</p>':'')+
+    '<details class="gauf"><summary>Woraus das Grundniveau kommt</summary>'+
+      grundAufschluesselung(code)+'</details>'+
+  '</div>';
 }
 
 function landSeite(code){
@@ -390,58 +1261,59 @@ function landSeite(code){
   const idx=codes.indexOf(code);
   const rang=[...codes].sort((a,b)=>D.laender[b].stand_z-D.laender[a].stand_z).indexOf(code)+1;
 
-  vL.innerHTML='<div class="navbar"><button class="back" id="zurueck">‹ Alle Länder</button>'+
+  const zurueckZiel = ZURUECK[HERKUNFT] ? HERKUNFT : "#/";
+  vL.innerHTML='<div class="navbar"><button class="back" id="zurueck">‹ '+
+    (ZURUECK[zurueckZiel]||"Alle Länder")+'</button>'+
     '<span class="navtitle">'+L.name+'</span>'+
     '<span class="navstat" style="background:'+s.bg+';color:'+s.c+'">'+s.i+' '+s.l+'</span></div>'+
 
     steckbrief(L)+
 
-    '<div class="hero"><div class="herolab">Risikostand · '+fmtD(L.stand_datum)+'</div>'+
-    '<div class="heroval" style="color:'+(L.stand_z>=0.5?"var(--crit)":"var(--ink)")+'">'+
-      (L.stand_z>0?"+":"")+L.stand_z.toFixed(2)+'</div>'+
-    '<p class="heronote">Abweichung vom eigenen Normalzustand der letzten 120 Tage. '+
-      'Platz '+rang+' von '+codes.length+' im heutigen Vergleich. Beschreibend, keine Vorhersage.</p></div>'+
+    kopfInstrument(L, code, rang)+
+
+    landMeldungen(code)+
 
     '<div class="sect"><div class="secthead"><h3 class="secttitle">Krisen</h3></div>'+
       '<p class="sectnote">Aus den GDELT-Ereignisdaten erkannte Lagen, gemessen an der '+
       'Normallage dieses Landes über 180 Tage. Eine Lage beginnt, wenn ihr Anteil fünf Tage '+
       'in Folge 1,5 Standardabweichungen darüber liegt, und endet erst nach sieben Tagen '+
       'darunter — deshalb zerfällt ein langer Konflikt nicht in viele Einzelmeldungen. '+
-      'Erkennung der Gegenwart, keine Vorhersage.</p>'+
-      krisenBlock(L)+'</div>'+
-
-    '<div class="kpis kpi3">'+
-    prognoseBox('Marktmodell', L.prognose_7t, L.prognose_auc,
-                'Fortschreibung des Index aus sich selbst.')+
-    prognoseBox('Ereignismodell', L.prognose_gdelt_7t, L.prognose_gdelt_auc,
-                'Ausschließlich GDELT-Ereignisdaten.')+
-    '<div class="kbox"><div class="klab">Auffällige Tage</div><div class="kval">'+L.auffaellig.reduce((a,b)=>a+b,0)+'</div>'+
-      '<div class="knote">von '+L.daten.length+' gezeigten Tagen</div></div></div>'+
-    '<p class="sectnote" style="margin:-4px 0 14px">'+
-      'Beide Prognosen schätzen dieselbe Zielgröße: Anspannung mindestens 1 Standardabweichung '+
-      'über dem eigenen 120-Tage-Mittel, in 5 Handelstagen. Die AUC misst, wie gut das Modell '+
-      'zwischen Tagen mit und ohne Folgeanspannung trennt (0,50 = Münzwurf). '+
-      'Messlatte ohne Modell — einfach das heutige Niveau fortschreiben: AUC '+
-      (L.prognose_persistenz_auc==null?'nicht berechenbar':fmtAuc(L.prognose_persistenz_auc))+'. '+
-      'Ein Modell, das diese Zahl nicht schlägt, hat nichts gelernt.</p>'+
+      'Erkennung der Gegenwart, keine Vorhersage. Laufende Lagen stehen zusätzlich oben als Meldung.</p>'+
+      '<div data-auf="auf">'+krisenBlock(L)+'</div></div>'+
 
     '<div class="sect"><div class="secthead"><h3 class="secttitle">Verlauf nach Kategorie</h3>'+
       '<button class="tblbtn" id="tbtn">Tabelle</button></div>'+
-      '<p class="sectnote">Alle Kurven als z-Werte, dadurch untereinander vergleichbar.</p>'+
+      '<p class="sectnote">Alle Kurven als z-Werte in Standardabweichungen, dadurch '+
+      'untereinander vergleichbar. Die Namen stehen am rechten Ende der jeweiligen Kurve.</p>'+
       '<div class="vizwrap"><div class="legend">'+
       '<span class="lg"><span class="lgm" style="background:var(--ink)"></span>Gesamtrisiko</span>'+
       kats.map(k=>'<span class="lg"><span class="lgm" style="background:'+KAT[k].c+'"></span>'+KAT[k].n+'</span>').join("")+
       '<span class="lg"><span class="lgm" style="background:var(--crit);opacity:.3"></span>auffälliger Tag</span></div>'+
-      '<div style="position:relative" id="cwrap">'+chart(L)+'<div class="tip" id="tip"></div></div>'+
+      '<div style="position:relative" id="cwrap" data-auf="wisch">'+chart(L)+'<div class="tip" id="tip"></div></div>'+
       '<div id="tbl" hidden>'+tabelle(L)+'</div></div></div>'+
 
     '<div class="sect"><div class="secthead"><h3 class="secttitle">Aktuelle Ereignisse</h3></div>'+
       '<p class="sectnote">Meldungen mit dem stärksten Konfliktbezug je Tag, neueste zuerst. '+
       'Die Zahl rechts ist der Goldstein-Wert — je negativer, desto konfliktträchtiger. '+
-      'Überschriften aus den Quell-URLs abgeleitet.</p>'+
-      '<div class="news">'+nachrichtenBlock(L)+'</div></div>';
+      'Überschriften aus den Quell-URLs abgeleitet.<br>Gezählt werden nur Ereignisse, deren '+
+      '<b>Handlungsort</b> dieses Land ist und an denen ein Akteur dieses Landes beteiligt ist; '+
+      'Mehrfachmeldungen derselben Quelle zählen einmal. Für die <b>Anzeige</b> filtert zusätzlich '+
+      'eine Stoppliste historische Rückblicke und Unterhaltung heraus — sie wirkt nie auf die '+
+      'Messung. <a href="#/rechnungen">Rechnungen</a></p>'+
+      '<div class="news" data-auf="auf">'+nachrichtenBlock(L)+'</div></div>'+
 
-  document.getElementById("zurueck").onclick=()=>{location.hash="#/";};
+    '<div class="sect nachrang"><div class="secthead">'+
+      '<h3 class="secttitle">Ausblick</h3>'+
+      '<span class="chip" style="border:1px solid var(--line);color:var(--ink3)">nachrangig</span>'+
+      '<a class="tblbtn" href="#/rechnungen" style="text-decoration:none">Rechnungen →</a></div>'+
+      '<p class="sectnote">Fortschreibung des <b>Marktindex</b> über fünf Handelstage aus seiner '+
+      'eigenen Historie — ohne die Ereignislage, weil genau deren Beitrag hier geprüft wird. Die '+
+      'gestrichelte Linie ist die Fortschreibung, die Fläche ihr Streuungsband. Eine Verlängerung '+
+      'des bisherigen Verlaufs, keine Vorhersage von Ereignissen.</p>'+
+      '<div class="vizwrap" data-auf="wisch">'+ausblickChart(L, (L.ausblick||{}).gesamt)+'</div>'+
+      ausblickSatz(L)+'</div>';
+
+  document.getElementById("zurueck").onclick=()=>{location.hash=zurueckZiel;};
   const btn=document.getElementById("tbtn"), tbl=document.getElementById("tbl"),
         viz=document.querySelector("#cwrap");
   btn.onclick=()=>{ const zeigen=tbl.hidden; tbl.hidden=!zeigen; viz.parentElement.querySelector("#cwrap").hidden=zeigen;
@@ -453,7 +1325,7 @@ function hover(L){
   const kats=Object.keys(L.kategorien);
   const svg=document.querySelector("#cwrap svg"), tip=document.getElementById("tip"),
         cross=svg.querySelector("#cross"), wrap=document.getElementById("cwrap");
-  const W=760,PL=34,PR=14;
+  const W=760,PL=36,PR=86;   // identisch mit chart(); sonst versetzt sich das Fadenkreuz
   function move(ev){
     const r=svg.getBoundingClientRect();
     const cx=(ev.touches?ev.touches[0].clientX:ev.clientX)-r.left;
@@ -512,18 +1384,774 @@ function historieSeite(){
   document.getElementById("zurueck2").onclick=()=>{location.hash="#/";};
 }
 
-function route(){
+// ---------------------------------------------------------------- Weltkarte
+// Erste Ansicht fuer den Lieferkettenfall: nicht "wie steht Land X", sondern
+// "laeuft eine meiner Routen gerade durch ein Land mit offener Lage".
+//
+// Wichtig fuer die Einordnung: der Monitor misst LAENDER. Ein Nadeloehr wird
+// deshalb nur dann eingefaerbt, wenn eines seiner Anrainerlaender ueberwacht
+// wird UND dort eine Meldung offen ist. Wo kein Anrainer im Monitor liegt,
+// bleibt das Nadeloehr grau -- das ist eine Abdeckungsluecke und wird als
+// solche ausgewiesen, statt sie durch eine Ersatzgroesse zu verdecken.
+const KARTE_ISO = {"376":"IS","643":"RS","804":"UP","566":"NI","586":"PK","158":"TW",
+  "792":"TU","76":"BR","710":"SF","356":"IN","484":"MX","818":"EG","840":"US","276":"GM",
+  "458":"MY","360":"ID","724":"SP","682":"SA"};
+
+const NADELOEHRE = [
+  {id:"suez",       name:"Suezkanal",              lon:32.35, lat:30.0,  anrainer:["EG"]},
+  {id:"bab",        name:"Bab el-Mandeb",          lon:43.3,  lat:12.6,  anrainer:[]},
+  {id:"hormus",     name:"Straße von Hormus",      lon:56.6,  lat:26.6,  anrainer:[]},
+  {id:"malakka",    name:"Straße von Malakka",     lon:100.4, lat:2.5,   anrainer:["MY","ID"]},
+  {id:"sunda",      name:"Sundastraße",            lon:105.9, lat:-6.0,  anrainer:["ID"]},
+  {id:"panama",     name:"Panamakanal",            lon:-79.6, lat:9.1,   anrainer:[]},
+  {id:"gibraltar",  name:"Straße von Gibraltar",   lon:-5.6,  lat:36.0,  anrainer:["SP"]},
+  {id:"rotesmeer",  name:"Rotes Meer",             lon:38.5,  lat:20.5,  anrainer:["SA"]},
+  {id:"kap",        name:"Kap der Guten Hoffnung", lon:18.5,  lat:-34.4, anrainer:["SF"]},
+  {id:"bosporus",   name:"Bosporus",               lon:29.0,  lat:41.1,  anrainer:["TU"]},
+  {id:"taiwan",     name:"Straße von Taiwan",      lon:119.5, lat:24.5,  anrainer:["TW"]},
+  {id:"schwarzmeer",name:"Nordwestliches Schwarzes Meer", lon:31.5, lat:45.6, anrainer:["UP","RS"]},
+  {id:"guinea",     name:"Golf von Guinea",        lon:4.0,   lat:4.0,   anrainer:["NI"]},
+  {id:"arabsee",    name:"Arabisches Meer",        lon:68.0,  lat:22.0,  anrainer:["PK","IN"]}
+];
+
+const ROUTEN = [
+  {name:"Asien – Europa über Suez", nadel:["taiwan","malakka","bab","rotesmeer","suez","gibraltar"],
+   pfad:[[121.5,31.2],[119.5,24.5],[112,12],[105,3],[100.4,2.5],[95,5],[85,5],[70,10],[57,13],
+         [48,12],[43.3,12.6],[39,18],[34,26],[32.35,30],[31,32],[20,34],[5,37],[-5.6,36],
+         [-9.5,38.5],[-9,44],[-4,49],[4.1,52]]},
+  {name:"Asien – Europa um das Kap", nadel:["malakka","sunda","kap","gibraltar"],
+   pfad:[[103.8,1.3],[95,-6],[80,-16],[60,-26],[40,-33],[25,-35],[18.5,-34.4],[10,-28],[0,-12],
+         [-14,2],[-18,16],[-16,28],[-10,36],[-9.5,38.5],[-4,49],[4.1,52]]},
+  {name:"Golfregion – Ostasien", nadel:["hormus","malakka","taiwan"],
+   pfad:[[56.6,26.6],[60,23],[66,17],[75,8],[85,5],[95,3],[100.4,2.5],[105,3],[112,12],
+         [119.5,24.5],[121.5,31.2]]},
+  {name:"Transpazifik", nadel:["taiwan"],
+   pfad:[[121.5,31.2],[140,38],[165,45],[179,47],[-179,47],[-150,44],[-125,36],[-118.2,33.7]]},
+  {name:"Transatlantik", nadel:[],
+   pfad:[[4.1,52],[-2,50],[-16,48],[-40,45],[-62,41],[-73,40.5]]},
+  {name:"Schwarzes Meer – Mittelmeer (Getreide, Öl)", nadel:["schwarzmeer","bosporus","suez","gibraltar"],
+   pfad:[[31.5,45.6],[30.5,43],[29.0,41.1],[26,39],[24,36],[20,34],[12,35],[5,37],[-5.6,36]]},
+  {name:"Westafrika – Europa", nadel:["guinea","gibraltar"],
+   pfad:[[4.0,4.0],[0,8],[-6,14],[-16,22],[-14,30],[-9,36],[-5.6,36],[-9.5,38.5],[-4,49],[4.1,52]]},
+  {name:"Ostküste Südamerika – Europa", nadel:["gibraltar"],
+   pfad:[[-46.3,-23.9],[-38,-18],[-33,-5],[-25,10],[-18,25],[-10,34],[-5.6,36],[-2,44],[4.1,52]]}
+];
+
+const KW=1000, KH=520, KLAT_N=83, KLAT_S=-56;
+const kx = lon => (lon+180)/360*KW;
+const ky = lat => (KLAT_N-lat)/(KLAT_N-KLAT_S)*KH;
+
+// Ein Land ist so eingefaerbt wie seine dringlichste offene Meldung.
+function landStufe(code){
+  const m=MELD_JE_LAND[code]||[];
+  if(!m.length) return null;
+  return m.reduce((a,b)=>(RANG[b.stufe]||1)>(RANG[a.stufe]||1)?b:a).stufe;
+}
+const KFARBE = st => st ? (STUFE[st]||STUFE.beachten).c : "var(--good)";
+
+// Ein Anrainer zaehlt nur, wenn er im aktuellen Datenstand tatsaechlich
+// gefuehrt wird. Ein neu in die Konfiguration aufgenommenes Land taucht erst
+// nach dem naechsten Lauf auf; bis dahin bleibt sein Nadeloehr ausdruecklich
+// unbekannt statt faelschlich ruhig.
+function nadelAktiv(n){ return n.anrainer.filter(c=>D.laender[c]); }
+
+// Ein Nadeloehr ist fuer die Auswahl relevant, wenn eines seiner
+// ueberwachten Anrainerlaender darin liegt. Ohne Auswahl ist alles relevant.
+function nadelMeins(n){ return MEINE.size===0 || nadelAktiv(n).some(c=>MEINE.has(c)); }
+
+function nadelStufe(n){
+  const aktiv=nadelAktiv(n);
+  if(!aktiv.length) return "unbekannt";
+  const st=aktiv.map(landStufe).filter(Boolean);
+  if(!st.length) return null;
+  return st.reduce((a,b)=>RANG[b]>RANG[a]?b:a);
+}
+
+// Gradnetz. Auf einer Seekarte ist das keine Zierde, sondern die Angabe, in
+// welcher Abbildung man liest -- hier eine Plattkarte, also gleich weite
+// Meridiane und Breitenparallelen. Nebeneffekt: die Fläche bekommt Tiefe,
+// ohne dass ein Farbverlauf nötig wäre.
+function gradnetz(){
+  let g='';
+  for(let lon=-180; lon<=180; lon+=30){
+    const x=kx(lon).toFixed(1);
+    g+='<line x1="'+x+'" y1="0" x2="'+x+'" y2="'+KH+'" stroke="var(--grat)" stroke-width="'+
+       (lon===0?1.1:0.6)+'" vector-effect="non-scaling-stroke" opacity="'+(lon===0?.85:.5)+'"/>';
+  }
+  for(let lat=-40; lat<=80; lat+=20){
+    const y=ky(lat).toFixed(1);
+    g+='<line x1="0" y1="'+y+'" x2="'+KW+'" y2="'+y+'" stroke="var(--grat)" stroke-width="'+
+       (lat===0?1.1:0.6)+'" vector-effect="non-scaling-stroke" opacity="'+(lat===0?.85:.5)+'"/>';
+  }
+  // Der Äquator wird beschriftet, die übrigen Linien nicht -- eine Karte, die
+  // jede Linie benennt, wird zur Tabelle.
+  g+='<text x="8" y="'+(ky(0)-6).toFixed(1)+'" font-family="var(--mono)" font-size="8.5" '+
+     'letter-spacing="1.4" fill="var(--grat)">ÄQUATOR</text>';
+  return g;
+}
+
+function karteSVG(){
+  const K=window.__KARTE__;
+  if(!K) return '<p class="empty" style="padding:16px 18px">Die Ländergeometrie '+
+    '(<code>weltkarte.json</code>) konnte nicht geladen werden.</p>';
+  let laender="";
+  Object.keys(K.pfade).forEach(gid=>{
+    const code=KARTE_ISO[gid];
+    if(!code || !D.laender[code]){
+      laender+='<path d="'+K.pfade[gid]+'" fill="var(--land)" stroke="var(--land-linie)" '+
+        'stroke-width="0.6" vector-effect="non-scaling-stroke"/>';
+      return;
+    }
+    const st=landStufe(code), meins=meinesLand(code);
+    laender+='<a href="#/land/'+code+'"><path class="flaeche" d="'+K.pfade[gid]+'" fill="'+
+      grundFarbe(code)+'" fill-opacity="'+(meins?0.92:0.2)+
+      '" stroke="'+(st?KFARBE(st):"var(--land-linie)")+
+      '" stroke-width="'+(st?1.6:0.6)+'" vector-effect="non-scaling-stroke">'+
+      '<title>'+D.laender[code].name+" — "+grundText(code)+
+      (st?" · Meldung: "+st:" · keine offene Meldung")+'</title></path></a>';
+  });
+
+  // Routen. An der Datumsgrenze wird die Linie getrennt, sonst zoege sie quer
+  // ueber die ganze Karte.
+  let routen="";
+  ROUTEN.forEach(r=>{
+    const betroffen=r.nadel.some(id=>{
+      const n=NADELOEHRE.find(x=>x.id===id); if(!n||!nadelMeins(n)) return false;
+      const s=nadelStufe(n);
+      return s&&s!=="unbekannt";
+    });
+    let d="", vor=null;
+    r.pfad.forEach(p=>{
+      const bruch = vor!==null && Math.abs(p[0]-vor)>180;
+      d += (d==="" || bruch ? "M" : "L")+kx(p[0]).toFixed(1)+" "+ky(p[1]).toFixed(1)+" ";
+      vor=p[0];
+    });
+    if(betroffen){
+      routen+='<path d="'+d+'" vector-effect="non-scaling-stroke" fill="none" stroke="var(--crit)" '+
+        'stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity=".16"/>';
+    }
+    routen+='<path d="'+d+'" vector-effect="non-scaling-stroke" fill="none" stroke="'+
+      (betroffen?"var(--crit)":"var(--karte-ink)")+
+      '" stroke-width="'+(betroffen?2:1.1)+'" stroke-dasharray="'+(betroffen?"":"4 5")+
+      '" stroke-linejoin="round" stroke-linecap="round" opacity="'+(betroffen?1:0.55)+'">'+
+      '<title>'+r.name+(betroffen?" — betroffen":"")+'</title></path>';
+    // Auf einer betroffenen Route läuft eine feine Strichfolge in
+    // Fahrtrichtung. Sie zeigt, WELCHER Weg gemeint ist, und tut das ohne
+    // zusätzliche Farbe.
+    if(betroffen){
+      routen+='<path class="kfluss" d="'+d+'" vector-effect="non-scaling-stroke" fill="none" '+
+        'stroke="#FFE9E2" stroke-width="1.6" stroke-linecap="round" opacity=".85"/>';
+    }
+  });
+
+  let punkte="";
+  Object.keys(K.punkte).forEach((code,i)=>{
+    if(!D.laender[code]) return;
+    const [x,y]=K.punkte[code], st=landStufe(code), meins=meinesLand(code);
+    const r0 = st?4.5:2.6;
+    const ring = MEINE.has(code) ? '<circle r="'+(r0+4.5)+'" fill="none" stroke="var(--karte-ink)" '+
+      'stroke-width="1" stroke-dasharray="2 2.5"/>' : '';
+    // Der Halo atmet, aber nur wo eine Meldung offen ist -- Bewegung ist hier
+    // Zustandsanzeige, nicht Zierde.
+    const halo = st ? '<circle class="khalo" r="'+(r0+5.5)+'" fill="'+KFARBE(st)+'" opacity=".22" '+
+      'style="animation-delay:'+((i%5)*0.4).toFixed(1)+'s"/>' : '';
+    punkte+='<a href="#/land/'+code+'"><g class="kmark" data-x="'+x+'" data-y="'+y+
+      '" transform="translate('+x+','+y+')" opacity="'+(meins?1:0.28)+'">'+halo+ring+
+      '<circle r="'+r0+'" fill="'+(st?KFARBE(st):grundFarbe(code))+
+      '" stroke="'+(st?"var(--sea)":"var(--karte-ink)")+'" stroke-width="'+(st?1:1)+
+      '" stroke-opacity="'+(st?1:.7)+'"><title>'+
+      D.laender[code].name+" — "+grundText(code)+(MEINE.has(code)?" · ausgewählt":"")+
+      '</title></circle></g></a>';
+  });
+
+  let nadeln="";
+  NADELOEHRE.forEach((n,idx)=>{
+    const st=nadelStufe(n), x=kx(n.lon), y=ky(n.lat), meins=nadelMeins(n);
+    const f = st==="unbekannt" ? "var(--ink3)" : st ? (STUFE[st]||STUFE.beachten).c : "var(--card)";
+    const quelle=nadelAktiv(n).find(landStufe);
+    const scharf = st && st!=="unbekannt";
+    const marke='<g class="kmark" data-x="'+x.toFixed(1)+'" data-y="'+y.toFixed(1)+
+      '" transform="translate('+x.toFixed(1)+','+y.toFixed(1)+')" opacity="'+
+      (!meins?0.18:(st==="unbekannt"?0.5:1))+'">'+
+      (scharf?'<g class="knadelpuls" style="animation-delay:'+((idx%4)*0.65).toFixed(2)+
+        's"><circle r="9.5" fill="none" stroke="'+f+'" stroke-width="1.2"/></g>':'')+
+      '<rect x="-4" y="-4" width="8" height="8" transform="rotate(45)" fill="'+f+
+      '" stroke="var(--sea)" stroke-width="1.2">'+
+      '<title>'+n.name+(scharf?" — "+st+" über "+D.laender[quelle].name:
+        (st==="unbekannt"?" — kein Anrainer im Monitor":" — ruhig"))+
+      '</title></rect></g>';
+    nadeln += quelle ? '<a href="#/land/'+quelle+'">'+marke+'</a>' : marke;
+  });
+
+  return '<svg class="karte" id="ksvg" viewBox="0 0 '+KW+' '+KH+'" role="img" '+
+    'aria-label="Weltkarte mit Länderrisiko, Seewegen und Nadelöhren">'+
+    '<defs><radialGradient id="ktiefe" cx="50%" cy="46%" r="72%">'+
+      '<stop offset="55%" stop-color="#000" stop-opacity="0"/>'+
+      '<stop offset="100%" stop-color="#000" stop-opacity=".38"/></radialGradient></defs>'+
+    '<rect width="'+KW+'" height="'+KH+'" fill="var(--sea)"/>'+
+    '<g id="kzoom">'+
+      '<g class="klage netz">'+gradnetz()+'</g>'+
+      '<g class="klage land">'+laender+'</g>'+
+      '<g class="klage route">'+routen+'</g>'+
+      '<g class="klage marke">'+nadeln+punkte+'</g>'+
+    '</g>'+
+    '<rect width="'+KW+'" height="'+KH+'" fill="url(#ktiefe)" pointer-events="none"/></svg>';
+}
+
+function nadelTabelle(){
+  const zeile=n=>{
+    const st=nadelStufe(n);
+    const aktiv=nadelAktiv(n);
+    const anr=aktiv.map(c=>D.laender[c].name).join(", ");
+    let text, farbe;
+    if(st==="unbekannt"){ text="kein Anrainer im Monitor"; farbe="var(--ink3)"; }
+    else if(!st){ text="keine offene Meldung"; farbe="var(--ink2)"; }
+    else { text=(STUFE[st]||STUFE.beachten).l; farbe=(STUFE[st]||STUFE.beachten).c; }
+    const grund = st && st!=="unbekannt"
+      ? aktiv.filter(landStufe).map(c=>(MELD_JE_LAND[c][0].titel+" ("+D.laender[c].name+")")).join("; ")
+      : "—";
+    return '<tr'+(MEINE.size&&!nadelMeins(n)?' style="opacity:.45"':'')+'><td>'+
+      (MEINE.size&&nadelMeins(n)?'<b>'+n.name+'</b>':n.name)+'</td><td>'+(anr||"—")+'</td>'+
+      '<td style="color:'+farbe+'">'+text+'</td><td style="text-align:left">'+grund+'</td></tr>';
+  };
+  return '<div class="scroll" style="padding:0 17px 12px;max-height:none"><table><thead><tr>'+
+    '<th>Nadelöhr</th><th>Anrainer im Monitor</th><th>Status</th>'+
+    '<th style="text-align:left">Woraus</th></tr></thead><tbody>'+
+    [...NADELOEHRE].sort((a,b)=>(nadelMeins(b)-nadelMeins(a))).map(zeile).join("")+
+    '</tbody></table></div>';
+}
+
+// Die Karte beantwortet zuerst eine Satzfrage, nicht eine Bildfrage: welche
+// Route laeuft gerade durch ein Land mit offener Lage.
+function routenSatz(){
+  const betroffen=ROUTEN.filter(r=>r.nadel.some(id=>{
+    const n=NADELOEHRE.find(x=>x.id===id); if(!n||!nadelMeins(n)) return false;
+    const s=nadelStufe(n);
+    return s&&s!=="unbekannt";
+  }));
+  if(!betroffen.length) return '<p class="sectnote" style="color:var(--ink2)">Zum Stand '+
+    fmtD(D.stand)+' läuft keine der '+ROUTEN.length+' abgebildeten Routen durch ein Nadelöhr mit '+
+    'offener Meldung'+(MEINE.size?' in den ausgewählten Ländern':'')+'.</p>';
+  return '<p class="sectnote" style="color:var(--ink2)"><b>'+betroffen.length+' von '+ROUTEN.length+
+    ' Routen betroffen:</b> '+betroffen.map(r=>r.name).join(" · ")+'.</p>';
+}
+
+// ---------------------------------------------------------------- Zoom
+// Eigene Implementierung statt einer Bibliothek: die Karte ist ein einziges
+// SVG, die gesamte Bedienung besteht aus einer Verschiebung und einem Faktor.
+// Zwei Dinge muessen dabei UNABHAENGIG vom Faktor bleiben, sonst wird die
+// Karte beim Hineinzoomen unlesbar: Strichstaerken (ueber
+// vector-effect="non-scaling-stroke") und die Marker, die stattdessen mit
+// 1/k gegengerechnet werden. Sonst wuerde ein Nadeloehr bei achtfachem Zoom
+// ein halbes Land verdecken.
+function karteZoom(){
+  const svg=document.getElementById("ksvg"), g=document.getElementById("kzoom");
+  if(!svg||!g) return;
+  let k=1, tx=0, ty=0;
+  const KMIN=1, KMAX=12;
+
+  function grenzen(){
+    // Nie ueber den Rand hinaus: bei k=1 ist die Karte genau formatfuellend.
+    const maxX=KW*(k-1), maxY=KH*(k-1);
+    tx=Math.min(0,Math.max(-maxX,tx)); ty=Math.min(0,Math.max(-maxY,ty));
+  }
+  function zeichnen(gleiten){
+    grenzen();
+    // Über style statt über das Attribut, damit die CSS-Überblendung greift.
+    g.classList.toggle("gleiten", !!gleiten);
+    g.style.transform="translate("+tx.toFixed(2)+"px,"+ty.toFixed(2)+"px) scale("+k.toFixed(4)+")";
+    const s=1/k;
+    g.querySelectorAll(".kmark").forEach(m=>{
+      m.setAttribute("transform","translate("+m.dataset.x+","+m.dataset.y+") scale("+s.toFixed(4)+")");
+    });
+    const b=document.getElementById("kreset");
+    if(b) b.textContent = k>1.001 ? "Zurücksetzen · "+k.toFixed(1)+"×" : "Zurücksetzen";
+  }
+  // Zoom auf den Punkt unter dem Zeiger, nicht auf die Bildmitte -- alles
+  // andere fuehrt dazu, dass man das gesuchte Nadeloehr aus dem Bild zoomt.
+  function zoomAuf(px,py,faktor,gleiten){
+    const alt=k;
+    k=Math.min(KMAX,Math.max(KMIN,k*faktor));
+    if(k===alt) return;
+    tx = px-(px-tx)*(k/alt);
+    ty = py-(py-ty)*(k/alt);
+    zeichnen(gleiten);
+  }
+  function svgPunkt(ev){
+    const r=svg.getBoundingClientRect();
+    const cx=(ev.touches?ev.touches[0].clientX:ev.clientX)-r.left;
+    const cy=(ev.touches?ev.touches[0].clientY:ev.clientY)-r.top;
+    return [cx/r.width*KW, cy/r.height*KH];
+  }
+
+  svg.addEventListener("wheel",ev=>{
+    ev.preventDefault();
+    const p=svgPunkt(ev);
+    zoomAuf(p[0],p[1], ev.deltaY<0 ? 1.18 : 1/1.18);
+  },{passive:false});
+
+  // Ziehen. Ein Zug ueber mehr als vier Pixel darf nicht als Klick auf ein
+  // Land durchgehen, sonst springt die Seite beim Verschieben weg.
+  let zieht=false, start=null, bewegt=0;
+  function runter(ev){
+    zieht=true; bewegt=0; start=svgPunkt(ev); svg.style.cursor="grabbing";
+  }
+  function bewegen(ev){
+    if(!zieht) return;
+    const p=svgPunkt(ev), r=svg.getBoundingClientRect();
+    const dx=(p[0]-start[0])*(r.width/KW), dy=(p[1]-start[1])*(r.height/KH);
+    bewegt=Math.max(bewegt,Math.abs(dx)+Math.abs(dy));
+    tx += p[0]-start[0]; ty += p[1]-start[1];
+    start=p; zeichnen(false);
+  }
+  function hoch(){ zieht=false; svg.style.cursor=""; }
+  svg.addEventListener("mousedown",runter);
+  window.addEventListener("mousemove",bewegen);
+  window.addEventListener("mouseup",hoch);
+  svg.addEventListener("touchstart",runter,{passive:true});
+  svg.addEventListener("touchmove",ev=>{ if(zieht){ev.preventDefault(); bewegen(ev);} },{passive:false});
+  svg.addEventListener("touchend",hoch);
+  svg.addEventListener("click",ev=>{ if(bewegt>4){ ev.preventDefault(); ev.stopPropagation(); } },true);
+
+  const knopf=(id,fn)=>{ const b=document.getElementById(id); if(b) b.onclick=fn; };
+  knopf("kplus", ()=>zoomAuf(KW/2,KH/2,1.5,true));
+  knopf("kminus",()=>zoomAuf(KW/2,KH/2,1/1.5,true));
+  knopf("kreset",()=>{ k=1; tx=0; ty=0; zeichnen(true); });
+
+  // Direkt auf eine Region springen. Der Nutzen im Lieferkettenfall ist die
+  // Nahsicht auf ein Nadeloehr, nicht der Weltueberblick.
+  document.querySelectorAll("[data-ziel]").forEach(b=>{
+    b.onclick=()=>{
+      const n=NADELOEHRE.find(x=>x.id===b.dataset.ziel);
+      if(!n) return;
+      k=5; tx=KW/2-kx(n.lon)*k; ty=KH/2-ky(n.lat)*k; zeichnen(true);
+    };
+  });
+  zeichnen();
+}
+
+function karteAbschnitt(){
+  return '<div class="sect"><div class="secthead"><h3 class="secttitle">Lage und Seewege</h3></div>'+
+      '<p class="sectnote">Zwei Achsen auf einer Karte. Die <b>Fläche</b> zeigt das '+
+      '<b>Grundniveau</b> — in welchem Viertel der überwachten Länder ein Land liegt, gemittelt '+
+      'über ein Jahr. Die <b>Marke</b> zeigt die <b>heutige Meldelage</b>. Ein Land '+
+      'kann damit strukturell dunkel und heute ruhig sein, und umgekehrt. Linien sind die großen '+
+      'Seewege, Rauten ihre Nadelöhre; ein Klick öffnet das Land.</p>'+
+      auswahlChips("kawahl")+
+      routenSatz()+
+      '<div class="kartenband"><div class="kartenrahmen">'+
+        karteSVG()+
+        '<div class="kbar">'+
+          '<button class="fbtn" id="kplus" title="Vergrößern" aria-label="Vergrößern">+</button>'+
+          '<button class="fbtn" id="kminus" title="Verkleinern" aria-label="Verkleinern">−</button>'+
+          '<button class="fbtn" id="kreset">Zurücksetzen</button>'+
+          '<span class="ksprung">Nadelöhr</span>'+
+          '<span class="ksprungliste">'+
+          NADELOEHRE.map(n=>'<button class="fbtn" data-ziel="'+n.id+'">'+n.name+'</button>').join("")+
+          '</span>'+
+        '</div>'+
+        '<div class="kartenfuss">'+
+          '<span class="klegtitel">Marke · Meldestufe</span>'+
+          '<span class="lg"><span class="lgm rund" style="background:var(--crit)"></span>kritisch</span>'+
+          '<span class="lg"><span class="lgm rund" style="background:var(--serious)"></span>hoch</span>'+
+          '<span class="lg"><span class="lgm rund" style="background:var(--warn)"></span>beachten</span>'+
+          '<span class="lg"><span class="lgm rund hohl"></span>überwacht, ruhig '+
+            '(Marke in der Grundniveaufarbe)</span>'+
+          '<span class="lg"><span class="lgm" style="background:var(--crit);width:18px"></span>betroffene Route</span>'+
+        '</div>'+
+        '<div class="kartenfuss">'+
+          '<span class="klegtitel">Fläche · Grundniveau</span>'+
+          [["hoch","oberes Viertel"],["erhöht","drittes"],["mittel","zweites"],
+           ["niedrig","unteres Viertel"]].map(pp=>'<span class="lg"><span class="lgm kachel" '+
+            'style="background:'+GRUND[pp[0]].f+'"></span>'+pp[1]+'</span>').join("")+
+          '<span class="lg"><span class="lgm kachel" style="background:var(--land)"></span>nicht überwacht</span>'+
+          '<span style="margin-left:auto;opacity:.7">Plattkarte · Gradnetz 30°/20° · Küstenlinien 110 m</span>'+
+        '</div>'+
+      '</div></div></div>';
+}
+
+
+// Die Karte steht auch auf der Startseite. Gezeichnet wird immer nur eine der
+// beiden Fassungen -- die Bedienelemente laufen ueber feste IDs, zwei gleich-
+// zeitige Instanzen wuerden sich gegenseitig die Knoepfe wegnehmen.
+function karteStart(){
+  const el=document.getElementById("karte-start");
+  if(!el) return;
+  el.innerHTML=karteAbschnitt();
+  auswahlBinden("kawahl", ()=>{ karteStart(); lageFilterBauen(); lageZeichnen(); });
+  karteZoom();
+}
+
+function karteSeite(){
+  const offen=NADELOEHRE.filter(n=>{const s=nadelStufe(n);
+    return s&&s!=="unbekannt"&&nadelMeins(n);}).length;
+  const ohne=NADELOEHRE.filter(n=>!nadelAktiv(n).length).length;
+  vK.innerHTML='<div class="navbar"><button class="back" id="zurueck4">‹ Alle Länder</button>'+
+    '<span class="navtitle">Karte</span>'+
+    '<span class="navstat" style="background:'+(offen?"var(--crit)":"var(--sunk)")+';color:'+
+      (offen?"#fff":"var(--ink2)")+'">'+offen+' Nadelöhre betroffen</span></div>'+
+
+    karteAbschnitt()+
+
+    
+
+    '<div class="sect"><div class="secthead"><h3 class="secttitle">Nadelöhre</h3></div>'+
+      '<p class="sectnote">Ein Nadelöhr gilt als betroffen, wenn eines seiner Anrainerländer im '+
+      'Monitor liegt und dort eine Meldung offen ist. Die letzte Spalte nennt die Meldung, auf der '+
+      'das beruht.</p>'+
+      nadelTabelle()+'</div>'+
+
+    '<div class="sect"><div class="secthead"><h3 class="secttitle">Was diese Karte sagt — und was nicht</h3></div>'+
+      '<p class="sectnote" style="padding-bottom:15px;max-width:78ch">Der Monitor misst Länder, '+
+      'keine Schiffe und keine Häfen. Die Karte übersetzt die Länderlage in die Frage, die im '+
+      'Lieferkettenkontext zählt: läuft eine Route gerade durch ein Land mit offener Lage. Sie '+
+      'enthält keine Verkehrsdaten — Wartezeiten, Umleitungen, Frachtraten und Versicherungsprämien '+
+      'sind hier nicht abgebildet. '+ohne+' der '+NADELOEHRE.length+' Nadelöhre haben keinen '+
+      'Anrainer im Monitor und bleiben grau. Das ist eine ausgewiesene Abdeckungslücke und keine '+
+      'Entwarnung — und sie folgt aus der Länderauswahlregel: aufgenommen wird nur, wessen Währung '+
+      'frei gehandelt und marktgestellt ist. Panama rechnet in US-Dollar, Jemen und Dschibuti haben '+
+      'amtlich gestellte oder gebundene Kurse, Marokkos Dirham hängt an einem Korb. Deren Kurse '+
+      'bilden die Ankerwährung oder eine Verwaltungsentscheidung ab, nicht das Landesrisiko. Die Routen sind Hauptverkehrswege in vereinfachter Führung, keine '+
+      'AIS-Spuren.</p></div>';
+  document.getElementById("zurueck4").onclick=()=>{location.hash="#/";};
+  auswahlBinden("kawahl", ()=>{ karteSeite(); lageFilterBauen(); lageZeichnen(); });
+  karteZoom();
+}
+
+// ---------------------------------------------------------------- Rechnungen
+// Alle Pruefzahlen an einer Stelle. Der Monitor selbst zeigt Ergebnisse; wer
+// wissen will, woran sie gemessen wurden, findet hier den Rechenweg. Die
+// Trennung ist Absicht: eine Lageansicht, in der neben jeder Zahl ihre
+// Fehlerstatistik steht, liest sich wie ein Ergebnisprotokoll und nicht wie
+// ein Lagebild -- und die Pruefzahlen verschwinden umgekehrt nicht, sie
+// bekommen nur ihren eigenen Ort.
+function pz(x,k){ return x==null?"\u2014":x.toFixed(k===undefined?3:k).replace(".",","); }
+
+function rechnungenSeite(){
+  const AB=c=>D.laender[c].ausblick||{};
+  const mitA=codes.filter(c=>AB(c).gesamt);
+  const besser=mitA.filter(c=>AB(c).gesamt.besser_als_naiv===true).length;
+  const mitG=codes.filter(c=>AB(c).gdelt&&AB(c).gesamt&&AB(c).gdelt.mae!=null&&AB(c).gesamt.mae!=null);
+  const gBesser=mitG.filter(c=>AB(c).gdelt.mae<AB(c).gesamt.mae).length;
+
+  const zeileA=c=>{const a=AB(c).gesamt, gut=a.besser_als_naiv;
+    return '<tr><td>'+D.laender[c].name+'</td><td>'+pz(a.letzter,2)+'</td><td>'+pz(a.punkte[a.punkte.length-1],2)+'</td>'+
+      '<td>'+pz(a.mae)+'</td><td>'+pz(a.mae_naiv)+'</td>'+
+      '<td style="color:'+(gut?"var(--good)":"var(--ink3)")+'">'+
+      (a.mae==null?"kein Rücktest":gut?"+"+Math.round(a.vorsprung*100)+" %":"kein Vorsprung")+'</td></tr>';};
+
+  const zeileB=c=>{const e=AB(c).gesamt,g=AB(c).gdelt, gut=g.mae<e.mae;
+    return '<tr><td>'+D.laender[c].name+'</td><td>'+pz(e.mae)+'</td><td>'+pz(g.mae)+'</td>'+
+      '<td style="color:'+(gut?"var(--good)":"var(--ink3)")+'">'+(gut?"GDELT hilft":"GDELT hilft nicht")+'</td></tr>';};
+
+  const zeileC=c=>{const L=D.laender[c];
+    const p=L.prognose_persistenz_auc;
+    const bes=(x)=>x==null||p==null?"var(--ink3)":(x>p?"var(--good)":"var(--ink3)");
+    return '<tr><td>'+L.name+'</td>'+
+      '<td style="color:'+bes(L.prognose_auc)+'">'+pz(L.prognose_auc,2)+'</td>'+
+      '<td style="color:'+bes(L.prognose_gdelt_auc)+'">'+pz(L.prognose_gdelt_auc,2)+'</td>'+
+      '<td>'+pz(p,2)+'</td></tr>';};
+
+  const bau=["waehrung","markt","geopolitik"];
+  const zeileD=c=>'<tr><td>'+D.laender[c].name+'</td>'+bau.map(k=>{
+      const a=AB(c)[k];
+      if(!a||a.mae==null) return '<td>\u2014</td>';
+      const gut=a.besser_als_naiv;
+      return '<td style="color:'+(gut?"var(--good)":"var(--ink3)")+'">'+pz(a.mae)+' / '+pz(a.mae_naiv)+'</td>';
+    }).join("")+'</tr>';
+
+  vR.innerHTML='<div class="navbar"><button class="back" id="zurueck3">‹ Alle Länder</button>'+
+    '<span class="navtitle">Rechnungen</span></div>'+
+
+    '<div class="sect"><div class="secthead"><h3 class="secttitle">Wozu diese Seite da ist</h3></div>'+
+    '<p class="sectnote" style="padding-bottom:15px;max-width:78ch">Der Monitor zeigt in den '+
+    'Lageansichten Ergebnisse. Hier steht, woran sie gemessen wurden. Grundsatz für jede Zahl: '+
+    'sie wird gegen die einfachste denkbare Regel geprüft, die dieselbe Aufgabe erfüllt — bei einer '+
+    'Fortschreibung ist das „den heutigen Wert beibehalten", bei einem Wahrscheinlichkeitsmodell '+
+    '„das heutige Niveau als Rangfolge nehmen". Was diese Regel nicht schlägt, hat nichts gelernt, '+
+    'egal wie gut es absolut aussieht. Alle Prüfungen laufen ausschließlich auf zurückliegenden '+
+    'Daten: geschätzt wird jeweils nur auf dem, was vor dem Prüfzeitpunkt lag.</p>'+
+    '<p class="sectnote" style="padding-bottom:15px;max-width:78ch"><b>Zielgröße ist der '+
+    'Marktindex</b> — der Index ohne Ereignislage. Der Zustandsindex, den Karte und Meldungen '+
+    'zeigen, enthält sie; ihn hier als Ziel zu verwenden hieße, das Ereignismodell teilweise auf '+
+    'seine eigene Eingabe zu prüfen. Nachgemessen: gegen den Zustandsindex lag die AUC des '+
+    'Ereignismodells im Mittel 0,022 höher, in Nigeria 0,096 — klein, aber systematisch in eine '+
+    'Richtung, und genau die Art Fehler, die in der zugrunde liegenden Arbeit in den Limitationen '+
+    'steht.</p></div>'+
+
+    '<div class="sect"><div class="secthead"><h3 class="secttitle">0 · Datenlage: welche Tage überhaupt zählen</h3>'+
+      '<span class="chip" style="border:1px solid var(--line);color:var(--ink3)">'+
+      ((D.datenlage||{}).verworfen||0)+' Tage verworfen</span></div>'+
+      '<p class="sectnote" style="max-width:78ch">Die Ereignisanteile sind Quotienten: '+
+      'Gewaltanteil ist (CAMEO 18+19+20) geteilt durch alle Ereignisse des Tages. Wird ein Tag '+
+      'nur teilweise geerntet — der laufende Tag, ausgefallene Einzeldateien, ein Ausfall bei '+
+      'GDELT —, schrumpft der <b>Nenner</b> und der Anteil steigt, ohne dass im Land etwas '+
+      'passiert ist. Im eigenen Bestand gemessen: dünne Tage stellen 0,94 % aller Tage, aber '+
+      '2,29 % aller Überschreitungen von zwei Standardabweichungen, also das 2,4-fache ihres '+
+      'Anteils. Saudi-Arabien wies an solchen Tagen einen mittleren Gewaltanteil von 70 % aus '+
+      'gegenüber 4,1 % an normalen Tagen, Nigeria 13,4 % gegenüber 7,1 %.</p>'+
+      '<p class="sectnote" style="max-width:78ch"><b>Regel.</b> Ein Tag gilt als gemessen, wenn '+
+      'er mindestens 30 Ereignisse enthält und mindestens 40 % der üblichen Menge '+
+      '<b>desselben Wochentags</b> (Median der letzten acht). Der Vergleich je Wochentag ist '+
+      'nötig, weil die Tagesmenge stark davon abhängt: USA Donnerstag 50.945, Samstag 29.107, '+
+      'Sonntag 20.916 Ereignisse im Median. Ein Maßstab aus allen Tagen hätte bei den USA 184 '+
+      'statt 27 Tagen verworfen, fast nur Wochenenden — kein Qualitätsfilter, sondern der '+
+      'Verlust eines Viertels der Reihe. Ein verworfener Tag wird auf <i>nicht gemessen</i> '+
+      'gesetzt, nicht auf null: null hieße „heute ist nichts passiert" und würde die Normallage '+
+      'nach unten ziehen.</p>'+
+      '<p class="sectnote" style="max-width:78ch"><b>Wirkung auf die Meldungen.</b> Von neun '+
+      'offenen Lagemeldungen vor dieser Prüfung blieben zwei. Entfallen sind unter anderem '+
+      '„Gewaltanteil erhöht" für Saudi-Arabien und „Protestmeldungen häufen sich" für Israel '+
+      'und die USA — alle drei auf Tagen, an denen die Ernte unvollständig war. Der Indexstand '+
+      'Israels lag dadurch bei +0,85 statt bei −0,74 Standardabweichungen.</p>'+
+      '<p class="sectnote" style="max-width:78ch"><b>Die Gegenprobe.</b> Fehlt umgekehrt ein '+
+      'Baustein nur heute, wird der Index <b>nicht</b> aus den übrigen hochgerechnet. Israel '+
+      'stand am 09.09. bei −0,74 σ mit Ereignislage +0,85 und am 10.09. bei −2,18 σ, nachdem '+
+      'die Ereignisdaten ausgelaufen waren: gefallen war nicht die Lage, sondern die Messung. '+
+      'Ein solcher Tag gilt als nicht beurteilbar, der Zustandswert bleibt beim letzten Tag mit '+
+      'vollständigen Bausteinen. Unterschieden wird über eine Karenz von 30 Tagen — ein '+
+      'dauerhaft fehlender Baustein (Ukraine hat keinen brauchbaren Aktienindex) wird '+
+      'herausnormiert, ein heute fehlender macht den Tag unlesbar.</p>'+
+      '<p class="sectnote" style="max-width:78ch"><b>Die Erntequote.</b> GDELT '+
+      'veröffentlicht 96 Dateien je Tag im Viertelstundentakt. Schlägt ein Teil der '+
+      'Abrufe fehl, wurde der Tag früher trotzdem geschrieben — mit zu kleiner '+
+      'Ereigniszahl und verzerrten Anteilen. Nachweis im eigenen Bestand: derselbe '+
+      'Kalendertag ergab in zwei Ladesitzungen verschiedene Werte, für Deutschland '+
+      '1.883 Ereignisse am 08.09.2026 gegen 120 bis 437 an den Nachbartagen einer '+
+      'anderen Sitzung — bei identischer Masterliste mit 96 Dateien für jeden Tag. '+
+      'Das Niveau hing also daran, <i>wann</i> geladen wurde. Jeder Tag führt jetzt '+
+      'seine Erntequote mit; unter 95&nbsp;% wird er nicht übernommen, sondern beim '+
+      'nächsten Lauf erneut geholt. Beide Ladewege — täglicher Lauf und Historie — '+
+      'benutzen dieselbe Schwelle, sonst hängt das Niveau davon ab, welcher Weg den '+
+      'Tag geholt hat.</p>'+
+      '<p class="sectnote" style="max-width:78ch"><b>Ein echter Bruch in der Quelle.</b> '+
+      'Anfang Dezember 2024 sinkt die Ereignismenge von GDELT dauerhaft, im Median um '+
+      'den Faktor 4,7. Das ist <b>kein</b> Verarbeitungsfehler: eine unvollständige '+
+      'Ernte trifft alle Länder mit demselben Faktor, hier reicht er von 2,9 (USA) bis '+
+      '10,7 (Südafrika), Streuung 1,73 — und die CAMEO-Anteile bleiben nahezu '+
+      'unverändert (Gewaltanteil 8,21&nbsp;% davor, 7,60&nbsp;% danach). Das ist die '+
+      'Handschrift einer veränderten Quellenzusammensetzung, nicht einer veränderten '+
+      'Zurechnung. Folge: absolute Ereigniszahlen sind über diesen Bruch hinweg nicht '+
+      'vergleichbar. Der Monitor rechnet ausschließlich mit rollenden z-Werten und '+
+      'Anteilen; beide sind gegen einen Mengenbruch robust, sobald das Referenzfenster '+
+      'vollständig auf einer Seite liegt.</p>'+
+      '<p class="sectnote" style="max-width:78ch"><b>Eine gemeinsame Skala für die '+
+      'Bausteine.</b> Die vier Bausteine hatten drei verschiedene Nullpunkte: Währung und Markt '+
+      'waren über die gesamte eigene Reihe standardisiert, der globale GPR über seine Historie '+
+      'seit 1900, die Ereignislage rollend über 60 Tage und zusätzlich als Maximum dreier '+
+      'z-Werte. Gemessen über den ganzen Bestand lagen die Mittelwerte bei 0,00 (Währung), '+
+      '0,00 (Markt), +0,83 (Geopolitik) und +0,60 (Ereignis), und der Anteil der Tage über '+
+      '2 σ bei 2,2 / 4,9 / 11,2 / 5,3 %. Ein gewichtetes Mittel daraus ist nicht in '+
+      'Standardabweichungen lesbar, und die Eskalationsklausel griff bevorzugt beim globalen '+
+      'GPR — also bei dem Baustein, der zwischen Ländern gar nicht trennt. Alle vier werden '+
+      'jetzt vor der Gewichtung rollend über 120 Handelstage normiert: Anteile über 2 σ nun '+
+      '6,6 / 8,9 / 4,7 / 4,6 %. Nebeneffekt: die Standardisierung über die gesamte Reihe '+
+      'benutzte Mittelwert und Streuung auch der Tage <i>nach</i> t — für die GDELT-Merkmale war '+
+      'das von Anfang an ausgeschlossen, für die Marktbausteine nicht. Jetzt gilt für beide '+
+      'dieselbe Regel.</p>'+
+      '<p class="sectnote" style="max-width:78ch"><b>Was σ hier nicht heißt.</b> Die Schwellen '+
+      'sind Quantile dieser Reihen, keine Wahrscheinlichkeiten aus einer Normalverteilung. '+
+      'Nachgemessen über alle Länder und Tage liegt der Gesamtindex in 9,5 % der Tage über '+
+      '1,5 σ und in 2,6 % über 2,5 σ; unter Normalverteilung wären 6,7 % und 0,6 % zu erwarten. '+
+      'Volatilitäts- und Anteilsreihen haben schwere Ränder — die Schwellen sind deshalb als '+
+      '„etwa jeder zehnte Tag" und „etwa jeder vierzigste" zu lesen, nicht als Sigma-Regel.</p>'+
+      '<div class="scroll" data-auf="auf" style="padding:0 17px 12px;max-height:none"><table><thead><tr>'+
+      '<th>Land</th><th>Zustand vom</th><th>Ereignisdaten bis</th><th>Reihe bis</th>'+
+      '<th>verworfene Tage</th><th>Bausteine heute</th></tr></thead><tbody>'+
+      codes.map(c=>{const L=D.laender[c];
+        const n=Object.keys(L.kategorien).filter(k=>{const v=L.kategorien[k];return v&&v[v.length-1]!=null;}).length;
+        return '<tr><td>'+L.name+'</td><td>'+fmtD(L.stand_datum)+'</td><td>'+
+          (L.gdelt_stand?fmtD(L.gdelt_stand):'\u2014')+'</td><td>'+
+          (L.reihe_bis?fmtD(L.reihe_bis):'\u2014')+'</td><td>'+(L.gdelt_verworfen||0)+'</td>'+
+          '<td>'+n+' von 4</td></tr>';}).join("")+
+      '</tbody></table></div></div>'+
+
+    '<div class="sect"><div class="secthead"><h3 class="secttitle">1 · Fortschreibung des Gesamtindex</h3>'+
+      '<span class="chip" style="border:1px solid var(--line);color:var(--ink3)">'+besser+' von '+mitA.length+' besser</span></div>'+
+      '<p class="sectnote">Autoregressives Modell fünfter Ordnung auf den letzten 250 Beobachtungen, '+
+      'fünf Schritte iteriert. Der Fehler ist der mittlere absolute Abstand zwischen Fortschreibung und '+
+      'tatsächlichem Wert am fünften Tag, rollend über die jüngsten 120 Ursprungspunkte.</p>'+
+      '<div class="scroll" data-auf="auf" style="padding:0 17px 12px;max-height:none"><table><thead><tr><th>Land</th><th>heute</th>'+
+      '<th>in 5 Tagen</th><th>Fehler Modell</th><th>Fehler Beibehaltung</th><th>Vorsprung</th></tr></thead>'+
+      '<tbody>'+mitA.map(zeileA).join("")+'</tbody></table></div></div>'+
+
+    '<div class="sect"><div class="secthead"><h3 class="secttitle">2 · Tragen die GDELT-Merkmale etwas bei?</h3>'+
+      '<span class="chip" style="border:1px solid '+(gBesser?"var(--good)":"var(--line)")+';color:'+
+      (gBesser?"var(--good)":"var(--ink3)")+'">'+gBesser+' von '+mitG.length+'</span></div>'+
+      '<p class="sectnote">Dieselbe Fortschreibung, einmal nur aus der Eigenhistorie und einmal mit den '+
+      'sieben GDELT-Merkmalen als zusätzliche Größen. Das ist die Kernfrage der zugrunde liegenden '+
+      'Arbeit, an dieser Stelle erneut gestellt: trägt die Berichterstattung etwas zu den nächsten '+
+      'Tagen bei, muss ihr Fehler unter dem der reinen Eigenhistorie liegen.</p>'+
+      '<div class="scroll" data-auf="auf" style="padding:0 17px 12px;max-height:none"><table><thead><tr><th>Land</th>'+
+      '<th>Fehler nur Eigenhistorie</th><th>Fehler mit GDELT</th><th>Ergebnis</th></tr></thead>'+
+      '<tbody>'+mitG.map(zeileB).join("")+'</tbody></table></div></div>'+
+
+    '<div class="sect"><div class="secthead"><h3 class="secttitle">3 · Wahrscheinlichkeitsmodelle gegen das Nullmodell</h3></div>'+
+      '<p class="sectnote">Zielgröße: Anspannung des <b>Marktindex</b> mindestens eine '+
+      'Standardabweichung über dem eigenen 120-Tage-Mittel, in fünf Handelstagen. Die AUC misst, wie gut ein Modell Tage mit und ohne '+
+      'Folgeanspannung trennt; 0,50 entspricht dem Münzwurf. Grün heißt: über dem Nullmodell.</p>'+
+      '<div class="scroll" data-auf="auf" style="padding:0 17px 12px;max-height:none"><table><thead><tr><th>Land</th>'+
+      '<th>Marktmodell</th><th>Ereignismodell (GDELT)</th><th>Nullmodell</th></tr></thead>'+
+      '<tbody>'+codes.map(zeileC).join("")+'</tbody></table></div></div>'+
+
+    '<div class="sect"><div class="secthead"><h3 class="secttitle">4 · Fortschreibung der einzelnen Bausteine</h3></div>'+
+      '<p class="sectnote">Je Baustein der Fehler des Modells und daneben, nach dem Schrägstrich, der '+
+      'Fehler der Beibehaltungsregel. Grün heißt: das Modell liegt darunter.</p>'+
+      '<div class="scroll" data-auf="auf" style="padding:0 17px 12px;max-height:none"><table><thead><tr><th>Land</th>'+
+      '<th>Währungsdruck</th><th>Marktvolatilität</th><th>Geopolitik</th></tr></thead>'+
+      '<tbody>'+codes.map(zeileD).join("")+'</tbody></table></div></div>'+
+
+    '<div class="sect"><div class="secthead"><h3 class="secttitle">5 · Grundniveau je Land</h3></div>'+
+      '<p class="sectnote">Rangmittel über ein Jahr, jede Größe zuerst in einen Rang zwischen den '+
+      'Ländern umgerechnet. Ränge statt Werte, weil die Größen verschiedene Einheiten haben und ein '+
+      'einzelner Extremwert — etwa eine Währungskrise — den Mittelwert sonst allein bestimmen würde. '+
+      'Die Skala gilt nur <b>innerhalb</b> dieser Gruppe; ein Land außerhalb des Monitors hat kein '+
+      'Grundniveau. Die Stufe ist das <b>Viertel</b>, in dem das Land innerhalb der Gruppe liegt, '+
+      'und keine Schwelle auf der Punkteskala: die Punkte sind ein Mittel aus Rangprozenten und '+
+      'liegen deshalb fast zwangsläufig in der Mitte — mit festen Schwellen hießen zehn von '+
+      'siebzehn Ländern „erhöht\u201c, was auf die Mehrheit zutrifft und damit nichts sagt. '+
+      'Ein Stern markiert ein vorläufiges Ergebnis aus weniger als drei Größen.</p>'+
+      '<div class="scroll" data-auf="auf" style="padding:0 17px 12px;max-height:none"><table><thead><tr>'+
+      '<th>Land</th><th>Punkte</th><th>Platz</th><th>Viertel</th><th>Gewalt</th><th>Zwang</th>'+
+      '<th>Tonlage</th><th>Währung</th><th>Markt</th></tr></thead><tbody>'+
+      codes.filter(grundOf).sort((a,b)=>grundOf(b).wert-grundOf(a).wert).map(c=>{
+        const g=grundOf(c), b=g.grundlagen||{};
+        const f=k=>b[k]==null?'<td style="color:var(--ink3)">—</td>':'<td>'+Math.round(b[k])+'</td>';
+        return '<tr><td>'+D.laender[c].name+'</td><td>'+g.wert.toFixed(0)+(g.unsicher?' *':'')+
+          '</td><td>'+g.rang+'/'+g.von+'</td>'+
+          '<td style="color:'+((GRUND[g.stufe]||{}).f||'var(--ink3)')+'">'+(g.viertel||g.stufe)+'</td>'+
+          f("gewalt")+f("zwang")+f("tonlage")+f("waehrung")+f("markt")+'</tr>';
+      }).join("")+'</tbody></table></div></div>'+
+
+    '<div class="sect"><div class="secthead"><h3 class="secttitle">6 · Welche Ereignisse einem Land zugerechnet werden</h3></div>'+
+      '<p class="sectnote" style="padding-bottom:15px;max-width:80ch">Eine Prüfung an 434.204 '+
+      'Ereigniszeilen aus dem Bestand der Arbeit ergab: von den Deutschland zugeordneten '+
+      'Konfliktereignissen (CAMEO 18–20) lagen <b>28 %</b> mit ihrem Handlungsort außerhalb '+
+      'Deutschlands — sie trafen nur zu, weil das Land in einem anderen Geofeld auftauchte. Unter '+
+      'den negativsten standen ein Auschwitz-Rückblick, ein Weltkriegswrack und ein Attentat in '+
+      'Schweden. Derselbe Artikel erschien mehrfach, weil GDELT eine Zeile je <i>Erwähnung</i> '+
+      'ausgibt, nicht je Ereignis — genau die Kritik, die Schrodt (2012) an maschinell codierten '+
+      'Ereignisdaten formuliert.<br><br>Seither gilt: <b>Handlungsort</b> im Land, <b>ein Akteur</b> '+
+      'des Landes, <b>Duplikate</b> je Quelle und Ereignisart entfernt. Wirkung: Deutschland '+
+      '15.341 → 3.000 Zeilen, USA 384.562 → 117.968. Der Konfliktanteil ändert sich dabei kaum '+
+      '(4,82 → 5,87 % bzw. 7,57 → 8,39 %) — die anteilsbasierten Merkmale waren also gegen diese '+
+      'Verzerrung weitgehend robust, die Mengen und die angezeigten Überschriften nicht. Der Filter '+
+      'wirkt auf neu geladene Tage; bis die Historie damit neu geladen ist, hat die Ereigniszahl an '+
+      'seinem Einsatztag einen Sprung nach unten, der in '+
+      '<span class="mono">daten/filterwechsel.json</span> vermerkt ist.</p></div>'+
+
+    '<div class="sect"><div class="secthead"><h3 class="secttitle">Wie die Lagemeldungen entstehen</h3></div>'+
+      '<p class="sectnote" style="padding-bottom:15px;max-width:78ch"><b>Sprung</b> — Tagesbewegung über '+
+      'dem 2,5-fachen der landesüblichen Tagesstreuung. <b>Niveau</b> — Gesamtindex mindestens 1,5 '+
+      'Standardabweichungen über der eigenen Normallage der letzten 120 Handelstage, mit Angabe seit '+
+      'wann. <b>Baustein</b> — eine einzelne Komponente ab 2,0 Standardabweichungen; diese Meldung '+
+      'existiert, weil ein Mittelwert ruhig aussehen kann, während eine seiner Komponenten ausbricht. '+
+      '<b>Nachrichtenlage</b> — Meldungsaufkommen oder Anteil einer CAMEO-Kategorie ab 2,0 '+
+      'Standardabweichungen über dem eigenen 60-Tage-Normalwert, als Dreitagesmittel gerechnet, weil '+
+      'der laufende GDELT-Tag beim Lauf um 04:00 UTC nur teilweise gemeldet ist. <b>Episode</b> — '+
+      'Hysterese: eine Lage beginnt nach fünf Tagen über 1,5 Standardabweichungen und endet erst nach '+
+      'sieben Tagen unter 0,5, damit ein langer Konflikt nicht in viele Einzelmeldungen zerfällt.</p></div>'+
+
+    '<footer style="margin-top:8px"><p><b>Warum die Messlatte überhaupt mitläuft.</b> Die zugrunde '+
+    'liegende Bachelorarbeit enthielt keinen Vergleich gegen ein Nullmodell — das ist in ihrem '+
+    'Limitationskapitel benannt. In 91 nach der Abgabe geprüften Konstellationen ließ sich anschließend '+
+    'kein Prognosebeitrag der Ereignisdaten gegenüber einem Modell nachweisen, das nur die eigene '+
+    'Vergangenheit der Zielgröße kennt. Die <b>Fortschreibung</b> enthält deshalb keine '+
+    'GDELT-Merkmale, und jede Prognoseanzeige führt ihre Messlatte mit.</p>'+
+    '<p><b>Warum die Ereignislage trotzdem im Index steht.</b> Der Befund betrifft die Prognose, '+
+    'nicht die Beschreibung. Der Risikoindex ist eine Zustandsgröße — er sagt, wie die Lage heute '+
+    'gegenüber der eigenen Normallage aussieht — und dafür sind Ereignisdaten belegbar geeignet; '+
+    'die Episodenerkennung lebt davon. Ohne diesen Baustein war der Index blind für genau die Fälle, '+
+    'für die es ihn gibt: ein Land konnte bei −0,76 stehen, während der Anteil seiner '+
+    'Zwangsereignisse 2,19 Standardabweichungen über der Normallage lag. Die Trennung ist im Code '+
+    'durchgezogen: Ereignismerkmale gehen in den Zustand ein und bleiben aus der Fortschreibung '+
+    'heraus.</p></footer>';
+
+  document.getElementById("zurueck3").onclick=()=>{location.hash="#/";};
+}
+
+// Aufdecken beim Scrollen.
+//
+// Zwei Regeln, damit daraus kein Nachteil wird: der Anfangszustand wird
+// ausschliesslich von JavaScript gesetzt (Klasse js-auf), also ist die Seite
+// ohne JavaScript und bei abbestellter Bewegung vollstaendig sichtbar. Und
+// jedes Element wird nur EINMAL aufgedeckt -- ein Diagramm, das sich beim
+// Zurueckscrollen erneut aufbaut, wird beim zweiten Mal zur Belaestigung.
+const RUHIG = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
+const beobachter = (!RUHIG && "IntersectionObserver" in window)
+  ? new IntersectionObserver((eintraege, selbst)=>{
+      eintraege.forEach(e=>{
+        if(!e.isIntersecting) return;
+        e.target.classList.add("sichtbar");
+        selbst.unobserve(e.target);
+        // Nach dem Aufdecken faellt der Ausgangszustand weg. Sonst bliebe die
+        // Beschneidung stehen, und ein Kurzhinweis, der ueber den Rand des
+        // Diagramms hinausragt, waere abgeschnitten.
+        e.target.addEventListener("animationend",
+          ()=>e.target.classList.remove("js-auf"), {once:true});
+      });
+    }, {rootMargin:"0px 0px -10% 0px", threshold:0.15})
+  : null;
+
+function aufdecken(wurzel){
+  if(!beobachter || !wurzel) return;
+  wurzel.querySelectorAll("[data-auf]").forEach(el=>{
+    if(el.classList.contains("sichtbar") || el.classList.contains("js-auf")) return;
+    // Was beim Aufruf schon im Bild steht, bleibt einfach stehen: der erste
+    // Blick soll nichts nachladen muessen.
+    const r = el.getBoundingClientRect();
+    if(r.top < window.innerHeight * 0.9){ el.classList.add("sichtbar"); return; }
+    el.classList.add("js-auf");
+    beobachter.observe(el);
+  });
+}
+
+function routeKern(){
   const m=location.hash.match(/^#\/land\/([A-Z]{2})$/);
-  vU.hidden=true; vL.hidden=true; vH.hidden=true;
+  // Die Herkunft wird VOR dem Umschalten festgehalten, und nur wenn die alte
+  // Ansicht keine Länderseite war -- sonst würde der Knopf von Land zu Land
+  // zeigen statt zurück auf die Liste oder die Karte.
+  if(!m && ZURUECK[location.hash||"#/"]) HERKUNFT = location.hash || "#/";
+  vU.hidden=true; vL.hidden=true; vH.hidden=true; vR.hidden=true; vK.hidden=true;
+  const ksEl=document.getElementById("karte-start"); if(ksEl) ksEl.innerHTML="";
   if(m && D.laender[m[1]]){
     vL.hidden=false; landSeite(m[1]); window.scrollTo(0,0);
   }else if(location.hash==="#/historie"){
     vH.hidden=false; historieSeite(); window.scrollTo(0,0);
+  }else if(location.hash==="#/rechnungen"){
+    vR.hidden=false; rechnungenSeite(); window.scrollTo(0,0);
+  }else if(location.hash==="#/karte"){
+    vK.hidden=false; karteSeite(); window.scrollTo(0,0);
   }else{
-    vU.hidden=false; vL.innerHTML=""; vH.innerHTML="";
+    vU.hidden=false; vL.innerHTML=""; vH.innerHTML=""; vR.innerHTML=""; vK.innerHTML=""; karteStart();
   }
 }
+// Ansichtswechsel als Überblendung, wo der Browser das kann. Ohne die
+// Schnittstelle -- und wenn der Betrachter Bewegung abbestellt hat -- wird
+// unverändert direkt umgeschaltet.
+const routeDirekt = function(){ routeKern(); aufdecken(document.querySelector(".wrap")); };
+var route;
+route = function(){
+  const ruhig = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(document.startViewTransition && !ruhig) document.startViewTransition(()=>routeDirekt());
+  else routeDirekt();
+};
+
 window.addEventListener("hashchange",route);
+
+// Laendergeometrie separat laden: sie aendert sich nie und wuerde die
+// Datendatei sonst bei jedem Lauf um 90 KB aufblaehen. In der Artefaktfassung
+// ist sie fest eingebettet, dort ist window.__KARTE__ bereits gesetzt.
+(async function karteLaden(){
+  if(!window.__KARTE__){
+    try{
+      const r=await fetch("weltkarte.json");
+      if(r.ok) window.__KARTE__=await r.json();
+    }catch(e){ /* Karte bleibt leer, der Rest des Monitors funktioniert */ }
+  }
+  if(location.hash==="#/karte") karteSeite(); else karteStart();
+})();
+
 route();
 })();
 </script>

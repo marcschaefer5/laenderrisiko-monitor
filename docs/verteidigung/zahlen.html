@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>The numbers &#183; Country Risk</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="stil.css">
+</head>
+<body>
+<div class="wrap">
+
+<nav class="nav">
+  <a href="../index.html">Live monitor</a>
+  <a href="index.html">Defence</a>
+  <a href="zahlen.html" aria-current="page">The numbers</a>
+  <a href="pruefung.html">The check</a>
+</nav>
+
+<header class="top">
+  <p class="eyebrow">As submitted &#183; 01 Feb 2025 &#8211; 31 Jan 2026</p>
+  <h1 class="sec">The numbers</h1>
+  <p class="lede">Every figure used in the defence, with the script it came from.</p>
+</header>
+
+<h2>From 40 million events<br>to 730 rows</h2>
+<div class="rows">
+  <div class="row"><span class="lab">GDELT archives downloaded</span><span class="val">33,360</span></div>
+  <div class="row"><span class="lab">Events in those archives</span><span class="val">40,581,160</span></div>
+  <div class="row"><span class="lab">Touching Germany or the USA</span><span class="val">14,610,442</span></div>
+  <div class="row"><span class="lab">Matching the CAMEO risk thesaurus</span><span class="val">6,237,331</span></div>
+  <div class="row"><span class="lab">Rows the model actually sees</span><span class="val lg">730</span></div>
+  <div class="row"><span class="lab">Features per row</span><span class="val">7</span></div>
+  <div class="row"><span class="lab">American events per German event</span><span class="val dim">27 : 1</span></div>
+</div>
+<div class="note"><b>The last step is not a filter.</b> 365 days &#215; 2 countries = 730 rows.
+Millions of individual events become one row per country per day, and that row is the entire
+model input.</div>
+<p class="src">D1&#8211;D9 &#183; D10_build_country_ml_panel.py &#183; D28_build_panel_v2.py</p>
+
+<h2>The result</h2>
+<div class="hero">
+  <div class="fig"><b>0.809</b><span>Germany &#183; ROC-AUC</span></div>
+  <div class="fig"><b>0.789</b><span>USA &#183; ROC-AUC</span></div>
+  <div class="fig"><b>0.50</b><span>a coin flip</span></div>
+</div>
+<div class="rows">
+  <div class="row"><span class="lab">Pre-registered crisis events flagged in advance</span><span class="val ok">5 of 7</span></div>
+  <div class="row"><span class="lab">Validation folds, each trained only on its own past</span><span class="val">6</span></div>
+  <div class="row"><span class="lab">Minimum training window before any validation</span><span class="val">150 days</span></div>
+  <div class="row"><span class="lab">Holdout, opened once, after the thresholds were fixed</span><span class="val dim">16 Dec &#8211; 31 Jan</span></div>
+</div>
+<p class="src">D16_train_main_rolling_model.py &#183; D18_validate_anchors_against_main_model.py</p>
+
+<h2>Why one model<br>per country</h2>
+<div class="rows">
+  <div class="row"><span class="lab">M2 &#183; pooled, no country indicator</span><span class="val bad">0.330</span></div>
+  <div class="row"><span class="lab">M3 &#183; pooled, with country indicator</span><span class="val dim">0.550</span></div>
+  <div class="row"><span class="lab">M1 &#183; pooled, broad feature set</span><span class="val dim">0.580</span></div>
+  <div class="row"><span class="lab">M4S &#183; separate model, Germany</span><span class="val">0.640</span></div>
+  <div class="row"><span class="lab">M4S &#183; separate model, USA</span><span class="val">0.790</span></div>
+  <div class="row"><span class="lab">M4 &#183; final, rolling, per country</span><span class="val accent">0.809 / 0.789</span></div>
+</div>
+<div class="note accent"><b>0.330 is below chance, not merely weak.</b> With 27 times more
+American than German events, a pooled model learns which country a row belongs to and applies
+that as if it were the risk. A country indicator buys a different intercept, not a different
+relationship &#8212; only separate models fix it. This comparison is why the thesis is
+country-specific.</div>
+<p class="src">D12 / D13 / D14 / D15 &#183; D19_build_model_comparison_tables.py</p>
+
+<h2>The warning threshold</h2>
+<div class="rows">
+  <div class="row"><span class="lab">Germany &#183; threshold / warning days / episodes / recall</span><span class="val">0.20 &#183; 150 &#183; 24 &#183; 1.00</span></div>
+  <div class="row"><span class="lab">USA &#183; threshold / warning days / episodes / recall</span><span class="val">0.60 &#183; 43 &#183; 10 &#183; 0.75</span></div>
+</div>
+<div class="note"><b>Both thresholds come from the same rule</b> &#8212; highest F1 on
+out-of-fold predictions &#8212; and the rule produced two different answers. Where the line
+sits is a decision about the cost of a false alarm, not a statistic.</div>
+
+<h2>What moves<br>the warning</h2>
+<table class="tbl">
+  <tr><th>Feature</th><th>Meaning</th><th>USA</th><th>Germany</th></tr>
+  <tr><td>n_events_ma7</td><td>reporting volume, 7-day mean</td><td class="num">+2.53</td><td class="num">+2.27</td></tr>
+  <tr><td>tone_avg</td><td>average tone of reporting</td><td class="num">&#8722;2.08</td><td class="num">&#8722;0.41</td></tr>
+  <tr><td>tone_avg_delta1</td><td>change in tone against yesterday</td><td class="num">+1.22</td><td class="num">+0.20</td></tr>
+  <tr><td>gold_neg_sum</td><td>negative Goldstein sum, conflict intensity</td><td class="num">&#8722;0.07</td><td class="num">&#8722;0.39</td></tr>
+  <tr><td>gold_sum</td><td>Goldstein sum across all events</td><td class="num">&#8722;0.03</td><td class="num">&#8722;0.21</td></tr>
+</table>
+<div class="note accent"><b>The sign of tone_avg is a trap.</b> The coefficient is negative and
+the feature itself takes negative values, so a more negative tone raises the modelled
+probability. Negativity increases the warning; it does not reduce it. And the answer to the
+second half of the research question is the first row: the strongest single predictor is not
+violence but the sheer density of reporting.</div>
+<p class="src">coefficients_all_countries.csv &#183; D25_regression_table_inference.py</p>
+
+<h2>The target,<br>and its weakness</h2>
+<div class="rows">
+  <div class="row"><span class="lab">Target variable</span><span class="val dim">label_t3_any_z60_ge_15</span></div>
+  <div class="row"><span class="lab">Input series</span><span class="val dim">7-day mean of log(1 + n_events)</span></div>
+  <div class="row"><span class="lab">Rolling window for the z-score</span><span class="val">60 days</span></div>
+  <div class="row"><span class="lab">Threshold that makes a day positive</span><span class="val">1.5 &#963;</span></div>
+  <div class="row"><span class="lab">Look-ahead</span><span class="val">t+1 &#8230; t+3</span></div>
+  <div class="row"><span class="lab">Regularisation &#183; class weighting</span><span class="val dim">ridge &#955;&#8239;=&#8239;1 &#183; balanced</span></div>
+</div>
+<div class="note"><b>Feature and target descend from the same smoothed event series.</b>
+The z-scores were excluded from the features; the series they are computed from was not.
+That is why the work did not stop at submission &#8212;
+<a href="pruefung.html" style="color:var(--accent)">the check</a> replaces the target with one
+from a different data source entirely.</div>
+
+<footer>
+  Marc Oliver Sch&#228;fer &#183; WIMBIT23B &#183; grade 1.7 (87 / 100)<br>
+  <a href="index.html">Defence</a> &#183; <a href="pruefung.html">The check</a> &#183;
+  <a href="https://github.com/marcschaefer5/laenderrisiko-monitor">source repository</a>
+</footer>
+
+</div>
+</body>
+</html>

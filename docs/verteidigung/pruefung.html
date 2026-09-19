@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>The check &#183; Country Risk</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="stil.css">
+</head>
+<body>
+<div class="wrap">
+
+<nav class="nav">
+  <a href="../index.html">Live monitor</a>
+  <a href="index.html">Defence</a>
+  <a href="zahlen.html">The numbers</a>
+  <a href="pruefung.html" aria-current="page">The check</a>
+</nav>
+
+<header class="top">
+  <p class="eyebrow">After submission &#183; external target &#183; with a benchmark</p>
+  <h1 class="sec">The check</h1>
+  <p class="lede">The thesis named two gaps in its own limitations chapter: the target was
+  derived from the same event series as the features, and no model was ever compared against a
+  benchmark. This page is what happens when both gaps are closed.</p>
+</header>
+
+<div class="hero">
+  <div class="fig accent"><b>0.497</b><span>mean ROC-AUC</span></div>
+  <div class="fig"><b>91</b><span>constellations</span></div>
+  <div class="fig"><b>6,683</b><span>country-days</span></div>
+  <div class="fig ok"><b>1</b><span>finding that survived</span></div>
+</div>
+<div class="note accent"><b>0.497 against a coin flip at 0.500.</b>
+Not one of the 91 constellations beat its own benchmark by more than the confidence interval
+of zero.</div>
+
+<h2>Why a second<br>look was needed</h2>
+<div class="rows">
+  <div class="row"><span class="lab">Average ROC-AUC the circular target handed the event model for free</span><span class="val accent">+0.022</span></div>
+  <div class="row"><span class="lab">Largest single case of that effect, measured per country</span><span class="val accent">+0.096</span></div>
+  <div class="row"><span class="lab">Benchmarks the submitted thesis compared against</span><span class="val bad">0</span></div>
+</div>
+<div class="note"><b>An ROC-AUC only means something next to a second number.</b>
+0.809 reads as strong until the score of a model that does nothing clever stands beside it.
+Measuring that flattery required rebuilding the target from a source outside GDELT.</div>
+<p class="src">D23_feasibility_external_target.py &#183; D29_verify_panel_equivalence.py</p>
+
+<h2>What was measured</h2>
+<div class="rows">
+  <div class="row"><span class="lab">External targets</span><span class="val dim">market volatility &#183; policy uncertainty &#183; geopolitical risk</span></div>
+  <div class="row"><span class="lab">Countries</span><span class="val">14</span></div>
+  <div class="row"><span class="lab">Model classes</span><span class="val dim">logistic regression &#183; gradient boosting</span></div>
+  <div class="row"><span class="lab">Forecast horizons tested</span><span class="val">20</span></div>
+  <div class="row"><span class="lab">Country-days in the panel</span><span class="val">6,683</span></div>
+  <div class="row"><span class="lab">Constellations in total</span><span class="val">10 + 20 + 16 + 36 + 9 = 91</span></div>
+  <div class="row"><span class="lab">Bootstrap draws per confidence interval</span><span class="val">2,000</span></div>
+</div>
+<div class="note">Each constellation was run three ways: <b>A</b> the thesis logic &#8212; predict
+the external target from GDELT features alone; <b>B</b> the null model &#8212; predict it from
+its own recent history; <b>C</b> both together. The row that decides anything is
+<b>C &#8722; B</b>: what GDELT adds once the cheap forecast already exists.</div>
+<p class="src">D30_compare_external_targets.py &#183; D31_horizon_test.py &#183; zielvariablen_vergleich.csv</p>
+
+<h2>The two rules that beat<br>every fitted model</h2>
+<div class="rows">
+  <div class="row"><span class="lab">B2 &#183; &#8222;tomorrow looks like today&#8220; &#183; USA / Germany</span><span class="val ok">0.799 / 0.724</span></div>
+  <div class="row"><span class="lab">B3 &#183; rank the days by today's value &#183; USA / Germany</span><span class="val ok">0.770 / 0.938</span></div>
+  <div class="row"><span class="lab">Brier score of B2</span><span class="val">0.087</span></div>
+  <div class="row"><span class="lab">Parameters either rule estimates</span><span class="val lg">0</span></div>
+</div>
+<div class="note"><b>Neither rule contains a model.</b> One repeats today's value, the other sorts
+the days by it. Both stayed ahead of every fitted event model across the rebuild &#8212; which
+is the clearest single statement this work can make about the original figures.</div>
+<p class="src">D22_baseline_comparison.py</p>
+
+<h2>Does a longer<br>lead time help?</h2>
+<div class="rows">
+  <div class="row"><span class="lab">Horizons between 1 and 20 trading days whose contribution interval excludes zero</span><span class="val bad">0 of 20</span></div>
+  <div class="row"><span class="lab">At 21 days of lead time, the best model of all</span><span class="val dim">at chance level</span></div>
+  <div class="row"><span class="lab">Gradient boosting instead of logistic regression</span><span class="val dim">no improvement over the null model</span></div>
+  <div class="row"><span class="lab">Dispersion features added and tested</span><span class="val">11</span></div>
+  <div class="row"><span class="lab">Of those that improved a model</span><span class="val bad">0</span></div>
+</div>
+<div class="note"><b>The failure is not a matter of the method.</b> A longer horizon, a
+non-linear model class and eleven additional features were each tried on the same data, and
+none of them moved the contribution away from zero.</div>
+<p class="src">D31_horizon_test.py &#183; D38_modellklasse_eskalation.py &#183; D41_rich_feature_test.py &#183; D42_stress_test_rich_result.py</p>
+
+<h2>The placebo tests</h2>
+<table class="tbl">
+  <tr><th>Test</th><th>What it asks</th><th>Lift and 95&#8239;% interval</th><th>Verdict</th></tr>
+  <tr><td>The finding itself</td><td>does the warning rise on the 20 documented events?</td>
+      <td class="num">+0.152 &#160;[0.077, 0.242]</td><td class="v hold">holds</td></tr>
+  <tr><td>Against the harder null model</td><td>does it survive a stricter baseline?</td>
+      <td class="num">+0.097 &#160;[0.017, 0.166]</td><td class="v hold">holds</td></tr>
+  <tr><td>The other country's events</td><td>does it stay silent where it should?</td>
+      <td class="num">&#8722;0.069</td><td class="v pass">passes</td></tr>
+  <tr><td>The same events on random dates</td><td>does it stay silent where it should?</td>
+      <td class="num">&#8722;0.021</td><td class="v pass">passes</td></tr>
+  <tr><td>Threshold moved to 1.5 &#963;</td><td>does it survive a different definition?</td>
+      <td class="num">&#8722;0.008</td><td class="v fail">fails</td></tr>
+  <tr><td>Threshold moved to 2.0 &#963;</td><td>does it survive a different definition?</td>
+      <td class="num">&#8722;0.175</td><td class="v fail">fails</td></tr>
+  <tr><td>First half versus second half</td><td>is it stable over time?</td>
+      <td class="num">+0.221 &#160;vs &#160;&#8722;0.045</td><td class="v fail">fails</td></tr>
+</table>
+<div class="note accent"><b>One finding survives both placebos, and no more than that.</b>
+On the 20 documented events the warning does rise measurably. It does not survive a shift of
+the threshold or a split of the period &#8212; so it is evidence that the signal exists, not
+that it can be relied on operationally. Keeping those two apart is the whole point of the
+rebuild.</div>
+<p class="src">D26_anchor_baserate_test.py &#183; daten/ankerereignisse.json &#183; 20 anchors, each verified against a documented source</p>
+
+<h2>GDELT's second<br>database</h2>
+<div class="rows">
+  <div class="row"><span class="lab">Events database against the external uncertainty index</span><span class="val">r = 0.577</span></div>
+  <div class="row"><span class="lab">GKG database against the same index</span><span class="val dim">r = 0.271</span></div>
+  <div class="row"><span class="lab">GKG theme placebos run</span><span class="val dim">themes unrelated to risk scored alike</span></div>
+</div>
+<div class="note"><b>The weaker of the two databases was not the problem.</b> GDELT's Global
+Knowledge Graph tracks themes rather than events; measured against the same external index it
+correlates less than half as strongly, and swapping it in changed nothing about the
+result.</div>
+<p class="src">D43_download_gkg.py &#183; D44_gkg_vs_events.py &#183; D45 / D47 / D48</p>
+
+<h2>What is left standing</h2>
+<div class="rows">
+  <div class="row"><span class="lab">Measured, not assumed</span><span class="val dim">2 targets &#183; 14 countries &#183; 2 model classes &#183; 91 constellations</span></div>
+  <div class="row"><span class="lab">Mean ROC-AUC of the event models</span><span class="val accent">0.497</span></div>
+  <div class="row"><span class="lab">A coin flip</span><span class="val dim">0.500</span></div>
+</div>
+<div class="note accent" style="font-size:18px;line-height:1.5"><b>Counted news events do not
+anticipate uncertainty that is measured somewhere else.</b> What they do describe is the
+present: how much is being reported, how negatively, and how that compares to a country's own
+recent normal. That is what the
+<a href="../index.html" style="color:var(--accent)">live monitor</a> was built to show, and why
+every figure there stands next to its benchmark.</div>
+
+<footer>
+  Marc Oliver Sch&#228;fer &#183; WIMBIT23B &#183; DHBW Mannheim<br>
+  <a href="../index.html">Live monitor</a> &#183; <a href="index.html">Defence</a> &#183;
+  <a href="zahlen.html">The numbers</a> &#183;
+  <a href="https://github.com/marcschaefer5/laenderrisiko-monitor">source repository</a>
+</footer>
+
+</div>
+</body>
+</html>
