@@ -21,186 +21,244 @@
   <a href="pruefung.html">The check</a>
 </nav>
 
-<!-- ================= HERO ================= -->
 <header class="hero">
-  <p class="eyebrow rv">The basics &#183; from one news event to one warning</p>
+  <p class="eyebrow rv">The basics &#183; six steps</p>
   <h1 class="lines">
-    <span class="ln"><span>One line of news.</span></span>
-    <span class="ln"><span>Sixty-one fields.</span></span>
+    <span class="ln"><span>From one news</span></span>
+    <span class="ln"><span>report to one</span></span>
+    <span class="ln"><span>warning.</span></span>
   </h1>
-  <p class="sub rv">GDELT reads the world's news every fifteen minutes and writes down what it
-  thinks happened, as a row of numbers and codes. This page takes one real row &#8212; recorded
-  on 1 February 2025 and used in this thesis &#8212; and pulls it apart, field by field, until
-  what is left is the number a model can learn from.</p>
-  <div class="scrollcue rv"><i></i> Scroll</div>
+  <p class="sub rv d1">Nothing on this page requires prior knowledge. It follows a single real
+  event &#8212; recorded on 1 February 2025 and used in this thesis &#8212; through every step
+  that turns it into a number, and finally into a warning. Six steps, one scroll.</p>
+  <div class="scrollcue rv d2"><i></i> Scroll to begin</div>
 </header>
 
 </div><!-- /wrap -->
 
-<!-- ================= ACT 1 · THE RECORD ================= -->
-<section class="track" id="t1" style="height:440svh">
-  <div class="stage">
-    <p class="chapter"><b>01</b> &#160;&#160;The record</p>
-    <div class="stage-inner">
-
-      <p class="raw" id="rawline"></p>
-
-      <div class="fields" id="grps">
-        <div class="grp" data-x="-46" data-y="-150">
-          <div class="k"><i></i>Identity</div>
-          <div class="v">1223954814 &#183; 20250201</div>
-          <div class="d">A global event id and the day it happened. Every row in GDELT carries
-            both, which is what makes the archive addressable at all.</div>
-        </div>
-        <div class="grp" data-x="46" data-y="-150">
-          <div class="k"><i></i>Who acted, on whom</div>
-          <div class="v">REB &#8594; COD</div>
-          <div class="d">Actor codes. REB is a rebel group, COD the Democratic Republic of the
-            Congo. Ten further actor fields &#8212; ethnicity, religion, known group &#8212;
-            stay empty in most rows.</div>
-        </div>
-        <div class="grp keep" data-x="-46" data-y="-50">
-          <div class="k"><i></i>What happened &#183; CAMEO</div>
-          <div class="v">192 &#183; root 19 &#183; quad 4</div>
-          <div class="d">The event is classified into one of roughly 300 CAMEO codes. 192 is
-            &#8222;occupy territory&#8220;, its root 19 is the family &#8222;fight&#8220;, and
-            quad class 4 means material conflict. This is the field the risk thesaurus of the
-            thesis filters on.</div>
-        </div>
-        <div class="grp keep" data-x="46" data-y="-50">
-          <div class="k"><i></i>How severe &#183; Goldstein</div>
-          <div class="v">&#8722;9.5</div>
-          <div class="d">A fixed value per CAMEO code, &#8722;10 to +10. Not measured
-            from this event &#8212; it is the textbook severity of that kind of event.</div>
-        </div>
-        <div class="grp keep" data-x="-46" data-y="50">
-          <div class="k"><i></i>How loud &#183; attention</div>
-          <div class="v">63 mentions &#183; 9 sources</div>
-          <div class="d">How often it was mentioned, by how many distinct outlets.
-            Aggregated, this becomes the strongest predictor in both models &#8212; not violence,
-            but the density of reporting.</div>
-        </div>
-        <div class="grp keep" data-x="46" data-y="50">
-          <div class="k"><i></i>How it reads &#183; tone</div>
-          <div class="v">&#8722;5.68</div>
-          <div class="d">Average tone of the covering articles, roughly &#8722;100 to
-            +100. The feature itself is negative, so a negative coefficient means: more negative
-            tone raises the warning.</div>
-        </div>
-        <div class="grp keep" data-x="-46" data-y="150">
-          <div class="k"><i></i>Where &#183; geocoding</div>
-          <div class="v">GM &#183; 51.5, 10.5</div>
-          <div class="d">Geocoded to Germany at the country centroid &#8212; although
-            the article is about fighting in Goma. Rows like this are why a strict geographic
-            filter and a domain blacklist run first.</div>
-        </div>
-        <div class="grp" data-x="46" data-y="150">
-          <div class="k"><i></i>Where it came from</div>
-          <div class="v">npr.org &#8230;</div>
-          <div class="d">One source url per row. It is what makes a row checkable by hand &#8212;
-            and what the domain blacklist works on.</div>
-        </div>
+<!-- 00 - WHAT GDELT IS -->
+<section class="track" id="t0" style="height:300svh">
+  <div class="scene">
+    <div class="scene-grid">
+      <div class="rail" data-rail="0"></div>
+      <div class="say">
+        <p class="eyebrow">Step 00 &#183; the data source</p>
+        <h2>A machine reads the news and writes down what happened.</h2>
+        <p>GDELT is a public research project. Every fifteen minutes it scans news reports from
+        around the world and, for each event it recognises, writes <b>one row into a
+        table</b>: who did something, to whom, where, how severe it was, how widely it was
+        reported.</p>
+        <p>No person fills in those rows. A program infers them from the article text. That is
+        the raw material of this thesis &#8212; not anyone's opinion about risk, but a
+        <b>count of reported events</b>.</p>
+        <p class="take">And that is the catch: the machine never checks whether it understood
+        the article correctly.</p>
       </div>
-
-    </div>
-    <div class="scrub"><i></i></div>
-  </div>
-</section>
-
-<!-- ================= ACT 2 · AGGREGATION ================= -->
-<section class="track" id="t2" style="height:380svh">
-  <div class="stage">
-    <p class="chapter"><b>02</b> &#160;&#160;Six million become 730</p>
-    <div class="stage-inner">
-      <div class="swarm" id="swarm"></div>
-      <div class="rowcard">
-        <div class="h">What the model actually sees</div>
-        <div class="big"><span class="counter" id="cnt">6,237,331</span> <span
-          id="unit" style="color:var(--ink-2);font-size:.44em">events after filtering</span></div>
-        <p style="color:var(--ink-2);font-size:15px;line-height:1.5;margin:var(--s7) 0 0;max-width:70ch">
-          Individual events are never shown to the model. They are counted, averaged and summed
-          per country and day. 365 days &#215; 2 countries leaves <b style="color:var(--ink)">730
-          rows</b> &#8212; and that table is the entire model input.</p>
+      <div class="frame">
+        <div class="pad">
+          <div class="pipe" id="pipe">
+            <div class="step" data-i="0">
+              <span class="badge">1 &#183; the article</span>
+              <div class="body"><div class="l1">&#8222;Rebels seize control of Goma as M23
+                advances&#8220;</div><div class="l2">npr.org &#183; 31 Jan 2025</div></div>
+            </div>
+            <span class="arrow"></span>
+            <div class="step" data-i="1">
+              <span class="badge">2 &#183; the machine</span>
+              <div class="body"><div class="l1">Who acted? On whom? What kind of act? Where?
+                How severe? How often reported?</div></div>
+            </div>
+            <span class="arrow"></span>
+            <div class="step" data-i="2">
+              <span class="badge">3 &#183; the row</span>
+              <div class="body"><div class="l1">One line in a table &#8212; 61 fields.</div>
+                <div class="l2">1223954814 &#183; 20250201 &#183; REB &#183; 192 &#183; &#8722;9.5 &#183; 63 &#183; &#8722;5.68</div></div>
+            </div>
+          </div>
+        </div>
+        <p class="fcap">Every 15 minutes, in over 100 languages</p>
       </div>
     </div>
     <div class="scrub"><i></i></div>
   </div>
 </section>
 
-<!-- ================= ACT 3 · SEVEN FEATURES ================= -->
-<section class="track" id="t3" style="height:330svh">
-  <div class="stage">
-    <p class="chapter"><b>03</b> &#160;&#160;Seven numbers per day</p>
-    <div class="stage-inner">
-      <div class="feat" id="feat">
-        <div class="f"><div class="n">01</div><div class="t">n_events_ma7</div><div class="w">how much was reported, smoothed over seven days</div></div>
-        <div class="f"><div class="n">02</div><div class="t">tone_avg</div><div class="w">how negative the reporting was</div></div>
-        <div class="f"><div class="n">03</div><div class="t">tone_avg_delta1</div><div class="w">how much the tone moved against yesterday</div></div>
-        <div class="f"><div class="n">04</div><div class="t">gold_sum</div><div class="w">summed severity of all events</div></div>
-        <div class="f"><div class="n">05</div><div class="t">gold_neg_sum</div><div class="w">summed severity of the conflictual ones</div></div>
-        <div class="f"><div class="n">06</div><div class="t">n_events_delta1</div><div class="w">change in volume against yesterday</div></div>
-        <div class="f"><div class="n">07</div><div class="t">share_conflict</div><div class="w">conflict events as a share of the day</div></div>
+<!-- 01 - THE RECORD -->
+<section class="track" id="t1" style="height:420svh">
+  <div class="scene">
+    <div class="scene-grid">
+      <div class="rail" data-rail="1"></div>
+      <div class="say">
+        <p class="eyebrow">Step 01 &#183; one event</p>
+        <h2>Sixty-one fields. Five of them matter.</h2>
+        <p>This is the actual row for that report. Most of its fields are empty or
+        administrative &#8212; identifiers, dates, actor attributes nobody filled in.</p>
+        <p>Watch it come apart. The <b style="color:var(--accent)">marked</b> groups are the
+        ones this thesis reads: <b>what kind of event</b> it was, <b>how severe</b>, <b>how
+        widely reported</b>, <b>how negative the coverage</b>, and <b>where</b> it happened.</p>
+        <p class="take">Everything else is discarded before a single number is computed.</p>
       </div>
-      <p style="text-align:center;color:var(--ink-2);font-size:15px;margin:var(--s9) auto 0;max-width:62ch">
-        Seven per country-day. Everything the two models ever see about a country is in these
-        seven numbers.</p>
+      <div class="frame">
+        <div class="pad"><p class="raw" id="rawline"></p></div>
+        <div class="fields" id="grps">
+          <div class="grp"><div class="k"><i></i>Identity</div>
+            <div class="v">1223954814</div></div>
+          <div class="grp"><div class="k"><i></i>Actors</div>
+            <div class="v">REB &#8594; COD</div></div>
+          <div class="grp keep"><div class="k"><i></i>Kind of event</div>
+            <div class="v">CAMEO 192</div></div>
+          <div class="grp keep"><div class="k"><i></i>Severity</div>
+            <div class="v">&#8722;9.5 of &#8722;10</div></div>
+          <div class="grp keep"><div class="k"><i></i>Attention</div>
+            <div class="v">63 mentions &#183; 9 sources</div></div>
+          <div class="grp keep"><div class="k"><i></i>Tone of coverage</div>
+            <div class="v">&#8722;5.68</div></div>
+          <div class="grp keep"><div class="k"><i></i>Place</div>
+            <div class="v">Germany &#183; 51.5, 10.5</div></div>
+          <div class="grp"><div class="k"><i></i>Source</div>
+            <div class="v">npr.org</div></div>
+        </div>
+        <p class="fcap">One real row &#183; GDELT export, 1 Feb 2025</p>
+      </div>
     </div>
     <div class="scrub"><i></i></div>
   </div>
 </section>
 
-<!-- ================= ACT 4 · THE Z-SCORE ================= -->
-<section class="track" id="t4" style="height:400svh">
-  <div class="stage">
-    <p class="chapter"><b>04</b> &#160;&#160;Unusual, against its own normal</p>
-    <div class="stage-inner">
-      <svg class="plot" id="plot" viewBox="0 0 1000 420" role="img"
-        aria-label="A smoothed series of reported volume with a band of normal variation and a threshold at 1.5 standard deviations; one day crosses it.">
-        <rect class="band" id="band" x="60" y="200" width="820" height="110"></rect>
-        <line class="ax" x1="60" y1="255" x2="880" y2="255" opacity=".5"></line>
-        <line class="ax" x1="60" y1="372" x2="880" y2="372"></line>
-        <line class="thr" id="thr" x1="60" y1="172.5" x2="880" y2="172.5"></line>
-        <path class="ser" id="ser"></path>
-        <circle class="hit" id="hit" cx="0" cy="0" r="9"></circle>
-        <text x="872" y="249" text-anchor="end" opacity=".75">0 &#183; normal</text>
-        <text x="872" y="194" text-anchor="end" opacity=".75">+1 &#963;</text>
-        <text x="872" y="165" text-anchor="end" id="thrlab" opacity="0" fill="#f36458">+1.5 &#963; &#183; the label</text>
-        <text x="60" y="396">60 days of this country's own history</text>
-        <text x="880" y="396" text-anchor="end">today</text>
-      </svg>
-      <p style="text-align:center;color:var(--ink-2);font-size:15px;margin:var(--s9) auto 0;max-width:66ch">
-        Germany and the USA are not comparable in absolute numbers &#8212; there are 27 American
-        events for every German one. So each value is expressed as a distance from that country's
-        own rolling 60-day normal. Crossing <b style="color:var(--ink)">1.5 standard
-        deviations</b> within the next three days is what the model is trained to anticipate.</p>
+<!-- 02 - AGGREGATION -->
+<section class="track" id="t2" style="height:360svh">
+  <div class="scene">
+    <div class="scene-grid">
+      <div class="rail" data-rail="2"></div>
+      <div class="say">
+        <p class="eyebrow">Step 02 &#183; from many to one</p>
+        <h2>The model never sees a single event.</h2>
+        <p>One event says nothing about a country's risk. What matters is the <b>pattern</b>:
+        how much is being reported today compared with a normal day, how negative it reads,
+        how severe it is on average.</p>
+        <p>So every event for one country on one day is counted, averaged and summed into a
+        single line. Over one year and two countries, <b>6.2 million events become 730
+        lines</b>.</p>
+        <p class="take">From here on, a day is one row. Individual reports no longer exist.</p>
+      </div>
+      <div class="frame">
+        <div class="swarm" id="swarm"></div>
+        <div class="rowout">
+          <div class="big"><span id="cnt">6,237,331</span></div>
+          <div class="u" id="unit">events after filtering</div>
+        </div>
+        <p class="fcap">365 days &#215; 2 countries</p>
+      </div>
     </div>
     <div class="scrub"><i></i></div>
   </div>
 </section>
 
-<!-- ================= ACT 5 · THE WARNING ================= -->
+<!-- 03 - THE FEATURES -->
+<section class="track" id="t3" style="height:300svh">
+  <div class="scene">
+    <div class="scene-grid">
+      <div class="rail" data-rail="3"></div>
+      <div class="say">
+        <p class="eyebrow">Step 03 &#183; what a day looks like</p>
+        <h2>Seven numbers describe a country's day.</h2>
+        <p>This is the whole input. No headlines, no text, no context &#8212; seven figures per
+        country and day, each one a count, an average or a difference computed from the events
+        of that day.</p>
+        <p>The first one, the smoothed volume of reporting, turns out to be the
+        <b>strongest predictor of all</b> &#8212; stronger than any measure of violence.</p>
+        <p class="take">Seven numbers in, one probability out.</p>
+      </div>
+      <div class="frame">
+        <div class="pad">
+          <div class="feat" id="feat">
+            <div class="f"><div class="n">01</div><div class="t">n_events_ma7</div><div class="w">how much was reported, smoothed over 7 days</div></div>
+            <div class="f"><div class="n">02</div><div class="t">tone_avg</div><div class="w">how negative the coverage was</div></div>
+            <div class="f"><div class="n">03</div><div class="t">tone_avg_delta1</div><div class="w">how far the tone moved since yesterday</div></div>
+            <div class="f"><div class="n">04</div><div class="t">gold_sum</div><div class="w">summed severity of all events</div></div>
+            <div class="f"><div class="n">05</div><div class="t">gold_neg_sum</div><div class="w">summed severity of the conflictual ones</div></div>
+            <div class="f"><div class="n">06</div><div class="t">n_events_delta1</div><div class="w">change in volume since yesterday</div></div>
+            <div class="f"><div class="n">07</div><div class="t">share_conflict</div><div class="w">conflict events as a share of the day</div></div>
+          </div>
+        </div>
+        <p class="fcap">Seven features per country-day</p>
+      </div>
+    </div>
+    <div class="scrub"><i></i></div>
+  </div>
+</section>
+
+<!-- 04 - COMPARABILITY -->
+<section class="track" id="t4" style="height:380svh">
+  <div class="scene">
+    <div class="scene-grid">
+      <div class="rail" data-rail="4"></div>
+      <div class="say">
+        <p class="eyebrow">Step 04 &#183; unusual, not large</p>
+        <h2>There are 27 American events for every German one.</h2>
+        <p>Raw counts cannot be compared between the two countries. So each day is expressed
+        as a <b>distance from that country's own recent normal</b> &#8212; the average of its
+        last 60 days, measured in standard deviations.</p>
+        <p>A quiet German day and a quiet American day then look alike. And a day counts as a
+        <b>warning day</b> when the series rises more than 1.5 standard deviations above that
+        normal within the next three days.</p>
+        <p class="take">That crossing is what the model is trained to anticipate.</p>
+      </div>
+      <div class="frame">
+        <div class="pad">
+          <svg class="plot" id="plot" viewBox="0 140 1000 320" role="img"
+            aria-label="A series of reported volume against its own normal range; the last days rise past the 1.5 sigma threshold.">
+            <rect class="band" id="band" x="30" y="230" width="700" height="130"></rect>
+            <line class="ax" x1="30" y1="295" x2="730" y2="295" opacity=".45"></line>
+            <line class="thr" id="thr" x1="30" y1="197.5" x2="730" y2="197.5"></line>
+            <path class="ser" id="ser"></path>
+            <circle class="hit" id="hit" cx="0" cy="0" r="11"></circle>
+            <text x="746" y="301">0 &#183; normal</text>
+            <text x="746" y="236" opacity=".75">+1 &#963;</text>
+            <text x="746" y="203" id="thrlab" opacity="0" fill="#f36458">+1.5 &#963;</text>
+            <text x="30" y="440">60 days back</text>
+            <text x="730" y="440" text-anchor="end">today</text>
+          </svg>
+        </div>
+        <p class="fcap">The same picture works for either country</p>
+      </div>
+    </div>
+    <div class="scrub"><i></i></div>
+  </div>
+</section>
+
+<!-- 05 - THE LINE -->
 <section class="track" id="t5" style="height:340svh">
-  <div class="stage">
-    <p class="chapter"><b>05</b> &#160;&#160;Where the line is drawn</p>
-    <div class="stage-inner">
-      <div class="gauge">
-        <p style="font-size:clamp(20px,2.6vw,34px);line-height:1.2;letter-spacing:-.02em;
-          max-width:26ch;margin:0 auto var(--s10);text-align:center">
-          The model returns a probability. A human decides when it counts as a warning.</p>
-        <div class="gline">
-          <div class="gfill"></div>
-          <div class="gmark" id="mDE" style="left:20%">Germany warns at 0.20</div>
-          <div class="gmark" id="mUS" style="left:60%">USA warns at 0.60</div>
+  <div class="scene">
+    <div class="scene-grid">
+      <div class="rail" data-rail="5"></div>
+      <div class="say">
+        <p class="eyebrow">Step 05 &#183; the decision</p>
+        <h2>The model returns a probability. A human draws the line.</h2>
+        <p>For every day the model outputs a number between 0 and 1. It never says
+        &#8222;warning&#8220; by itself &#8212; someone has to decide how high that number must
+        be before anyone is told.</p>
+        <p>Both thresholds were picked by the same rule, and the rule produced
+        <b>two different answers</b>: Germany warns early and often, the USA warns rarely and
+        only when it is fairly sure.</p>
+        <p class="take">Where the line sits is a judgement about the cost of a false alarm.</p>
+      </div>
+      <div class="frame">
+        <div class="pad">
+          <div class="gauge">
+            <div class="gline">
+              <div class="gfill"></div>
+              <div class="gmark" id="mDE" style="left:20%"><b>0.20</b><span>Germany</span></div>
+              <div class="gmark" id="mUS" style="left:60%"><b>0.60</b><span>USA</span></div>
+            </div>
+            <div class="gends"><span>0.00 &#183; calm</span><span>1.00 &#183; certain</span></div>
+            <div class="gtab">
+              <div><span>Germany &#183; warning days / episodes / recall</span><b>150 &#183; 24 &#183; 1.00</b></div>
+              <div><span>USA &#183; warning days / episodes / recall</span><b>43 &#183; 10 &#183; 0.75</b></div>
+            </div>
+          </div>
         </div>
-        <div class="gends"><span>0.00 &#183; calm</span><span>modelled probability</span><span>1.00 &#183; certain</span></div>
-        <div class="rows" style="max-width:820px;margin:var(--s11) auto 0">
-          <div class="row"><span class="lab">Germany &#183; warning days / episodes / recall</span><span class="val">150 &#183; 24 &#183; 1.00</span></div>
-          <div class="row"><span class="lab">USA &#183; warning days / episodes / recall</span><span class="val">43 &#183; 10 &#183; 0.75</span></div>
-        </div>
-        <p style="text-align:center;color:var(--ink-2);font-size:15px;margin:var(--s9) auto 0;max-width:64ch">
-          Both thresholds come from the same rule &#8212; highest F1 on out-of-fold predictions.
-          The rule produced two different answers, and that is the central result of the thesis
-          in one picture: where the line sits is a decision about the cost of a false alarm.</p>
+        <p class="fcap">Threshold chosen on out-of-fold predictions, before the holdout</p>
       </div>
     </div>
     <div class="scrub"><i></i></div>
@@ -209,10 +267,10 @@
 
 <div class="wrap outro">
   <h2>And then the honest part</h2>
-  <p class="lede rv">Everything above describes how a warning is produced. It says nothing about
-  whether the warning is any good. That question needs a benchmark and a target that does not come
-  from the same data &#8212; which is what the rebuild after submission supplied, and where the
-  answer changed.</p>
+  <p class="lede rv">Those five steps describe how a warning is produced. They say nothing about
+  whether the warning is any good. Answering that needs two more things the thesis did not have:
+  a benchmark to beat, and a target that does not come from the same data. The rebuild after
+  submission supplied both &#8212; and the answer changed.</p>
   <div class="tiles" style="margin-top:var(--s10)">
     <a class="tile" href="zahlen.html">
       <div class="t">The numbers</div>
@@ -231,7 +289,9 @@
   <footer>
     Marc Oliver Schaefer &#183; WIMBIT23B &#183; DHBW Mannheim<br>
     The record shown is GlobalEventID 1223954814 from the GDELT 2.0 event export of
-    1 February 2025, 00:00 UTC, as used in this thesis.
+    1 February 2025, 00:00 UTC. GDELT geocoded it to Germany although the report concerns
+    Goma in the DR Congo &#8212; which is why a strict geographic filter and a domain
+    blacklist run before anything is counted.
   </footer>
 </div>
 

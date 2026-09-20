@@ -1,24 +1,20 @@
-/* Grundlagen — Apple-style scroll motion on the project's Sanity tokens.
-   Motion: long pinned stages, scrub-driven disassembly, staggered line reveals,
-   mass-and-inertia easing. Transform/opacity only. */
+/* Grundlagen — two-column editorial stage on the project's Sanity tokens.
+   One left edge for all text, one framed viewport for all visuals, one rail
+   for orientation. Motion after the reference: long pinned scenes, scrubbed
+   transitions, staggered reveals, mass-and-inertia easing. */
 
 :root{
   --ease-out:cubic-bezier(.28,.11,.32,1);
   --ease-io:cubic-bezier(.65,.05,.36,1);
-  --stage-h:100svh;
+  --rail:64px;
+  --frame-h:min(62svh,560px);
 }
 
 /* ---------- reveal primitive ---------- */
-.rv{opacity:0;transform:translateY(22px);
+.rv{opacity:0;transform:translateY(20px);
   transition:opacity .9s var(--ease-out),transform .9s var(--ease-out)}
 .rv.in{opacity:1;transform:none}
-.rv:nth-child(2){transition-delay:.07s}
-.rv:nth-child(3){transition-delay:.14s}
-.rv:nth-child(4){transition-delay:.21s}
-.rv:nth-child(5){transition-delay:.28s}
-
-/* line-by-line display reveal */
-.lines{display:block}
+.rv.d1{transition-delay:.08s} .rv.d2{transition-delay:.16s} .rv.d3{transition-delay:.24s}
 .lines .ln{display:block;overflow:hidden}
 .lines .ln > span{display:block;transform:translateY(105%);
   transition:transform 1.05s var(--ease-out)}
@@ -27,141 +23,179 @@
 .lines.in .ln:nth-child(3) > span{transition-delay:.18s}
 
 /* ---------- hero ---------- */
-.hero{min-height:92svh;display:flex;flex-direction:column;justify-content:center;
-  padding:var(--s12) 0 var(--s11)}
-.hero h1{font-size:clamp(46px,9vw,124px);line-height:.98;letter-spacing:-.045em;
+.hero{min-height:88svh;display:flex;flex-direction:column;justify-content:center;
+  padding:var(--s12) 0 var(--s11);max-width:22ch}
+.hero h1{font-size:clamp(44px,8vw,104px);line-height:.98;letter-spacing:-.045em;
   font-weight:400;margin:0}
-.hero .sub{font-size:clamp(17px,2vw,24px);line-height:1.45;letter-spacing:-.02em;
-  color:var(--ink-2);max-width:60ch;margin:var(--s9) 0 0}
+.hero .sub{font-size:clamp(17px,1.7vw,21px);line-height:1.55;letter-spacing:-.01em;
+  color:var(--ink-2);max-width:56ch;margin:var(--s9) 0 0}
 .scrollcue{margin-top:var(--s11);display:flex;align-items:center;gap:var(--s6);
   font-family:var(--mono);font-size:11px;font-weight:600;text-transform:uppercase;
   color:var(--ink-2)}
-.scrollcue i{display:block;width:1px;height:46px;background:linear-gradient(
+.scrollcue i{display:block;width:1px;height:44px;background:linear-gradient(
   to bottom,var(--accent),transparent);animation:cue 2.2s var(--ease-io) infinite}
 @keyframes cue{0%{transform:scaleY(0);transform-origin:top}
   45%{transform:scaleY(1);transform-origin:top}
   55%{transform:scaleY(1);transform-origin:bottom}
   100%{transform:scaleY(0);transform-origin:bottom}}
 
-/* ---------- pinned stage ---------- */
+/* ---------- the pinned scene ---------- */
 .track{position:relative}
-.stage{position:sticky;top:0;height:var(--stage-h);display:grid;
-  grid-template-columns:minmax(0,1fr);align-content:center;overflow:hidden}
-.stage-inner{width:100%;min-width:0;max-width:1180px;margin:0 auto;padding:0 var(--s9)}
+.scene{position:sticky;top:0;height:100svh;display:grid;align-content:center;
+  overflow:hidden}
+.scene-grid{
+  width:100%;max-width:1320px;margin:0 auto;padding:0 var(--s9);
+  display:grid;grid-template-columns:var(--rail) minmax(0,38fr) minmax(0,52fr);
+  gap:0 var(--s10);align-items:center}
 
-/* chapter marker */
-.chapter{position:absolute;top:calc(var(--s9) + 8px);left:var(--s9);
+/* chapter rail */
+.rail{align-self:stretch;display:flex;flex-direction:column;justify-content:flex-start;
+  gap:var(--s6);padding-top:3px}
+.rail span{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink-2);
+  opacity:.32;transition:opacity .4s var(--ease-out),color .4s var(--ease-out);
+  display:flex;align-items:center;gap:8px}
+.rail span:before{content:"";width:10px;height:1px;background:currentColor;
+  transition:width .4s var(--ease-out)}
+.rail span.on{opacity:1;color:var(--accent)}
+.rail span.on:before{width:22px}
+.rail span.done{opacity:.6}
+
+/* text column — one left edge for everything */
+.say{max-width:44ch}
+.say .eyebrow{margin:0 0 var(--s7)}
+.say h2{font-size:clamp(26px,2.5vw,40px);line-height:1.12;letter-spacing:-.032em;
+  font-weight:400;margin:0 0 var(--s8);border:0;padding:0}
+.say p{font-size:16.5px;line-height:1.6;letter-spacing:-.01em;color:var(--ink-2);
+  margin:0 0 var(--s7)}
+.say p:last-of-type{margin-bottom:0}
+.say b{color:var(--ink);font-weight:425}
+.say p.take{margin-top:var(--s9);padding-top:var(--s7);
+  border-top:1px solid var(--border-2);
+  font-family:var(--mono);font-size:13px;line-height:1.55;color:var(--accent);
+  letter-spacing:0}
+
+/* the framed viewport every visual lives in */
+.frame{position:relative;height:var(--frame-h);border:1px solid var(--border);
+  border-radius:var(--r-lg);background:var(--surface);overflow:hidden}
+.frame > .pad{position:absolute;inset:var(--s8);display:grid;align-content:center}
+.fcap{position:absolute;left:var(--s8);right:var(--s8);bottom:var(--s7);
   font-family:var(--mono);font-size:11px;font-weight:600;text-transform:uppercase;
-  color:var(--ink-2);opacity:.75;z-index:3}
-.chapter b{color:var(--accent);font-weight:600}
+  color:var(--ink-2);opacity:.8}
 
-/* scrub progress hairline */
-.scrub{position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--border);z-index:3}
-.scrub i{display:block;height:100%;width:100%;background:var(--accent);
+/* scrub hairline along the bottom of the scene */
+.scrub{position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--border)}
+.scrub i{display:block;height:100%;background:var(--accent);
   transform:scaleX(var(--p,0));transform-origin:left}
 
-/* ---------- ACT 1 · the record ---------- */
-.raw{font-family:var(--mono);font-size:clamp(9px,1.05vw,13px);line-height:1.9;
-  color:var(--ink-2);word-break:break-all;text-align:center;
-  transform:scale(var(--rawScale,1));opacity:var(--rawOp,1);
-  transition:none;max-width:980px;margin:0 auto}
-.raw em{font-style:normal;color:var(--ink)}
-.raw .sep{color:var(--surface-3)}
+/* ---------- 00 · what GDELT is ---------- */
+.pipe{display:grid;gap:var(--s7)}
+.pipe .step{display:grid;grid-template-columns:auto 1fr;gap:var(--s7);align-items:center;
+  opacity:var(--o,0);transform:translateY(calc(14px * (1 - var(--o,0))))}
+.pipe .badge{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink-2);
+  border:1px solid var(--border-2);border-radius:var(--r-pill);padding:4px 10px;
+  white-space:nowrap}
+.pipe .body{border:1px solid var(--border-2);border-radius:var(--r-sm);
+  padding:var(--s7);background:var(--canvas);min-width:0}
+.pipe .body .l1{font-size:14.5px;line-height:1.4;color:var(--ink)}
+.pipe .body .l2{font-family:var(--mono);font-size:12px;color:var(--ink-2);margin-top:6px;
+  word-break:break-all}
+.pipe .arrow{justify-self:center;width:1px;height:18px;background:var(--surface-3);
+  grid-column:1 / -1;opacity:var(--ao,0)}
 
+/* ---------- 01 · the record ---------- */
+.raw{font-family:var(--mono);font-size:clamp(8px,.85vw,11px);line-height:1.95;
+  color:var(--ink-2);word-break:break-all;opacity:var(--rawOp,1);
+  transform:scale(var(--rawScale,1));transform-origin:center}
+.raw em{font-style:normal;color:var(--accent)}
 .fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:var(--s7) var(--s10);margin:0 auto;max-width:1060px}
-.grp{opacity:var(--o,0);
-  transform:translate3d(var(--x,0px),var(--y,0px),0) scale(var(--s,1));
-  will-change:transform,opacity}
-.grp .k{font-family:var(--mono);font-size:11px;font-weight:600;text-transform:uppercase;
-  color:var(--ink-2);display:flex;align-items:center;gap:8px}
-.grp .k i{width:14px;height:1px;background:var(--surface-3);display:block}
-.grp.keep .k{color:var(--accent)}
-.grp.keep .k i{background:var(--accent);width:22px}
-.grp .v{font-family:var(--mono);font-size:clamp(15px,1.7vw,22px);line-height:1.3;
-  color:var(--ink);margin-top:6px;font-variant-numeric:tabular-nums}
-.grp .d{font-size:13.5px;line-height:1.45;color:var(--ink-2);margin-top:8px;
-  max-width:44ch;height:104px;overflow:hidden;
-  opacity:0;transform:translateY(8px);
-  transition:opacity .55s var(--ease-out),transform .55s var(--ease-out)}
-.grp.showd .d{opacity:1;transform:none}
-.grp.focus .v{color:var(--ink)}
-.grp .v{transition:color .4s var(--ease-out)}
+  gap:var(--s7) var(--s8);position:absolute;inset:var(--s8);align-content:center}
+.grp{min-width:0;opacity:var(--o,0);
+  transform:translate3d(var(--x,0px),var(--y,0px),0) scale(var(--s,1))}
+.grp .k{font-family:var(--mono);font-size:10.5px;font-weight:600;text-transform:uppercase;
+  color:var(--ink-2);display:flex;align-items:center;gap:7px}
+.grp .k i{width:12px;height:1px;background:var(--surface-3)}
+.grp.keep .k{color:var(--accent)} .grp.keep .k i{background:var(--accent);width:18px}
+.grp .v{font-family:var(--mono);font-size:clamp(13px,1.25vw,17px);line-height:1.3;
+  color:var(--ink);margin-top:5px;font-variant-numeric:tabular-nums}
 
-/* ---------- ACT 2 · swarm collapses into a row ---------- */
-.swarm{position:relative;height:min(46svh,380px);margin:0 auto;max-width:900px}
-.dot{position:absolute;width:4px;height:4px;border-radius:50%;
-  background:var(--ink-2);opacity:.62;will-change:transform,opacity}
+/* ---------- 02 · swarm ---------- */
+.swarm{position:relative;height:100%}
+.dot{position:absolute;width:4px;height:4px;border-radius:50%;background:var(--ink-2);
+  opacity:.6;will-change:transform,opacity}
 .dot.big{width:6px;height:6px;background:var(--ink)}
 .dot.acc{background:var(--accent)}
-.rowcard{margin:var(--s10) auto 0;max-width:900px;border:1px solid var(--border-2);
-  border-radius:var(--r-md);background:var(--surface);padding:var(--s8);
-  opacity:var(--rowOp,0);transform:translateY(calc(18px * (1 - var(--rowOp,0))))}
-.rowcard .h{font-family:var(--mono);font-size:11px;font-weight:600;
-  text-transform:uppercase;color:var(--ink-2)}
-.rowcard .big{font-family:var(--mono);font-size:clamp(26px,4.4vw,52px);line-height:1;
-  letter-spacing:-.03em;margin-top:var(--s6);font-variant-numeric:tabular-nums}
-.counter{font-variant-numeric:tabular-nums}
+.rowout{position:absolute;left:var(--s8);right:var(--s8);top:50%;
+  transform:translateY(-50%);opacity:var(--rowOp,0);text-align:center}
+.rowout .big{font-family:var(--mono);font-size:clamp(34px,4.6vw,64px);line-height:1;
+  letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.rowout .u{font-family:var(--mono);font-size:12px;font-weight:600;text-transform:uppercase;
+  color:var(--ink-2);margin-top:var(--s7)}
 
-/* ---------- ACT 3 · seven features ---------- */
-.feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-  gap:var(--s7);max-width:1060px;margin:0 auto}
-.feat .f{min-width:0}
-.grp{min-width:0}
-.f{border:1px solid var(--border-2);border-radius:var(--r-sm);padding:var(--s7);
-  background:var(--surface);opacity:var(--fo,0);
-  transform:translateY(calc(26px * (1 - var(--fo,0)))) scale(calc(.97 + .03 * var(--fo,0)))}
-.f .n{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink-2)}
-.f .t{font-family:var(--mono);font-size:15px;margin-top:8px;color:var(--ink);
+/* ---------- 03 · features ---------- */
+.feat{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s6)}
+.f{min-width:0;border:1px solid var(--border-2);border-radius:var(--r-sm);
+  padding:var(--s6) var(--s7);background:var(--canvas);opacity:var(--fo,0);
+  transform:translateY(calc(20px * (1 - var(--fo,0))))}
+.f .n{font-family:var(--mono);font-size:10.5px;font-weight:600;color:var(--accent)}
+.f .t{font-family:var(--mono);font-size:13.5px;margin-top:5px;color:var(--ink);
   word-break:break-word}
-.f .w{font-size:13px;color:var(--ink-2);margin-top:6px;line-height:1.4}
+.f .w{font-size:12.5px;color:var(--ink-2);margin-top:4px;line-height:1.4}
 
-/* ---------- ACT 4 · the z-score ---------- */
-.plot{width:100%;max-width:1000px;margin:0 auto;display:block;overflow:hidden}
-.plot .ser{stroke:var(--ink);fill:none;stroke-width:2;
-  stroke-dasharray:var(--len,2000);stroke-dashoffset:calc(var(--len,2000) * (1 - var(--draw,0)))}
-.plot .band{fill:var(--surface);opacity:calc(.9 * var(--bandOp,0))}
-.plot .thr{stroke:var(--accent);stroke-width:1.5;stroke-dasharray:6 5;
-  opacity:var(--thrOp,0)}
+/* ---------- 04 · z-score ---------- */
+.plot{width:100%;display:block;overflow:hidden}
+.plot .ser{stroke:var(--ink);fill:none;stroke-width:2.5;
+  stroke-dasharray:var(--len,2000);stroke-dashoffset:calc(var(--len,2000)*(1 - var(--draw,0)))}
+.plot .band{fill:#ffffff;opacity:calc(.05*var(--bandOp,0))}
+.plot .thr{stroke:var(--accent);stroke-width:2;stroke-dasharray:7 6;opacity:var(--thrOp,0)}
 .plot .hit{fill:var(--accent);opacity:var(--hitOp,0);
   transform:scale(var(--hitS,.2));transform-origin:center;transform-box:fill-box}
-.plot .ax{stroke:var(--border-2);stroke-width:1}
-.plot text{font-family:var(--mono);font-size:11px;fill:var(--ink-2)}
+.plot .ax{stroke:var(--border-2);stroke-width:1.5}
+.plot text{font-family:var(--mono);font-size:19px;fill:var(--ink-2);font-weight:500}
 
-/* ---------- ACT 5 · the threshold ---------- */
-.gauge{max-width:1000px;margin:0 auto}
+/* ---------- 05 · the line ---------- */
+.gauge{padding:0 var(--s6)}
 .gline{position:relative;height:3px;background:var(--border-2);border-radius:2px;
-  margin:var(--s11) 0 var(--s9)}
+  margin:var(--s12) 0 var(--s8)}
 .gfill{position:absolute;inset:0;background:var(--accent);border-radius:2px;
   transform:scaleX(var(--gp,0));transform-origin:left}
-.gends{display:flex;justify-content:space-between;margin-top:var(--s6);
-  font-family:var(--mono);font-size:11px;font-weight:600;text-transform:uppercase;
-  color:var(--ink-2)}
-.gmark{position:absolute;top:-30px;transform:translateX(-50%);
-  font-family:var(--mono);font-size:11px;font-weight:600;text-transform:uppercase;
-  color:var(--ink-2);opacity:var(--mo,0);white-space:nowrap}
-.gmark:after{content:"";position:absolute;left:50%;top:22px;width:1px;height:16px;
+.gmark{position:absolute;top:-46px;transform:translateX(-50%);text-align:center;
+  opacity:var(--mo,0);white-space:nowrap}
+.gmark b{display:block;font-family:var(--mono);font-size:18px;color:var(--ink);
+  font-weight:500}
+.gmark span{display:block;font-family:var(--mono);font-size:10.5px;font-weight:600;
+  text-transform:uppercase;color:var(--ink-2);margin-top:3px}
+.gmark:after{content:"";position:absolute;left:50%;top:52px;width:1px;height:14px;
   background:var(--surface-3)}
+.gends{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;
+  font-weight:600;text-transform:uppercase;color:var(--ink-2)}
+.gtab{margin-top:var(--s10);border-top:1px solid var(--border-2)}
+.gtab div{display:flex;justify-content:space-between;gap:var(--s7);padding:var(--s6) 0;
+  border-bottom:1px solid var(--border);font-size:14px;color:var(--ink-2)}
+.gtab b{font-family:var(--mono);color:var(--ink);font-weight:500;
+  font-variant-numeric:tabular-nums;white-space:nowrap}
 
-/* ---------- closing ---------- */
+/* ---------- outro ---------- */
 .outro{padding:var(--s12) 0 var(--s11)}
 .outro h2{margin-top:0}
 
-@media (max-width:760px){
-  .fields{grid-template-columns:1fr;gap:var(--s6)}
-  .grp .d{display:none}
-  .grp .v{font-size:17px}
-  .swarm{height:34svh}
-  /* the plot keeps its 1000x420 viewBox, so everything inside it shrinks with
-     the container -- bump the user-space sizes back up for a phone */
-  .plot text{font-size:21px}
+/* ---------- narrow ---------- */
+@media (max-width:1000px){
+  :root{--rail:0px;--frame-h:min(42svh,340px)}
+  .scene{height:auto;min-height:100svh;align-content:start;padding:var(--s11) 0 var(--s10)}
+  .scene-grid{grid-template-columns:minmax(0,1fr);gap:var(--s9);padding:0 var(--s7)}
+  .rail{display:none}
+  .say{max-width:none}
+  .say h2{font-size:clamp(24px,5.4vw,32px)}
+  .fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s6)}
+  .grp .v{font-size:12.5px}
+  .plot text{font-size:26px}
   .plot .ser{stroke-width:4}
-  .plot .thr{stroke-width:3;stroke-dasharray:11 9}
-  .plot .hit{r:15}
-  .plot .ax{stroke-width:2}
-  .stage-inner{padding:0 var(--s7)}
-  .feat{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s6)}
+  .plot .thr{stroke-width:3}
+  .plot .hit{r:14}
+  .feat{grid-template-columns:repeat(2,minmax(0,1fr))}
   .f .w{display:none}
+  .gline{margin-top:var(--s11)}
+  .hero{max-width:none}
 }
 @media (prefers-reduced-motion:reduce){
   .rv,.lines .ln > span{transition:none}
