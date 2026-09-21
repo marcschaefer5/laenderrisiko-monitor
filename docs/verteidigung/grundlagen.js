@@ -146,58 +146,76 @@
   }
 
   /* ---------- 04 · the z-score ---------- */
-  // z mapped to the plot: y(z) = 295 - z*65, so +1.5 sigma lands on 197.5
-  var SER=(function(){
+  /* Die Kurve wird fuer die jeweilige Breite neu gezeichnet. Auf dem Handy
+     liegt sie hoeher und steiler, damit sie den Rahmen fuellt statt als
+     schmaler Streifen in der Mitte zu haengen. Die Beschriftungen stehen
+     dann links ueber der Kurve, nicht auf ihr. */
+  var PLOT = {
+    wide:  { box:"0 140 1000 320", x0:30, x1:730, zero:295, sig:65,
+             labX:746, labAnchor:"", botY:440, showZero:true },
+    narrow:{ box:"0 118 492 434",  x0:30, x1:452, zero:360, sig:85,
+             labX:30,  labAnchor:"start", botY:502, showZero:false }
+  };
+  var SER=[], PLOT_MODE="";
+
+  function buildSeries(c){
     var pts=[], n=64;
     for(var i=0;i<n;i++){
-      var x=30 + (700*i/(n-1));
+      var x=c.x0 + ((c.x1-c.x0)*i/(n-1));
       var z = Math.sin(i*0.55)*0.28 + Math.sin(i*0.19+1.2)*0.20 + Math.cos(i*0.9)*0.09;
       if(i>44) z += Math.pow((i-44)/(n-1-44), 1.7) * 2.15;
-      pts.push([x, 295 - z*65, z]);
+      pts.push([x, c.zero - z*c.sig, z]);
     }
     return pts;
-  })();
-  (function(){
-    var path=document.getElementById("ser"); if(!path) return;
-    path.setAttribute("d","M"+SER.map(function(q){
-      return q[0].toFixed(1)+" "+q[1].toFixed(1); }).join("L"));
-    var len=path.getTotalLength ? path.getTotalLength() : 2000;
-    path.style.setProperty("--len", String(Math.ceil(len)));
+  }
+
+  function layoutPlot(){
+    var plot=document.getElementById("plot"); if(!plot) return;
+    var mode = window.innerWidth<=1000 ? "narrow" : "wide";
+    if(mode===PLOT_MODE) return;
+    PLOT_MODE=mode;
+    var c=PLOT[mode];
+    plot.setAttribute("viewBox", c.box);
+
+    var band=document.getElementById("band");
+    if(band){ band.setAttribute("x",c.x0); band.setAttribute("width",c.x1-c.x0);
+      band.setAttribute("y",c.zero-c.sig); band.setAttribute("height",c.sig*2); }
+    var ax=plot.querySelector(".ax");
+    if(ax){ ax.setAttribute("x1",c.x0); ax.setAttribute("x2",c.x1);
+      ax.setAttribute("y1",c.zero); ax.setAttribute("y2",c.zero); }
+    var thr=document.getElementById("thr");
+    if(thr){ thr.setAttribute("x1",c.x0); thr.setAttribute("x2",c.x1);
+      thr.setAttribute("y1",c.zero-1.5*c.sig); thr.setAttribute("y2",c.zero-1.5*c.sig); }
+
+    var texts=[].slice.call(plot.querySelectorAll("text"));
+    // 0: "0 normal", 1: "+1 sigma", 2: "+1.5 sigma", 3: "60 days back", 4: "today"
+    function put(el,x,y,anchor){
+      if(!el) return;
+      el.setAttribute("x",x); el.setAttribute("y",y);
+      if(anchor) el.setAttribute("text-anchor",anchor); else el.removeAttribute("text-anchor");
+    }
+    if(texts[0]){
+      texts[0].style.display = c.showZero ? "" : "none";
+      put(texts[0], c.labX, c.zero+6, c.labAnchor);
+    }
+    put(texts[1], c.labX, c.zero-c.sig-(c.showZero?59:18), c.labAnchor);
+    put(texts[2], c.labX, c.zero-1.5*c.sig-(c.showZero?92:12), c.labAnchor);
+    put(texts[3], c.x0, c.botY, "");
+    put(texts[4], c.x1, c.botY, "end");
+
+    SER=buildSeries(c);
+    var path=document.getElementById("ser");
+    if(path){
+      path.setAttribute("d","M"+SER.map(function(q){
+        return q[0].toFixed(1)+" "+q[1].toFixed(1); }).join("L"));
+      var len=path.getTotalLength ? path.getTotalLength() : 2000;
+      path.style.setProperty("--len", String(Math.ceil(len)));
+    }
     var cross=null;
     for(var i=0;i<SER.length;i++){ if(SER[i][2]>=1.5){ cross=SER[i]; break; } }
     if(!cross) cross=SER[SER.length-1];
     var hit=document.getElementById("hit");
-    hit.setAttribute("cx",cross[0].toFixed(1)); hit.setAttribute("cy",cross[1].toFixed(1));
-  })();
-  /* The plot is authored wide. On a narrow viewport the same drawing is shown
-     through a tighter viewBox, and the three scale labels move inside it, so the
-     curve fills the frame instead of shrinking into a strip. */
-  var PLOT_LABELS=null;
-  function layoutPlot(){
-    var plot=document.getElementById("plot"); if(!plot) return;
-    if(!PLOT_LABELS){
-      PLOT_LABELS=[].slice.call(plot.querySelectorAll("text")).map(function(t){
-        return {el:t, x:t.getAttribute("x"), y:t.getAttribute("y"),
-                anchor:t.getAttribute("text-anchor")||""};
-      });
-    }
-    if(window.innerWidth<=1000){
-      plot.setAttribute("viewBox","14 150 764 336");
-      PLOT_LABELS.forEach(function(L){
-        if(parseFloat(L.x)>740 && L.y!=="440"){
-          L.el.setAttribute("x","40");
-          L.el.setAttribute("y",String(parseFloat(L.y)-10));
-          L.el.setAttribute("text-anchor","start");
-        }
-      });
-    }else{
-      plot.setAttribute("viewBox","0 140 1000 320");
-      PLOT_LABELS.forEach(function(L){
-        L.el.setAttribute("x",L.x); L.el.setAttribute("y",L.y);
-        if(L.anchor) L.el.setAttribute("text-anchor",L.anchor);
-        else L.el.removeAttribute("text-anchor");
-      });
-    }
+    if(hit){ hit.setAttribute("cx",cross[0].toFixed(1)); hit.setAttribute("cy",cross[1].toFixed(1)); }
   }
 
   function act4(p){

@@ -538,6 +538,28 @@ footer p{margin:0 0 10px}
   .scroll .fbtn,.filterzeile .fbtn{margin-block:2px}
   summary{min-height:44px;display:flex;align-items:center}
 }
+
+/* ===== Handy: Kartenfuss, Bedienleiste, Nadeloehr-Tabelle ===== */
+@media (max-width:560px){
+  .kartenfuss{display:grid;grid-template-columns:minmax(0,1fr);gap:7px;
+    padding:11px 16px;font-size:10px;white-space:normal}
+  .kartenfuss > *{min-width:0}
+  .kartenfuss .lg{display:inline-flex;flex-wrap:wrap;align-items:center}
+  .klegtitel{display:block}
+  .kartenfuss span{white-space:normal;overflow-wrap:anywhere}
+  .kbar{flex-wrap:wrap;row-gap:6px}
+  .ksprungliste{display:flex;flex-wrap:nowrap;overflow-x:auto;max-width:100%;
+    gap:6px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .ksprungliste::-webkit-scrollbar{display:none}
+  .nadeltab{overflow:visible;padding:0 16px 12px !important}
+  .nadeltab table,.nadeltab tbody,.nadeltab tr,.nadeltab td{display:block;width:auto}
+  .nadeltab thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .nadeltab tr{padding:11px 0;border-bottom:1px solid var(--linie)}
+  .nadeltab td{padding:1px 0;text-align:left !important;white-space:normal}
+  .nadeltab td:first-child{font-size:14px;color:var(--ink);margin-bottom:3px}
+  .nadeltab td:nth-child(2):before{content:"Anrainer: ";color:var(--ink3)}
+  .nadeltab td:nth-child(4):before{content:"Woraus: ";color:var(--ink3)}
+}
 </style>
 </head>
 <body>
@@ -552,7 +574,7 @@ footer p{margin:0 0 10px}
   <header>
     <p class="eyebrow">Länderrisiko · täglich aktualisiert · <a href="verteidigung/index.html" style="color:inherit">Verteidigung</a></p>
     <h1>Länderrisiko-Monitor</h1>
-    <p class="sub">Ein Warnwerkzeug: der Monitor meldet, was in einem Land gerade eingetreten ist — ein Sprung im Risikoindex, ein anhaltend erhöhtes Niveau, eine laufende Lage in den Ereignisdaten. Die Fortschreibung der Reihen steht bewusst dahinter. Jede Zahl mit der Angabe, worauf sie beruht.</p>
+    <p class="sub">Was in einem Land gerade eingetreten ist: ein Sprung im Risikoindex, ein erhöhtes Niveau, eine laufende Lage. Keine Vorhersage.</p>
     <div class="stand"><span><span class="dot"></span>Stand <b id="stand"></b></span><span id="anzahl"></span></div>
   </header>
 
@@ -1656,7 +1678,7 @@ function nadelTabelle(){
       (MEINE.size&&nadelMeins(n)?'<b>'+n.name+'</b>':n.name)+'</td><td>'+(anr||"—")+'</td>'+
       '<td style="color:'+farbe+'">'+text+'</td><td style="text-align:left">'+grund+'</td></tr>';
   };
-  return '<div class="scroll" style="padding:0 17px 12px;max-height:none"><table><thead><tr>'+
+  return '<div class="scroll nadeltab" style="padding:0 17px 12px;max-height:none"><table><thead><tr>'+
     '<th>Nadelöhr</th><th>Anrainer im Monitor</th><th>Status</th>'+
     '<th style="text-align:left">Woraus</th></tr></thead><tbody>'+
     [...NADELOEHRE].sort((a,b)=>(nadelMeins(b)-nadelMeins(a))).map(zeile).join("")+
@@ -1774,11 +1796,8 @@ function karteZoom(){
 
 function karteAbschnitt(){
   return '<div class="sect"><div class="secthead"><h3 class="secttitle">Lage und Seewege</h3></div>'+
-      '<p class="sectnote">Zwei Achsen auf einer Karte. Die <b>Fläche</b> zeigt das '+
-      '<b>Grundniveau</b> — in welchem Viertel der überwachten Länder ein Land liegt, gemittelt '+
-      'über ein Jahr. Die <b>Marke</b> zeigt die <b>heutige Meldelage</b>. Ein Land '+
-      'kann damit strukturell dunkel und heute ruhig sein, und umgekehrt. Linien sind die großen '+
-      'Seewege, Rauten ihre Nadelöhre; ein Klick öffnet das Land.</p>'+
+      '<p class="sectnote">Die <b>Fläche</b> zeigt das Grundniveau eines Jahres, die <b>Marke</b> '+
+      'die heutige Meldelage. Linien sind Seewege, Rauten ihre Nadelöhre.</p>'+
       auswahlChips("kawahl")+
       routenSatz()+
       '<div class="kartenband"><div class="kartenrahmen">'+
