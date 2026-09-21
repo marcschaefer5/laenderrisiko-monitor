@@ -194,3 +194,38 @@
     grid-template-rows:repeat(7,minmax(0,1fr))}
   .cplot text{font-size:22px}
 }
+
+/* ---------- static figures (check page) ---------- */
+.figbox{
+  margin:var(--s8) 0 0;padding:var(--s8);
+  background:var(--surface);border:1px solid var(--border-2);border-radius:var(--r-md);
+}
+.figbox .cfig{display:block;width:100%;height:auto;overflow:visible}
+.figcap{
+  font-family:var(--mono);font-size:12px;line-height:1.5;
+  color:var(--ink-2);margin:var(--s6) 0 0;
+}
+.cfig .fb{font-family:var(--sans);font-size:17px;fill:var(--ink);letter-spacing:-0.17px}
+.cfig .fs{font-family:var(--sans);font-size:13px;fill:var(--ink-2)}
+.cfig .fa{font-family:var(--sans);font-size:14px;fill:var(--accent)}
+.cfig .fk{font-family:var(--mono);font-size:22px;fill:var(--ink)}
+.cfig .fv{font-family:var(--mono);font-size:14px;fill:var(--ink)}
+.cfig g{cursor:default}
+.cfig g:hover .fs{fill:var(--ink)}
+
+@media (max-width:760px){
+  .figbox{padding:var(--s7) var(--s6)}
+  .cfig .fb{font-size:19px}
+  .cfig .fs{font-size:15px}
+  .cfig .fa{font-size:18px}
+  .cfig .fv{font-size:18px}
+  .cfig .fk{font-size:26px}
+}
+
+@media (max-width:760px){
+  .figbox.scrollx{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .figbox.scrollx .cfig{min-width:660px}
+}
+
+.figcap .swipe{display:none}
+@media (max-width:760px){.figcap .swipe{display:inline;color:var(--accent)}}
