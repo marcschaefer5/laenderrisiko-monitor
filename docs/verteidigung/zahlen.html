@@ -35,8 +35,7 @@
   <div class="row"><span class="lab">American events per German event</span><span class="val dim">27 : 1</span></div>
 </div>
 <div class="note"><b>The last step is not a filter.</b> 365 days &#215; 2 countries = 730 rows.
-Millions of individual events become one row per country per day, and that row is the entire
-model input.</div>
+That row is the entire model input.</div>
 <p class="src">D1&#8211;D9 &#183; D10_build_country_ml_panel.py &#183; D28_build_panel_v2.py</p>
 
 <h2>The result</h2>
@@ -62,11 +61,7 @@ model input.</div>
   <div class="row"><span class="lab">M4S &#183; separate model, USA</span><span class="val">0.790</span></div>
   <div class="row"><span class="lab">M4 &#183; final, rolling, per country</span><span class="val accent">0.809 / 0.789</span></div>
 </div>
-<div class="note accent"><b>0.330 is below chance, not merely weak.</b> With 27 times more
-American than German events, a pooled model learns which country a row belongs to and applies
-that as if it were the risk. A country indicator buys a different intercept, not a different
-relationship &#8212; only separate models fix it. This comparison is why the thesis is
-country-specific.</div>
+<div class="note accent"><b>0.330 is below chance, not merely weak.</b> With 27 times more American than German events, a pooled model learns which country a row belongs to and treats that as the risk. Only separate models fix it.</div>
 <p class="src">D12 / D13 / D14 / D15 &#183; D19_build_model_comparison_tables.py</p>
 
 <h2>The warning threshold</h2>
@@ -75,8 +70,7 @@ country-specific.</div>
   <div class="row"><span class="lab">USA &#183; threshold / warning days / episodes / recall</span><span class="val">0.60 &#183; 43 &#183; 10 &#183; 0.75</span></div>
 </div>
 <div class="note"><b>Both thresholds come from the same rule</b> &#8212; highest F1 on
-out-of-fold predictions &#8212; and the rule produced two different answers. Where the line
-sits is a decision about the cost of a false alarm, not a statistic.</div>
+out-of-fold predictions &#8212; and the rule produced two different answers. Where the line sits is a decision, not a statistic.</div>
 
 <h2>What moves<br>the warning</h2>
 <table class="tbl">

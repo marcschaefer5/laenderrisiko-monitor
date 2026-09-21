@@ -26,9 +26,8 @@
     <span class="ln"><span>report to one</span></span>
     <span class="ln"><span>warning.</span></span>
   </h1>
-  <p class="sub rv d1">Nothing on this page requires prior knowledge. It follows a single real
-  event &#8212; recorded on 1 February 2025 and used in this thesis &#8212; through every step
-  that turns it into a number, and finally into a warning. Six steps, one scroll.</p>
+  <p class="sub rv d1">One real event from 1 February 2025, followed through every step that turns it into a
+  warning. Six steps, one scroll.</p>
   <div class="scrollcue rv d2"><i></i> Scroll to begin</div>
 </header>
 
@@ -42,13 +41,9 @@
       <div class="say">
         <p class="eyebrow">Step 00 &#183; the data source</p>
         <h2>A machine reads the news and writes down what happened.</h2>
-        <p>GDELT is a public research project. Every fifteen minutes it scans news reports from
-        around the world and, for each event it recognises, writes <b>one row into a
-        table</b>: who did something, to whom, where, how severe it was, how widely it was
-        reported.</p>
-        <p>No person fills in those rows. A program infers them from the article text. That is
-        the raw material of this thesis &#8212; not anyone's opinion about risk, but a
-        <b>count of reported events</b>.</p>
+        <p>Every fifteen minutes GDELT scans news reports worldwide and writes <b>one row per
+        event</b>: who did what to whom, where, how severe, how widely reported. No person
+        fills those rows in &#8212; a program infers them from the article text.</p>
         <p class="take">And that is the catch: the machine never checks whether it understood
         the article correctly.</p>
       </div>
@@ -57,20 +52,18 @@
           <div class="pipe" id="pipe">
             <div class="step" data-i="0">
               <span class="badge">1 &#183; the article</span>
-              <div class="body"><div class="l1">&#8222;Rebels seize control of Goma as M23
-                advances&#8220;</div><div class="l2">npr.org &#183; 31 Jan 2025</div></div>
+              <div class="body"><div class="l1">&#8222;Rebels seize control of Goma&#8220;</div><div class="l2">npr.org &#183; 31 Jan 2025</div></div>
             </div>
             <span class="arrow"></span>
             <div class="step" data-i="1">
               <span class="badge">2 &#183; the machine</span>
-              <div class="body"><div class="l1">Who acted? On whom? What kind of act? Where?
-                How severe? How often reported?</div></div>
+              <div class="body"><div class="l1">Who acted, on whom, what act, where, how severe?</div></div>
             </div>
             <span class="arrow"></span>
             <div class="step" data-i="2">
               <span class="badge">3 &#183; the row</span>
               <div class="body"><div class="l1">One line in a table &#8212; 61 fields.</div>
-                <div class="l2">1223954814 &#183; 20250201 &#183; REB &#183; 192 &#183; &#8722;9.5 &#183; 63 &#183; &#8722;5.68</div></div>
+                <div class="l2">1223954814 &#183; 20250201 &#183; REB &#183; &#8722;9.5</div></div>
             </div>
           </div>
         </div>
@@ -131,12 +124,9 @@
       <div class="say">
         <p class="eyebrow">Step 02 &#183; from many to one</p>
         <h2>The model never sees a single event.</h2>
-        <p>One event says nothing about a country's risk. What matters is the <b>pattern</b>:
-        how much is being reported today compared with a normal day, how negative it reads,
-        how severe it is on average.</p>
-        <p>So every event for one country on one day is counted, averaged and summed into a
-        single line. Over one year and two countries, <b>6.2 million events become 730
-        lines</b>.</p>
+        <p>What matters is the <b>pattern</b>, not the single event: how much is reported today
+        against a normal day, how negative, how severe. Counted per country and day,
+        <b>6.2 million events become 730 lines</b>.</p>
         <p class="take">From here on, a day is one row. Individual reports no longer exist.</p>
       </div>
       <div class="frame">
@@ -194,12 +184,9 @@
       <div class="say">
         <p class="eyebrow">Step 04 &#183; unusual, not large</p>
         <h2>There are 27 American events for every German one.</h2>
-        <p>Raw counts cannot be compared between the two countries. So each day is expressed
-        as a <b>distance from that country's own recent normal</b> &#8212; the average of its
-        last 60 days, measured in standard deviations.</p>
-        <p>A quiet German day and a quiet American day then look alike. And a day counts as a
-        <b>warning day</b> when the series rises more than 1.5 standard deviations above that
-        normal within the next three days.</p>
+        <p>Raw counts are not comparable, so each day is a <b>distance from that country's own
+        60-day normal</b>, in standard deviations. A day counts as a warning day when that
+        distance passes 1.5 within the next three days.</p>
         <p class="take">That crossing is what the model is trained to anticipate.</p>
       </div>
       <div class="frame">
@@ -233,12 +220,9 @@
       <div class="say">
         <p class="eyebrow">Step 05 &#183; the decision</p>
         <h2>The model returns a probability. A human draws the line.</h2>
-        <p>For every day the model outputs a number between 0 and 1. It never says
-        &#8222;warning&#8220; by itself &#8212; someone has to decide how high that number must
-        be before anyone is told.</p>
-        <p>Both thresholds were picked by the same rule, and the rule produced
-        <b>two different answers</b>: Germany warns early and often, the USA warns rarely and
-        only when it is fairly sure.</p>
+        <p>The model outputs a number between 0 and 1; someone has to decide how high it must be
+        before anyone is told. One rule, <b>two different answers</b>: Germany warns early and
+        often, the USA rarely and only when fairly sure.</p>
         <p class="take">Where the line sits is a judgement about the cost of a false alarm.</p>
       </div>
       <div class="frame">

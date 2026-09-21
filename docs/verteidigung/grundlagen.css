@@ -194,8 +194,10 @@
      the words take what they need, the frame takes the rest. */
   .scene{align-content:stretch;padding-bottom:var(--s6)}
   .scene-grid{height:100%;min-height:0;
-    grid-template-rows:auto minmax(150px,1fr);gap:var(--s7);align-items:stretch}
-  .frame{height:auto;min-height:0}
+    grid-template-rows:auto minmax(46svh,1fr);gap:var(--s6);align-items:stretch}
+  /* Der Rahmen bekommt eine garantierte Haelfte des Schirms und schneidet
+     nichts mehr ab: was nicht passt, wird kleiner, nicht unsichtbar. */
+  .frame{height:auto;min-height:0;overflow:hidden}
   .say h2{font-size:clamp(23px,5.6vw,32px);line-height:1.14;margin:0 0 var(--s6)}
   .say .eyebrow{margin:0 0 var(--s5)}
   .say p{font-size:16px;line-height:1.45;margin:0 0 var(--s6)}
@@ -206,13 +208,14 @@
   .fields{bottom:calc(var(--s6) + 14px);gap:var(--s5) var(--s6)}
   .grp .v{font-size:12.5px}
   .grp .k{font-size:9.5px}
-  .pipe{gap:var(--s5)}
-  .pipe .step{grid-template-columns:1fr;gap:4px}
-  .pipe .badge{justify-self:start}
-  .pipe .body{padding:var(--s6)}
-  .pipe .body .l1{font-size:13px;line-height:1.35}
-  .pipe .body .l2{font-size:10.5px}
-  .pipe .arrow{height:10px}
+  .pipe{gap:7px}
+  .pipe .step{grid-template-columns:1fr;gap:3px}
+  .pipe .badge{justify-self:start;font-size:10px}
+  .pipe .body{padding:7px 9px}
+  .pipe .body .l1{font-size:12px;line-height:1.28}
+  .pipe .body .l2{font-size:10px;margin-top:4px}
+  .pipe .arrow{height:8px}
+  .say p{margin:0 0 var(--s5)}
   .raw{font-size:9px;line-height:1.7}
   .feat{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s5)}
   .f{padding:5px var(--s6)}

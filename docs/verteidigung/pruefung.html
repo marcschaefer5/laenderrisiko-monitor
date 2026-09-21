@@ -43,8 +43,7 @@ of zero.</div>
   <div class="row"><span class="lab">Benchmarks the submitted thesis compared against</span><span class="val bad">0</span></div>
 </div>
 <div class="note"><b>An ROC-AUC only means something next to a second number.</b>
-0.809 reads as strong until the score of a model that does nothing clever stands beside it.
-Measuring that flattery required rebuilding the target from a source outside GDELT.</div>
+0.809 reads as strong until a model that does nothing clever stands beside it.</div>
 <p class="src">D23_feasibility_external_target.py &#183; D29_verify_panel_equivalence.py</p>
 
 <h2>What was measured</h2>
@@ -71,8 +70,7 @@ its own recent history; <b>C</b> both together. The row that decides anything is
   <div class="row"><span class="lab">Parameters either rule estimates</span><span class="val lg">0</span></div>
 </div>
 <div class="note"><b>Neither rule contains a model.</b> One repeats today's value, the other sorts
-the days by it. Both stayed ahead of every fitted event model across the rebuild &#8212; which
-is the clearest single statement this work can make about the original figures.</div>
+the days by it. Both stayed ahead of every fitted event model.</div>
 <p class="src">D22_baseline_comparison.py</p>
 
 <h2>Does a longer<br>lead time help?</h2>
@@ -83,9 +81,7 @@ is the clearest single statement this work can make about the original figures.<
   <div class="row"><span class="lab">Dispersion features added and tested</span><span class="val">11</span></div>
   <div class="row"><span class="lab">Of those that improved a model</span><span class="val bad">0</span></div>
 </div>
-<div class="note"><b>The failure is not a matter of the method.</b> A longer horizon, a
-non-linear model class and eleven additional features were each tried on the same data, and
-none of them moved the contribution away from zero.</div>
+<div class="note"><b>The failure is not a matter of the method.</b> A longer horizon, a non-linear model class and eleven further features moved the contribution not at all.</div>
 <p class="src">D31_horizon_test.py &#183; D38_modellklasse_eskalation.py &#183; D41_rich_feature_test.py &#183; D42_stress_test_rich_result.py</p>
 
 <h2>The placebo tests</h2>

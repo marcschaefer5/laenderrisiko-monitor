@@ -1291,12 +1291,9 @@ function kopfInstrument(L, code, rang){
         : '<div class="gross" style="color:var(--ink3)">—</div>'+
           '<div class="hdelta">noch nicht berechenbar</div>')+
     '</div>'+
-    '<p class="heronote">Links die schnelle Achse: Abweichung vom eigenen Normalzustand der '+
-      'letzten 120 Handelstage, in Standardabweichungen. Rechts die langsame: das Grundniveau '+
-      'gegenüber den anderen überwachten Ländern, gemittelt über ein Jahr. Beides beschreibend, '+
-      'keine Vorhersage.</p>'+
-    (datenStand(L)? '<p class="heronote datenz">Datenstand: '+datenStand(L)+'. '+
-      'Der Wert links gilt für den letzten Tag, an dem alle vorhandenen Bausteine belegt waren.</p>':'')+
+    '<p class="heronote">Links: Abweichung vom eigenen Normalzustand der letzten 120 '+
+      'Handelstage. Rechts: das Grundniveau im Ländervergleich. Keine Vorhersage.</p>'+
+    (datenStand(L)? '<p class="heronote datenz">Datenstand: '+datenStand(L)+'.</p>':'')+
     '<details class="gauf"><summary>Woraus das Grundniveau kommt</summary>'+
       grundAufschluesselung(code)+'</details>'+
   '</div>';
@@ -1330,8 +1327,7 @@ function landSeite(code){
 
     '<div class="sect"><div class="secthead"><h3 class="secttitle">Verlauf nach Kategorie</h3>'+
       '<button class="tblbtn" id="tbtn">Tabelle</button></div>'+
-      '<p class="sectnote">Alle Kurven als z-Werte in Standardabweichungen, dadurch '+
-      'untereinander vergleichbar. Die Namen stehen am rechten Ende der jeweiligen Kurve.</p>'+
+      '<p class="sectnote">Alle Kurven als z-Werte, dadurch vergleichbar.</p>'+
       '<div class="vizwrap"><div class="legend">'+
       '<span class="lg"><span class="lgm" style="background:var(--ink)"></span>Gesamtrisiko</span>'+
       kats.map(k=>'<span class="lg"><span class="lgm" style="background:'+KAT[k].c+'"></span>'+KAT[k].n+'</span>').join("")+
@@ -1425,8 +1421,7 @@ function historieSeite(){
   vH.innerHTML='<div class="navbar"><button class="back" id="zurueck2">‹ Alle Länder</button>'+
     '<span class="navtitle">Auffälligkeiten</span></div>'+
     '<div class="sect"><div class="secthead"><h3 class="secttitle">Chronologie</h3></div>'+
-    '<p class="sectnote">Tage, an denen ein Land ungewöhnlich stark nach oben von seinem Normalzustand abwich — '+
-    'durch eine Bewegung über dem 2,5-fachen der üblichen Streuung oder ein Niveau über +1,5. Antippen öffnet das Land.</p>'+
+    '<p class="sectnote">Tage mit ungewöhnlich starker Abweichung nach oben. Antippen öffnet das Land.</p>'+
     '<div class="news">'+inhalt+'</div></div>';
   document.getElementById("zurueck2").onclick=()=>{location.hash="#/";};
 }
@@ -1843,9 +1838,7 @@ function karteSeite(){
     
 
     '<div class="sect"><div class="secthead"><h3 class="secttitle">Nadelöhre</h3></div>'+
-      '<p class="sectnote">Ein Nadelöhr gilt als betroffen, wenn eines seiner Anrainerländer im '+
-      'Monitor liegt und dort eine Meldung offen ist. Die letzte Spalte nennt die Meldung, auf der '+
-      'das beruht.</p>'+
+      '<p class="sectnote">Betroffen, wenn ein Anrainerland im Monitor eine offene Meldung hat.</p>'+
       nadelTabelle()+'</div>'+
 
     '<div class="sect"><div class="secthead"><h3 class="secttitle">Was diese Karte sagt — und was nicht</h3></div>'+
