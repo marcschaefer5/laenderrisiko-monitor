@@ -1,0 +1,196 @@
+/* Pruefung — the four scrolled checks. Same stage as the basics page:
+   one left edge for all text, one framed viewport for all visuals, one rail.
+   Everything that moves moves through transform and opacity only. */
+
+:root{
+  --ease-out:cubic-bezier(.28,.11,.32,1);
+  --rail:64px;
+  --frame-h:min(62svh,560px);
+  --pad-f:var(--s8);
+}
+
+/* ---------- the pinned scene ---------- */
+.track{position:relative}
+.scene{position:sticky;top:0;height:100svh;height:100dvh;
+  display:grid;grid-template-columns:minmax(0,1fr);align-content:center;
+  padding-top:var(--bar-h);overflow:hidden;touch-action:pan-y}
+.scene-grid{
+  width:100%;max-width:1320px;margin:0 auto;padding:0 var(--s9);
+  display:grid;grid-template-columns:var(--rail) minmax(0,38fr) minmax(0,52fr);
+  gap:0 var(--s10);align-items:center}
+
+/* chapter rail */
+.rail{align-self:stretch;display:flex;flex-direction:column;justify-content:flex-start;
+  gap:var(--s6);padding-top:3px}
+.rail span{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink-2);
+  opacity:.32;transition:opacity .4s var(--ease-out),color .4s var(--ease-out);
+  display:flex;align-items:center;gap:8px}
+.rail span:before{content:"";width:10px;height:1px;background:currentColor;
+  transition:width .4s var(--ease-out)}
+.rail span.on{opacity:1;color:var(--accent)}
+.rail span.on:before{width:22px}
+.rail span.done{opacity:.6}
+
+/* text column */
+.say{max-width:44ch}
+.say .eyebrow{margin:0 0 var(--s7)}
+.say h2{font-size:clamp(26px,2.5vw,40px);line-height:1.12;letter-spacing:-.032em;
+  font-weight:400;margin:0 0 var(--s8);border:0;padding:0}
+.say p{font-size:16.5px;line-height:1.6;letter-spacing:-.01em;color:var(--ink-2);
+  margin:0 0 var(--s7)}
+.say p:last-of-type{margin-bottom:0}
+.say b{color:var(--ink);font-weight:425}
+.say p.take{margin-top:var(--s9);padding-top:var(--s7);
+  border-top:1px solid var(--border-2);
+  font-family:var(--mono);font-size:13px;line-height:1.55;color:var(--accent);
+  letter-spacing:0}
+
+/* the framed viewport every visual lives in */
+.frame{position:relative;height:var(--frame-h);border:1px solid var(--border);
+  border-radius:var(--r-lg);background:var(--surface);overflow:hidden}
+.frame > .pad{position:absolute;inset:var(--pad-f);display:grid;align-content:center}
+.frame > .pad.tall{align-content:stretch;bottom:calc(var(--pad-f) + 16px)}
+.fcap{position:absolute;left:var(--pad-f);right:var(--pad-f);bottom:var(--s5);
+  font-family:var(--mono);font-size:11px;font-weight:600;text-transform:uppercase;
+  color:var(--ink-2);opacity:.8;margin:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* scrub hairline along the bottom of the scene */
+.scrub{position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--border)}
+.scrub i{display:block;height:100%;background:var(--accent);
+  transform:scaleX(var(--p,0));transform-origin:left}
+
+/* ---------- 01 · the value against the chance line ---------- */
+.meter{position:relative;height:100%;min-height:0;
+  display:grid;grid-template-columns:minmax(0,92px) minmax(0,1fr);
+  gap:var(--s8);align-items:stretch}
+.mcol{position:relative;border:1px solid var(--border-2);border-radius:var(--r-sm);
+  background:var(--canvas);overflow:hidden}
+.mfill{position:absolute;left:0;right:0;bottom:0;height:48.5%;
+  background:var(--accent);opacity:.85;
+  transform:scaleY(var(--g,0));transform-origin:bottom}
+.mline{position:absolute;left:0;right:0;top:50%;height:0;
+  border-top:1px dashed var(--ink-2);opacity:var(--lo,0)}
+.mscale{position:absolute;inset:0;display:flex;flex-direction:column;
+  justify-content:space-between;padding:5px 6px;pointer-events:none}
+.mscale span{align-self:flex-start;font-family:var(--mono);font-size:10px;font-weight:600;
+  color:var(--ink-2);background:var(--canvas);border-radius:var(--r-xs);padding:1px 4px}
+.mread{display:grid;align-content:center;gap:var(--s6);min-width:0}
+.mread .big{font-family:var(--mono);font-size:clamp(38px,5.4vw,72px);line-height:1;
+  letter-spacing:-.03em;color:var(--accent);font-variant-numeric:tabular-nums}
+.mread .u{font-family:var(--mono);font-size:11px;font-weight:600;text-transform:uppercase;
+  color:var(--ink-2)}
+.mread .ref{margin-top:var(--s7);padding-top:var(--s6);border-top:1px solid var(--border-2);
+  display:flex;justify-content:space-between;gap:var(--s7);
+  font-family:var(--mono);font-size:12.5px;color:var(--ink-2);
+  font-variant-numeric:tabular-nums;opacity:var(--lo,0)}
+.mread .ref b{color:var(--ink);font-weight:500}
+
+/* ---------- 02 · the two rules ---------- */
+.duel{display:grid;gap:var(--s5);min-width:0}
+.duel .dh,.duel .dr{display:grid;grid-template-columns:minmax(0,1fr) 68px 68px;
+  gap:var(--s6);align-items:baseline}
+.duel .dh{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;
+  color:var(--ink-2);padding-bottom:var(--s5);border-bottom:1px solid var(--border-2);
+  opacity:var(--ho,0)}
+.duel .dh b{font-weight:600;text-align:right}
+.duel .dr{padding:var(--s6) 0;border-bottom:1px solid var(--border);
+  opacity:var(--o,0);transform:translateY(calc(14px * (1 - var(--o,0))))}
+.duel .dr span{font-size:13.5px;line-height:1.35;color:var(--ink-2);min-width:0}
+.duel .dr b{font-family:var(--mono);font-size:17px;font-weight:400;text-align:right;
+  color:var(--ink);font-variant-numeric:tabular-nums}
+.duel .dr b.hi{color:var(--accent)}
+.duel .dz{margin-top:var(--s6);display:flex;align-items:center;gap:var(--s7);
+  opacity:var(--zo,0);transform:translateY(calc(14px * (1 - var(--zo,0))))}
+.duel .dz b{font-family:var(--mono);font-size:44px;line-height:1;color:var(--accent);
+  letter-spacing:-.03em}
+.duel .dz span{font-family:var(--mono);font-size:11px;font-weight:600;
+  text-transform:uppercase;color:var(--ink-2);line-height:1.4}
+
+/* ---------- 03 · ninety-one constellations ---------- */
+.cells{position:absolute;inset:var(--pad-f);bottom:calc(var(--pad-f) + 16px);
+  display:grid;grid-template-columns:repeat(13,minmax(0,1fr));
+  grid-template-rows:repeat(7,minmax(0,1fr));gap:5px}
+.cells .c{position:relative;border-radius:var(--r-xs);background:var(--surface-3);
+  min-width:0;min-height:0;opacity:var(--o,0);
+  transform:scale(calc(.55 + .45 * var(--o,0)))}
+.cells .c i{position:absolute;inset:0;border-radius:inherit;background:var(--accent);
+  opacity:var(--a,0)}
+
+/* ---------- 04 · C minus B ---------- */
+.cplot{width:100%;max-height:100%;display:block;overflow:hidden}
+.cplot .zline{stroke:var(--ink-3);stroke-width:2;opacity:var(--z0,0)}
+.cplot .cbar{fill:var(--accent);opacity:.9;
+  transform:scaleX(var(--g,0));transform-origin:right center;transform-box:fill-box}
+.cplot .ci{stroke:var(--ink-2);stroke-width:2;fill:none;opacity:var(--ci,0)}
+.cplot text{font-family:var(--mono);font-size:19px;fill:var(--ink-2);font-weight:500}
+.cplot text.nm{fill:var(--ink)}
+.cplot .lab{opacity:var(--l,0)}
+
+/* ---------- narrow: the scene becomes a stack sized to the pinned viewport ---------- */
+@media (max-width:1000px){
+  :root{--rail:0px}
+  .scene-grid{grid-template-columns:minmax(0,1fr);padding:0 var(--s7)}
+  .rail{display:none}
+  .say{max-width:none}
+}
+@media (max-width:1000px) and (min-height:1px){
+  .scene{align-content:stretch;padding-bottom:var(--s6)}
+  .scene-grid{height:100%;min-height:0;
+    grid-template-rows:auto minmax(46svh,1fr);gap:var(--s6);align-items:stretch}
+  .frame{height:auto;min-height:0;overflow:hidden}
+  .say h2{font-size:clamp(23px,5.6vw,32px);line-height:1.14;margin:0 0 var(--s6)}
+  .say .eyebrow{margin:0 0 var(--s5)}
+  .say p{font-size:16px;line-height:1.45;margin:0 0 var(--s5)}
+  .say p.take{margin-top:var(--s6);padding-top:var(--s6);font-size:13px;line-height:1.45}
+  :root{--pad-f:var(--s6)}
+  .fcap{font-size:10px;bottom:var(--s3)}
+  .frame > .pad{bottom:calc(var(--s6) + 14px)}
+
+  .meter{grid-template-columns:minmax(0,56px) minmax(0,1fr);gap:var(--s7)}
+  .mread .big{font-size:clamp(34px,10vw,52px)}
+  .mread .u{font-size:10px}
+  .mread .ref{font-size:11px;margin-top:var(--s6);padding-top:var(--s5)}
+  .mscale span{font-size:9px}
+
+  .duel{gap:2px}
+  .duel .dh,.duel .dr{grid-template-columns:minmax(0,1fr) 54px 54px;gap:var(--s5)}
+  .duel .dh{font-size:9px;padding-bottom:3px}
+  .duel .dr{padding:6px 0}
+  .duel .dr span{font-size:12px;line-height:1.25}
+  .duel .dr b{font-size:14px}
+  .duel .dz{margin-top:var(--s5);gap:var(--s6)}
+  .duel .dz b{font-size:32px}
+  .duel .dz span{font-size:9.5px}
+
+  .cells{bottom:calc(var(--s6) + 16px);gap:4px;
+    grid-template-columns:repeat(7,minmax(0,1fr));
+    grid-template-rows:repeat(13,minmax(0,1fr))}
+
+  .cplot text{font-size:26px}
+  .cplot .zline{stroke-width:3}
+  .cplot .ci{stroke-width:3}
+}
+/* landscape phones: the words give way so the frame keeps a usable height */
+@media (max-width:1000px) and (max-height:620px){
+  .scene-grid{grid-template-rows:auto minmax(150px,1fr);gap:var(--s5)}
+  .say .eyebrow{font-size:9.5px;margin:0 0 var(--s3)}
+  .say h2{font-size:19px;line-height:1.14;margin:0 0 var(--s3)}
+  .say p{font-size:12.5px;line-height:1.32;margin:0 0 var(--s3)}
+  .say p.take{margin-top:var(--s5);padding-top:var(--s5);font-size:11px;line-height:1.35}
+  .fcap{font-size:9px}
+  .meter{grid-template-columns:minmax(0,44px) minmax(0,1fr)}
+  .mread .big{font-size:30px}
+  .mread .ref{font-size:10px;margin-top:var(--s5);padding-top:var(--s3)}
+  .duel{gap:0}
+  .duel .dh{font-size:8.5px;padding-bottom:2px}
+  .duel .dr{padding:4px 0}
+  .duel .dr span{font-size:11px}
+  .duel .dr b{font-size:12.5px}
+  .duel .dz{margin-top:var(--s3);gap:var(--s5)}
+  .duel .dz b{font-size:22px}
+  .duel .dz span{font-size:8.5px}
+  .cells{gap:3px;grid-template-columns:repeat(13,minmax(0,1fr));
+    grid-template-rows:repeat(7,minmax(0,1fr))}
+  .cplot text{font-size:22px}
+}

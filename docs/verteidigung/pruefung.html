@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="stil.css">
+<link rel="stylesheet" href="pruefung.css">
 </head>
 <body class="hasbar">
 <a class="topbar" href="index.html" style="text-decoration:none">
@@ -35,6 +36,123 @@
 <div class="note accent"><b>0.497 against a coin flip at 0.500.</b>
 Not one of the 91 constellations beat its own benchmark by more than the confidence interval
 of zero.</div>
+
+</div><!-- /wrap -->
+
+<!-- CHECK 01 · the benchmark -->
+<section class="track" id="c1" style="height:320svh">
+  <div class="scene">
+    <div class="scene-grid">
+      <div class="rail" data-rail="0"></div>
+      <div class="say">
+        <p class="eyebrow">Check 01 &#183; the benchmark</p>
+        <h2>0.497, and the coin flip sits at 0.500.</h2>
+        <p>Averaged over all 91 constellations the event models reach <b>0.497</b>. The
+        reference is not zero &#8212; it is the 0.500 a coin flip reaches without reading
+        anything at all.</p>
+        <p class="take">Below the line, never above it.</p>
+      </div>
+      <div class="frame">
+        <div class="pad tall">
+          <div class="meter" id="meter">
+            <div class="mcol">
+              <div class="mfill"></div>
+              <div class="mline"></div>
+              <div class="mscale"><span>0.600</span><span>0.400</span></div>
+            </div>
+            <div class="mread">
+              <div class="big" id="mval">0.400</div>
+              <div class="u">mean ROC-AUC &#183; 91 constellations</div>
+              <div class="ref"><span>A coin flip</span><b>0.500</b></div>
+            </div>
+          </div>
+        </div>
+        <p class="fcap">Scale 0.400 to 0.600</p>
+      </div>
+    </div>
+    <div class="scrub"><i></i></div>
+  </div>
+</section>
+
+<!-- CHECK 02 · the null models -->
+<section class="track" id="c2" style="height:340svh">
+  <div class="scene">
+    <div class="scene-grid">
+      <div class="rail" data-rail="1"></div>
+      <div class="say">
+        <p class="eyebrow">Check 02 &#183; the null models</p>
+        <h2>Two rules with nothing to fit beat the model.</h2>
+        <p>B2 repeats today's value, B3 sorts the days by it. Against the main model at
+        0.789 and 0.786, the highest score in each country belongs to a rule &#8212; and
+        <b>neither rule estimates a single parameter</b>.</p>
+        <p class="take">Zero parameters, first place.</p>
+      </div>
+      <div class="frame">
+        <div class="pad">
+          <div class="duel" id="duel">
+            <div class="dh"><span>ROC-AUC</span><b>USA</b><b>Germany</b></div>
+            <div class="dr"><span>Main model &#183; GDELT features</span><b>0.789</b><b>0.786</b></div>
+            <div class="dr"><span>B2 &#183; tomorrow looks like today</span><b class="hi">0.799</b><b>0.724</b></div>
+            <div class="dr"><span>B3 &#183; rank the days by today's value</span><b>0.770</b><b class="hi">0.938</b></div>
+            <div class="dz" id="dz"><b>0</b><span>parameters<br>either rule estimates</span></div>
+          </div>
+        </div>
+        <p class="fcap">D22_baseline_comparison.py</p>
+      </div>
+    </div>
+    <div class="scrub"><i></i></div>
+  </div>
+</section>
+
+<!-- CHECK 03 · the search space -->
+<section class="track" id="c3" style="height:360svh">
+  <div class="scene">
+    <div class="scene-grid">
+      <div class="rail" data-rail="2"></div>
+      <div class="say">
+        <p class="eyebrow">Check 03 &#183; the search space</p>
+        <h2>Ninety-one constellations, one survivor.</h2>
+        <p>Ten external targets, twenty horizons, sixteen country models, thirty-six feature
+        sets, nine stress tests. <b>One</b> result came through both placebos; the rest did
+        not.</p>
+        <p class="take">One field stays lit.</p>
+      </div>
+      <div class="frame">
+        <div class="cells" id="cells" role="img"
+          aria-label="Ninety-one fields build up; at the end a single field remains marked."></div>
+        <p class="fcap">10 + 20 + 16 + 36 + 9 = 91</p>
+      </div>
+    </div>
+    <div class="scrub"><i></i></div>
+  </div>
+</section>
+
+<!-- CHECK 04 · C minus B -->
+<section class="track" id="c4" style="height:320svh">
+  <div class="scene">
+    <div class="scene-grid">
+      <div class="rail" data-rail="3"></div>
+      <div class="say">
+        <p class="eyebrow">Check 04 &#183; C minus B</p>
+        <h2>What GDELT adds once the cheap forecast exists.</h2>
+        <p>C is both together, B the null model on its own. The difference comes out negative
+        in both model classes, and both intervals either touch zero or stay below it.</p>
+        <p class="take">No contribution is measurable.</p>
+      </div>
+      <div class="frame">
+        <div class="pad">
+          <svg class="cplot" id="cplot" viewBox="0 0 1000 330" role="img"
+            aria-label="Contribution of the GDELT features above the null model: logistic regression minus 0.019, gradient boosting minus 0.064; both 95 percent intervals reach zero or lie below it."></svg>
+        </div>
+        <p class="fcap">C &#8722; B &#183; 95&#8239;% bootstrap interval</p>
+      </div>
+    </div>
+    <div class="scrub"><i></i></div>
+  </div>
+</section>
+
+<div class="wrap">
+
 
 <h2>Why a second<br>look was needed</h2>
 <div class="rows">
@@ -142,12 +260,14 @@ every figure there stands next to its benchmark.</div>
 </div>
 
 <footer>
-  Marc Oliver Sch&#228;fer &#183; WIMBIT23B &#183; DHBW Mannheim<br>
+  Marc Oliver Schaefer &#183; Matrikelnummer 5791307 &#183; WIMBIT23B &#183; DHBW Mannheim<br>
   <a href="../index.html">Live monitor</a> &#183; <a href="index.html">Defence</a> &#183;
   <a href="zahlen.html">The numbers</a> &#183;
   <a href="https://github.com/marcschaefer5/laenderrisiko-monitor">source repository</a>
 </footer>
 
 </div>
+
+<script src="pruefung.js"></script>
 </body>
 </html>
