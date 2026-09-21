@@ -280,3 +280,74 @@ footer a:hover{color:var(--hover)}
   .tbl td:first-child:before{display:none}
   .tbl td.num{white-space:normal}
 }
+
+/* =========================================================================
+   WELCOME SCREEN
+   Eine Bildschirmhöhe: die Frage, darunter die Angaben, dahinter eine
+   Masse, die sich bewegt. Der Text liegt über dem Canvas, nicht darin —
+   so bleibt er auswählbar und der Screenreader sieht nur Text.
+   ====================================================================== */
+.welcome{
+  position:relative;
+  min-height:100svh;min-height:100dvh;
+  display:grid;place-items:center;
+  padding:var(--s10) var(--s7);
+  overflow:hidden;
+  isolation:isolate;
+}
+.blobcv{
+  position:absolute;inset:0;width:100%;height:100%;
+  z-index:0;pointer-events:none;
+}
+.wtext{position:relative;z-index:1;text-align:center;width:min(100%,980px)}
+.wline{
+  margin:0 0 var(--s7);
+  font-family:var(--mono);font-size:12px;font-weight:600;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--ink-2);
+  min-height:1.2em;
+}
+.wline .caret{
+  display:inline-block;width:.6em;height:1em;margin-left:.15em;
+  background:var(--accent);vertical-align:-.16em;
+  animation:wblink 1.05s steps(1,end) infinite;
+}
+@keyframes wblink{0%,49%{opacity:1}50%,100%{opacity:0}}
+.welcome h1{
+  font-size:clamp(34px,6.1vw,82px);line-height:1.02;letter-spacing:-.035em;
+  margin:0 0 var(--s9);
+}
+.wmeta{
+  list-style:none;margin:0;padding:0;
+  display:flex;flex-wrap:wrap;justify-content:center;gap:var(--s5) var(--s7);
+  font-family:var(--mono);font-size:12.5px;color:var(--ink-2);
+}
+.wmeta b{color:var(--ink);font-weight:500}
+.wmeta li{position:relative}
+.wmeta li + li:before{
+  content:"";position:absolute;left:calc(var(--s7) / -2 - 1px);top:.35em;
+  width:1px;height:.85em;background:var(--surface-3);
+}
+.wgo{
+  display:inline-flex;align-items:center;gap:var(--s5);
+  margin-top:var(--s10);min-height:44px;
+  font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-2);text-decoration:none;
+}
+.wgo i{font-style:normal;animation:wnudge 2.4s ease-in-out infinite}
+.wgo:hover{color:var(--hover)}
+@keyframes wnudge{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+
+/* Die Karten beginnen danach — der Abstand oben entfällt, der Screen trägt ihn schon. */
+.welcome + .wrap{padding-top:var(--s10)}
+
+@media (max-width:640px){
+  .welcome{padding:var(--s9) var(--s7)}
+  .wtext{width:100%}
+  .welcome h1{margin-bottom:var(--s8)}
+  .wmeta{font-size:11.5px;gap:var(--s3) var(--s6)}
+  .wmeta li + li:before{display:none}   /* umgebrochene Zeilen: Trenner stoeren mehr als sie helfen */
+  .wgo{margin-top:var(--s9)}
+}
+@media (prefers-reduced-motion:reduce){
+  .wline .caret,.wgo i{animation:none}
+}

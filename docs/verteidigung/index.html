@@ -10,12 +10,22 @@
 <link rel="stylesheet" href="stil.css">
 </head>
 <body>
-<div class="wrap">
+<section class="welcome">
+  <canvas class="blobcv" id="blob" aria-hidden="true"></canvas>
+  <div class="wtext">
+    <p class="wline"><span id="wtype" data-text="THESIS DEFENCE"></span><i class="caret"></i></p>
+    <h1>Can counted news<br>events warn early?</h1>
+    <ul class="wmeta">
+      <li><b>Marc Oliver Schaefer</b></li>
+      <li>Matrikelnummer 5791307</li>
+      <li>WIMBIT23B &#183; DHBW Mannheim</li>
+      <li>September 2026</li>
+    </ul>
+    <a class="wgo" href="#dests">The four places to look <i>&#8595;</i></a>
+  </div>
+</section>
 
-<header class="lander">
-  <p class="eyebrow">Marc Oliver Schaefer &#183; 5791307 &#183; WIMBIT23B &#183; DHBW Mannheim &#183; 2026</p>
-  <h1>Can counted news<br>events warn early?</h1>
-</header>
+<div class="wrap" id="dests">
 
 <nav class="dests" aria-label="The four destinations">
   <a class="dest" href="../index.html">
@@ -107,5 +117,6 @@ Closing that gap is what the rebuild did &#8212; and it is where the honest answ
 </footer>
 
 </div>
+<script src="welcome.js" defer></script>
 </body>
 </html>
