@@ -169,6 +169,37 @@
     var hit=document.getElementById("hit");
     hit.setAttribute("cx",cross[0].toFixed(1)); hit.setAttribute("cy",cross[1].toFixed(1));
   })();
+  /* The plot is authored wide. On a narrow viewport the same drawing is shown
+     through a tighter viewBox, and the three scale labels move inside it, so the
+     curve fills the frame instead of shrinking into a strip. */
+  var PLOT_LABELS=null;
+  function layoutPlot(){
+    var plot=document.getElementById("plot"); if(!plot) return;
+    if(!PLOT_LABELS){
+      PLOT_LABELS=[].slice.call(plot.querySelectorAll("text")).map(function(t){
+        return {el:t, x:t.getAttribute("x"), y:t.getAttribute("y"),
+                anchor:t.getAttribute("text-anchor")||""};
+      });
+    }
+    if(window.innerWidth<=1000){
+      plot.setAttribute("viewBox","14 150 764 336");
+      PLOT_LABELS.forEach(function(L){
+        if(parseFloat(L.x)>740 && L.y!=="440"){
+          L.el.setAttribute("x","40");
+          L.el.setAttribute("y",String(parseFloat(L.y)-10));
+          L.el.setAttribute("text-anchor","start");
+        }
+      });
+    }else{
+      plot.setAttribute("viewBox","0 140 1000 320");
+      PLOT_LABELS.forEach(function(L){
+        L.el.setAttribute("x",L.x); L.el.setAttribute("y",L.y);
+        if(L.anchor) L.el.setAttribute("text-anchor",L.anchor);
+        else L.el.removeAttribute("text-anchor");
+      });
+    }
+  }
+
   function act4(p){
     var plot=document.getElementById("plot"); if(!plot) return;
     plot.style.setProperty("--bandOp", String(ease(seg(p,.10,.30))));
@@ -211,9 +242,10 @@
   }
   var ticking=false;
   function onScroll(){ if(!ticking){ ticking=true; requestAnimationFrame(frame); } }
-  function remeasure(){ measureGroups(); measureSwarm(); onScroll(); }
+  function remeasure(){ layoutPlot(); measureGroups(); measureSwarm(); onScroll(); }
 
   if(reduce){
+    layoutPlot();
     TRACKS.forEach(function(t){ t[1](1); });
     document.querySelectorAll(".rv,.lines").forEach(function(el){ el.classList.add("in"); });
     var c=document.getElementById("cnt"); if(c) c.textContent="730";
@@ -222,6 +254,7 @@
   }else{
     window.addEventListener("scroll", onScroll, {passive:true});
     window.addEventListener("resize", remeasure);
+    window.addEventListener("orientationchange", remeasure);
     window.addEventListener("load", remeasure);
     remeasure();
   }

@@ -3,22 +3,20 @@
 <head>
 <title>The numbers &#183; Country Risk</title>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="stil.css">
 </head>
-<body>
+<body class="hasbar">
+<a class="topbar" href="index.html" style="text-decoration:none">
+  <span class="tb-back"><i>&#8592;</i> Overview</span>
+  <span class="tb-here">The numbers</span>
+  <span class="tb-step">03 / 04</span>
+</a>
 <div class="wrap">
 
-<nav class="nav">
-  <a href="../index.html">Live monitor</a>
-  <a href="index.html">Defence</a>
-  <a href="grundlagen.html">How it works</a>
-  <a href="zahlen.html" aria-current="page">The numbers</a>
-  <a href="pruefung.html">The check</a>
-</nav>
 
 <header class="top">
   <p class="eyebrow">As submitted &#183; 01 Feb 2025 &#8211; 31 Jan 2026</p>
@@ -83,11 +81,11 @@ sits is a decision about the cost of a false alarm, not a statistic.</div>
 <h2>What moves<br>the warning</h2>
 <table class="tbl">
   <tr><th>Feature</th><th>Meaning</th><th>USA</th><th>Germany</th></tr>
-  <tr><td>n_events_ma7</td><td>reporting volume, 7-day mean</td><td class="num">+2.53</td><td class="num">+2.27</td></tr>
-  <tr><td>tone_avg</td><td>average tone of reporting</td><td class="num">&#8722;2.08</td><td class="num">&#8722;0.41</td></tr>
-  <tr><td>tone_avg_delta1</td><td>change in tone against yesterday</td><td class="num">+1.22</td><td class="num">+0.20</td></tr>
-  <tr><td>gold_neg_sum</td><td>negative Goldstein sum, conflict intensity</td><td class="num">&#8722;0.07</td><td class="num">&#8722;0.39</td></tr>
-  <tr><td>gold_sum</td><td>Goldstein sum across all events</td><td class="num">&#8722;0.03</td><td class="num">&#8722;0.21</td></tr>
+  <tr><td data-l="Feature">n_events_ma7</td><td data-l="Meaning">reporting volume, 7-day mean</td><td class="num" data-l="USA">+2.53</td><td class="num" data-l="Germany">+2.27</td></tr>
+  <tr><td data-l="Feature">tone_avg</td><td data-l="Meaning">average tone of reporting</td><td class="num" data-l="USA">&#8722;2.08</td><td class="num" data-l="Germany">&#8722;0.41</td></tr>
+  <tr><td data-l="Feature">tone_avg_delta1</td><td data-l="Meaning">change in tone against yesterday</td><td class="num" data-l="USA">+1.22</td><td class="num" data-l="Germany">+0.20</td></tr>
+  <tr><td data-l="Feature">gold_neg_sum</td><td data-l="Meaning">negative Goldstein sum, conflict intensity</td><td class="num" data-l="USA">&#8722;0.07</td><td class="num" data-l="Germany">&#8722;0.39</td></tr>
+  <tr><td data-l="Feature">gold_sum</td><td data-l="Meaning">Goldstein sum across all events</td><td class="num" data-l="USA">&#8722;0.03</td><td class="num" data-l="Germany">&#8722;0.21</td></tr>
 </table>
 <div class="note accent"><b>The sign of tone_avg is a trap.</b> The coefficient is negative and
 the feature itself takes negative values, so a more negative tone raises the modelled
@@ -110,6 +108,13 @@ The z-scores were excluded from the features; the series they are computed from 
 That is why the work did not stop at submission &#8212;
 <a href="pruefung.html" style="color:var(--accent)">the check</a> replaces the target with one
 from a different data source entirely.</div>
+
+<div class="wayout">
+  <a class="home" href="index.html"><i style="font-style:normal">&#8592;</i> Back to the overview</a>
+  <div class="also"><a href="../index.html">Live monitor &#8594;</a>
+    <a href="grundlagen.html">How it works &#8594;</a>
+    <a href="pruefung.html">The check &#8594;</a></div>
+</div>
 
 <footer>
   Marc Oliver Sch&#228;fer &#183; WIMBIT23B &#183; grade 1.7 (87 / 100)<br>

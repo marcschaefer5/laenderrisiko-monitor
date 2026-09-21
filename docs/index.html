@@ -377,7 +377,7 @@ details.awahlbox summary:hover{color:var(--ink)}
 .cstatgruppe{display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 
 /* ---------- Länderseite ---------- */
-.navbar{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);
+.navbar{position:sticky;top:var(--rueck-h);z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);
   backdrop-filter:blur(8px);border-bottom:1px solid var(--line);display:flex;align-items:center;
   gap:12px;padding:12px 0;margin:0 0 20px}
 .back{background:var(--card);border:1px solid var(--line);color:var(--ink);font:inherit;font-size:13.5px;
@@ -494,9 +494,56 @@ footer p{margin:0 0 10px}
 @media (max-width:780px){ .kbar{flex-wrap:wrap} .kpi3{grid-template-columns:1fr 1fr} .lrow{grid-template-columns:1fr;gap:8px} }
 @media (max-width:520px){ .heroval{font-size:42px} .kpis,.kpi3{grid-template-columns:1fr}
   h2{margin-top:30px} .mldzeit{margin-left:0} }
+
+/* =========================================================================
+   RUECKWEG
+   Der QR-Code der Praesentation fuehrt auf die Uebersichtsseite der
+   Verteidigung; von hier muss sie in jeder Ansicht und an jeder Scrollposition
+   erreichbar bleiben. Ein Streifen in den Tokens des Monitors, nicht in denen
+   der Verteidigungsseiten -- der Monitor bleibt der Monitor.
+   ========================================================================= */
+:root{ --rueck-h:44px; }
+.rueckweg{position:sticky;top:0;z-index:40;background:var(--bg);
+  border-bottom:1px solid var(--line)}
+.rueckweg a{display:flex;align-items:center;gap:9px;min-height:var(--rueck-h);
+  max-width:960px;margin:0 auto;padding-inline:20px;text-decoration:none;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--ink2)}
+.rueckweg a:hover{color:var(--acc)}
+.rueckweg i{font-style:normal;font-size:14px;line-height:1}
+.rueckweg b{font-weight:500;color:var(--ink3);letter-spacing:.06em}
+
+/* ---------- schmale Geraete ---------- */
+@media (max-width:420px){
+  .wrap{padding-inline:16px}
+  .kartenband{margin:0 -16px}
+  .rueckweg a{padding-inline:16px}
+  .grid{grid-template-columns:minmax(0,1fr)}
+  .stand{gap:6px 14px}
+  .sbrief{gap:6px 14px}
+  .kartenfuss{padding:10px 12px}
+  .secthead{padding:14px 14px 0}
+  .sectnote{padding:6px 14px 0}
+  .krise{padding:13px 14px}
+  .news{padding:2px 14px 16px}
+  .lrow{padding:14px 14px}
+  .kbox{padding:12px 13px}
+  .hero{padding:18px 16px}
+  .scroll{-webkit-overflow-scrolling:touch}
+  .navbar{flex-wrap:wrap;gap:8px}
+  .navstat{margin-left:0}
+  /* Tippziele: Finger brauchen 44px, nicht 27. */
+  .fbtn,.tblbtn{min-height:44px;min-width:44px;padding-block:10px;
+    display:inline-flex;align-items:center;justify-content:center}
+  .scroll .fbtn,.filterzeile .fbtn{margin-block:2px}
+  summary{min-height:44px;display:flex;align-items:center}
+}
 </style>
 </head>
 <body>
+<div class="rueckweg">
+  <a href="verteidigung/index.html"><i>&#8592;</i> &#220;bersicht <b>&#183; Verteidigung</b></a>
+</div>
 
 
 <div class="wrap">

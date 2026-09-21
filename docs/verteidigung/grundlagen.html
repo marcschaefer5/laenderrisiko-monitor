@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>How it works &#183; Country Risk</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -10,16 +10,14 @@
 <link rel="stylesheet" href="stil.css">
 <link rel="stylesheet" href="grundlagen.css">
 </head>
-<body>
+<body class="hasbar">
+<a class="topbar" href="index.html" style="text-decoration:none">
+  <span class="tb-back"><i>&#8592;</i> Overview</span>
+  <span class="tb-here">How it works</span>
+  <span class="tb-step">02 / 04</span>
+</a>
 <div class="wrap">
 
-<nav class="nav">
-  <a href="../index.html">Live monitor</a>
-  <a href="index.html">Defence</a>
-  <a href="grundlagen.html" aria-current="page">How it works</a>
-  <a href="zahlen.html">The numbers</a>
-  <a href="pruefung.html">The check</a>
-</nav>
 
 <header class="hero">
   <p class="eyebrow rv">The basics &#183; six steps</p>
@@ -286,7 +284,14 @@
       <div class="go">Open the check &#8594;</div>
     </a>
   </div>
-  <footer>
+  <div class="wayout">
+  <a class="home" href="index.html"><i style="font-style:normal">&#8592;</i> Back to the overview</a>
+  <div class="also"><a href="../index.html">Live monitor &#8594;</a>
+    <a href="zahlen.html">The numbers &#8594;</a>
+    <a href="pruefung.html">The check &#8594;</a></div>
+</div>
+
+<footer>
     Marc Oliver Schaefer &#183; WIMBIT23B &#183; DHBW Mannheim<br>
     The record shown is GlobalEventID 1223954814 from the GDELT 2.0 event export of
     1 February 2025, 00:00 UTC. GDELT geocoded it to Germany although the report concerns

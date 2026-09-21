@@ -3,22 +3,20 @@
 <head>
 <title>The check &#183; Country Risk</title>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="stil.css">
 </head>
-<body>
+<body class="hasbar">
+<a class="topbar" href="index.html" style="text-decoration:none">
+  <span class="tb-back"><i>&#8592;</i> Overview</span>
+  <span class="tb-here">The check</span>
+  <span class="tb-step">04 / 04</span>
+</a>
 <div class="wrap">
 
-<nav class="nav">
-  <a href="../index.html">Live monitor</a>
-  <a href="index.html">Defence</a>
-  <a href="grundlagen.html">How it works</a>
-  <a href="zahlen.html">The numbers</a>
-  <a href="pruefung.html" aria-current="page">The check</a>
-</nav>
 
 <header class="top">
   <p class="eyebrow">After submission &#183; external target &#183; with a benchmark</p>
@@ -93,20 +91,20 @@ none of them moved the contribution away from zero.</div>
 <h2>The placebo tests</h2>
 <table class="tbl">
   <tr><th>Test</th><th>What it asks</th><th>Lift and 95&#8239;% interval</th><th>Verdict</th></tr>
-  <tr><td>The finding itself</td><td>does the warning rise on the 20 documented events?</td>
-      <td class="num">+0.152 &#160;[0.077, 0.242]</td><td class="v hold">holds</td></tr>
-  <tr><td>Against the harder null model</td><td>does it survive a stricter baseline?</td>
-      <td class="num">+0.097 &#160;[0.017, 0.166]</td><td class="v hold">holds</td></tr>
-  <tr><td>The other country's events</td><td>does it stay silent where it should?</td>
-      <td class="num">&#8722;0.069</td><td class="v pass">passes</td></tr>
-  <tr><td>The same events on random dates</td><td>does it stay silent where it should?</td>
-      <td class="num">&#8722;0.021</td><td class="v pass">passes</td></tr>
-  <tr><td>Threshold moved to 1.5 &#963;</td><td>does it survive a different definition?</td>
-      <td class="num">&#8722;0.008</td><td class="v fail">fails</td></tr>
-  <tr><td>Threshold moved to 2.0 &#963;</td><td>does it survive a different definition?</td>
-      <td class="num">&#8722;0.175</td><td class="v fail">fails</td></tr>
-  <tr><td>First half versus second half</td><td>is it stable over time?</td>
-      <td class="num">+0.221 &#160;vs &#160;&#8722;0.045</td><td class="v fail">fails</td></tr>
+  <tr><td data-l="Test">The finding itself</td><td data-l="What it asks">does the warning rise on the 20 documented events?</td>
+      <td class="num" data-l="Lift and 95% interval">+0.152 &#160;[0.077, 0.242]</td><td class="v hold" data-l="Verdict">holds</td></tr>
+  <tr><td data-l="Test">Against the harder null model</td><td data-l="What it asks">does it survive a stricter baseline?</td>
+      <td class="num" data-l="Lift and 95% interval">+0.097 &#160;[0.017, 0.166]</td><td class="v hold" data-l="Verdict">holds</td></tr>
+  <tr><td data-l="Test">The other country's events</td><td data-l="What it asks">does it stay silent where it should?</td>
+      <td class="num" data-l="Lift and 95% interval">&#8722;0.069</td><td class="v pass" data-l="Verdict">passes</td></tr>
+  <tr><td data-l="Test">The same events on random dates</td><td data-l="What it asks">does it stay silent where it should?</td>
+      <td class="num" data-l="Lift and 95% interval">&#8722;0.021</td><td class="v pass" data-l="Verdict">passes</td></tr>
+  <tr><td data-l="Test">Threshold moved to 1.5 &#963;</td><td data-l="What it asks">does it survive a different definition?</td>
+      <td class="num" data-l="Lift and 95% interval">&#8722;0.008</td><td class="v fail" data-l="Verdict">fails</td></tr>
+  <tr><td data-l="Test">Threshold moved to 2.0 &#963;</td><td data-l="What it asks">does it survive a different definition?</td>
+      <td class="num" data-l="Lift and 95% interval">&#8722;0.175</td><td class="v fail" data-l="Verdict">fails</td></tr>
+  <tr><td data-l="Test">First half versus second half</td><td data-l="What it asks">is it stable over time?</td>
+      <td class="num" data-l="Lift and 95% interval">+0.221 &#160;vs &#160;&#8722;0.045</td><td class="v fail" data-l="Verdict">fails</td></tr>
 </table>
 <div class="note accent"><b>One finding survives both placebos, and no more than that.</b>
 On the 20 documented events the warning does rise measurably. It does not survive a shift of
@@ -139,6 +137,13 @@ present: how much is being reported, how negatively, and how that compares to a 
 recent normal. That is what the
 <a href="../index.html" style="color:var(--accent)">live monitor</a> was built to show, and why
 every figure there stands next to its benchmark.</div>
+
+<div class="wayout">
+  <a class="home" href="index.html"><i style="font-style:normal">&#8592;</i> Back to the overview</a>
+  <div class="also"><a href="../index.html">Live monitor &#8594;</a>
+    <a href="grundlagen.html">How it works &#8594;</a>
+    <a href="zahlen.html">The numbers &#8594;</a></div>
+</div>
 
 <footer>
   Marc Oliver Sch&#228;fer &#183; WIMBIT23B &#183; DHBW Mannheim<br>
