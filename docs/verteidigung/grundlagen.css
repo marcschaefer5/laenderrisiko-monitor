@@ -16,8 +16,11 @@
   transition:opacity .9s var(--ease-out),transform .9s var(--ease-out)}
 .rv.in{opacity:1;transform:none}
 .rv.d1{transition-delay:.08s} .rv.d2{transition-delay:.16s} .rv.d3{transition-delay:.24s}
-.lines .ln{display:block;overflow:hidden}
-.lines .ln > span{display:block;transform:translateY(105%);
+.lines .ln{display:block;overflow:hidden;
+  /* the left side bearing of the first glyph must not be clipped away:
+     pad the clipping box and pull it back, so only the vertical edge clips. */
+  padding-left:.08em;margin-left:-.08em}
+.lines .ln > span{display:block;white-space:nowrap;transform:translateY(105%);
   transition:transform 1.05s var(--ease-out)}
 .lines.in .ln > span{transform:none}
 .lines.in .ln:nth-child(2) > span{transition-delay:.09s}
@@ -25,7 +28,7 @@
 
 /* ---------- hero ---------- */
 .hero{min-height:calc(88svh - var(--bar-h));display:flex;flex-direction:column;justify-content:center;
-  padding:var(--s12) 0 var(--s11);max-width:22ch}
+  padding:var(--s12) 0 var(--s11)}
 .hero h1{font-size:clamp(44px,8vw,104px);line-height:.98;letter-spacing:-.045em;
   font-weight:400;margin:0}
 .hero .sub{font-size:clamp(17px,1.7vw,21px);line-height:1.55;letter-spacing:-.01em;
@@ -187,7 +190,6 @@
   .scene-grid{grid-template-columns:minmax(0,1fr);padding:0 var(--s7)}
   .rail{display:none}
   .say{max-width:none}
-  .hero{max-width:none}
 }
 @media (max-width:1000px) and (min-height:1px){
   /* the pinned box keeps its full height; the grid inside it divides that height:

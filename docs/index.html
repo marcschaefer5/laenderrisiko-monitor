@@ -4,7 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="Tagesaktuelles Länderrisiko aus Währungsdruck, Marktvolatilität und geopolitischer Spannung.">
-<meta name="color-scheme" content="light dark">
+<meta name="color-scheme" content="dark light">
+<script>/* Dunkel ist die Vorgabe; die Wahl des Besuchers geht vor und wird vor dem ersten
+   Anstrich gesetzt, damit es nicht kurz aufblitzt. */
+(function(){var t=null;try{t=localStorage.getItem("lrm-theme")}catch(e){}
+document.documentElement.setAttribute("data-theme",t==="light"?"light":"dark");})();</script>
 <title>Länderrisiko-Monitor</title>
 <meta name="description" content="Tagesaktuelles Länderrisiko: Lagemeldungen, Seewege und Nadelöhre für 17 Länder.">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -57,7 +61,8 @@
   --shadow:0 1px 1px rgba(0,0,0,.5), 0 10px 26px -16px rgba(0,0,0,.8);
 }
 *{box-sizing:border-box}
-html{color-scheme:light dark}
+html{color-scheme:dark}
+:root[data-theme="light"]{color-scheme:light}
 body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;
   line-height:1.55;margin:0;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
 .wrap{max-width:960px;margin:0 auto;padding-inline:20px;padding-block:0 80px}
@@ -505,10 +510,18 @@ footer p{margin:0 0 10px}
 :root{ --rueck-h:44px; }
 .rueckweg{position:sticky;top:0;z-index:40;background:var(--bg);
   border-bottom:1px solid var(--line)}
+.rueckweg-innen{display:flex;align-items:center;gap:12px;
+  max-width:960px;margin:0 auto;padding-inline:20px}
 .rueckweg a{display:flex;align-items:center;gap:9px;min-height:var(--rueck-h);
-  max-width:960px;margin:0 auto;padding-inline:20px;text-decoration:none;
+  text-decoration:none;
   font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
   color:var(--ink2)}
+.themeknopf{margin-left:auto;display:inline-flex;align-items:center;gap:7px;
+  min-height:28px;padding:0 10px;border:1px solid var(--line);border-radius:999px;
+  background:transparent;color:var(--ink2);cursor:pointer;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase}
+.themeknopf:hover{color:var(--acc);border-color:var(--acc)}
+.themeknopf .tk-i{font-size:12px;line-height:1}
 .rueckweg a:hover{color:var(--acc)}
 .rueckweg i{font-style:normal;font-size:14px;line-height:1}
 .rueckweg b{font-weight:500;color:var(--ink3);letter-spacing:.06em}
@@ -517,7 +530,8 @@ footer p{margin:0 0 10px}
 @media (max-width:420px){
   .wrap{padding-inline:16px}
   .kartenband{margin:0 -16px}
-  .rueckweg a{padding-inline:16px}
+  .rueckweg-innen{padding-inline:16px}
+  .themeknopf{min-height:44px}
   .grid{grid-template-columns:minmax(0,1fr)}
   .stand{gap:6px 14px}
   .sbrief{gap:6px 14px}
@@ -564,7 +578,12 @@ footer p{margin:0 0 10px}
 </head>
 <body>
 <div class="rueckweg">
-  <a href="verteidigung/index.html"><i>&#8592;</i> &#220;bersicht <b>&#183; Verteidigung</b></a>
+  <div class="rueckweg-innen">
+    <a href="verteidigung/index.html"><i>&#8592;</i> &#220;bersicht <b>&#183; Verteidigung</b></a>
+    <button type="button" class="themeknopf" id="themeknopf">
+      <span class="tk-i" aria-hidden="true">&#9680;</span><span class="tk-t">Hell</span>
+    </button>
+  </div>
 </div>
 
 
@@ -2216,5 +2235,25 @@ route();
 })();
 </script>
 
+<script>
+/* Heller oder dunkler Anstrich. Die Wahl bleibt im Browser des Besuchers stehen. */
+(function(){
+  var r=document.documentElement, b=document.getElementById("themeknopf");
+  if(!b) return;
+  function anschreiben(){
+    var dunkel = r.getAttribute("data-theme") !== "light";
+    b.querySelector(".tk-t").textContent = dunkel ? "Hell" : "Dunkel";
+    b.setAttribute("aria-label", dunkel ? "Zu heller Darstellung wechseln"
+                                        : "Zu dunkler Darstellung wechseln");
+  }
+  anschreiben();
+  b.addEventListener("click",function(){
+    var neu = r.getAttribute("data-theme")==="light" ? "dark" : "light";
+    r.setAttribute("data-theme",neu);
+    try{ localStorage.setItem("lrm-theme",neu); }catch(e){}
+    anschreiben();
+  });
+})();
+</script>
 </body>
 </html>
