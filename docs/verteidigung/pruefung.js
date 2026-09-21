@@ -26,8 +26,8 @@
 
   /* ---------- 01 · the value against the chance line ---------- */
   /* The column runs from 0.400 to 0.600; the dashed line at the middle is
-     0.500. The fill stops at 0.497 — just short of it, never past it. */
-  var LO=0.400, HI=0.600, VAL=0.497;
+     0.500. The fill stops at 0.508 — a hair past it, well inside the interval. */
+  var LO=0.400, HI=0.600, VAL=0.508;
   function act1(p){
     var m=document.getElementById("meter"); if(!m) return;
     var g=ease(seg(p,.10,.70));
