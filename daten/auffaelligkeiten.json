@@ -1,5 +1,23 @@
 [
  {
+  "datum": "2026-09-28",
+  "code": "RS",
+  "land": "Russland",
+  "z": 2.55
+ },
+ {
+  "datum": "2026-09-28",
+  "code": "NI",
+  "land": "Nigeria",
+  "z": 3.77
+ },
+ {
+  "datum": "2026-09-28",
+  "code": "EG",
+  "land": "Ägypten",
+  "z": 4.27
+ },
+ {
   "datum": "2026-09-25",
   "code": "US",
   "land": "USA",
