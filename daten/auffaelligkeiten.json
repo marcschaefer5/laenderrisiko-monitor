@@ -1,5 +1,11 @@
 [
  {
+  "datum": "2026-10-01",
+  "code": "RS",
+  "land": "Russland",
+  "z": 0.95
+ },
+ {
   "datum": "2026-09-28",
   "code": "RS",
   "land": "Russland",
