@@ -1,5 +1,5 @@
 {
- "stand": "2026-10-03",
+ "stand": "2026-10-04",
  "fenster_tage": 365,
  "groessen": {
   "gewalt": "Anteil Gewaltereignisse (CAMEO 18–20)",
@@ -92,8 +92,8 @@
    },
    "roh": {
     "gewalt": 0.0725,
-    "zwang": 0.0452,
-    "tonlage": 1.4981,
+    "zwang": 0.0453,
+    "tonlage": 1.5014,
     "waehrung": 0.0488,
     "markt": null
    },
@@ -136,9 +136,9 @@
     "markt": 100.0
    },
    "roh": {
-    "gewalt": 0.041,
+    "gewalt": 0.0412,
     "zwang": 0.0355,
-    "tonlage": 1.0759,
+    "tonlage": 1.0752,
     "waehrung": 0.0476,
     "markt": 0.259
    },
@@ -205,7 +205,7 @@
     "markt": 78.6
    },
    "roh": {
-    "gewalt": 0.0887,
+    "gewalt": 0.0885,
     "zwang": 0.0618,
     "tonlage": 2.8614,
     "waehrung": 0.1094,
@@ -229,8 +229,8 @@
    },
    "roh": {
     "gewalt": 0.0743,
-    "zwang": 0.0622,
-    "tonlage": 1.7614,
+    "zwang": 0.0623,
+    "tonlage": 1.7608,
     "waehrung": 0.0699,
     "markt": 0.1226
    },
@@ -274,8 +274,8 @@
    },
    "roh": {
     "gewalt": 0.0539,
-    "zwang": 0.0402,
-    "tonlage": 1.1202,
+    "zwang": 0.0403,
+    "tonlage": 1.1224,
     "waehrung": 0.0937,
     "markt": null
    },
@@ -341,9 +341,9 @@
     "markt": 28.6
    },
    "roh": {
-    "gewalt": 0.0848,
-    "zwang": 0.0639,
-    "tonlage": 2.2032,
+    "gewalt": 0.0847,
+    "zwang": 0.0638,
+    "tonlage": 2.201,
     "waehrung": null,
     "markt": 0.1246
    },
@@ -387,8 +387,8 @@
    },
    "roh": {
     "gewalt": 0.0653,
-    "zwang": 0.0563,
-    "tonlage": 1.5745,
+    "zwang": 0.0564,
+    "tonlage": 1.5788,
     "waehrung": null,
     "markt": 0.1532
    },
@@ -408,9 +408,9 @@
     "markt": 35.7
    },
    "roh": {
-    "gewalt": 0.0662,
+    "gewalt": 0.0663,
     "zwang": 0.0242,
-    "tonlage": 0.392,
+    "tonlage": 0.3915,
     "waehrung": null,
     "markt": 0.1427
    },
