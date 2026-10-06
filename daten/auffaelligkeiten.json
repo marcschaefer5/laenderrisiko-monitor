@@ -1,5 +1,23 @@
 [
  {
+  "datum": "2026-10-05",
+  "code": "BR",
+  "land": "Brasilien",
+  "z": 6.29
+ },
+ {
+  "datum": "2026-10-02",
+  "code": "US",
+  "land": "USA",
+  "z": 3.57
+ },
+ {
+  "datum": "2026-10-02",
+  "code": "SA",
+  "land": "Saudi-Arabien",
+  "z": 4.43
+ },
+ {
   "datum": "2026-10-01",
   "code": "RS",
   "land": "Russland",
