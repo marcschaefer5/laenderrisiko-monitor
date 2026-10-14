@@ -1,5 +1,83 @@
 [
  {
+  "datum": "2026-10-13",
+  "code": "US",
+  "land": "USA",
+  "z": 6.34
+ },
+ {
+  "datum": "2026-10-13",
+  "code": "TW",
+  "land": "Taiwan",
+  "z": 4.9
+ },
+ {
+  "datum": "2026-10-13",
+  "code": "TU",
+  "land": "Türkei",
+  "z": 3.47
+ },
+ {
+  "datum": "2026-10-13",
+  "code": "SP",
+  "land": "Spanien",
+  "z": 6.2
+ },
+ {
+  "datum": "2026-10-13",
+  "code": "SF",
+  "land": "Südafrika",
+  "z": 3.77
+ },
+ {
+  "datum": "2026-10-13",
+  "code": "SA",
+  "land": "Saudi-Arabien",
+  "z": 6.93
+ },
+ {
+  "datum": "2026-10-13",
+  "code": "MY",
+  "land": "Malaysia",
+  "z": 3.45
+ },
+ {
+  "datum": "2026-10-13",
+  "code": "IS",
+  "land": "Israel",
+  "z": 4.87
+ },
+ {
+  "datum": "2026-10-13",
+  "code": "ID",
+  "land": "Indonesien",
+  "z": 4.09
+ },
+ {
+  "datum": "2026-10-13",
+  "code": "GM",
+  "land": "Deutschland",
+  "z": 6.35
+ },
+ {
+  "datum": "2026-10-12",
+  "code": "US",
+  "land": "USA",
+  "z": 2.91
+ },
+ {
+  "datum": "2026-10-12",
+  "code": "RS",
+  "land": "Russland",
+  "z": 2.71
+ },
+ {
+  "datum": "2026-10-12",
+  "code": "EG",
+  "land": "Ägypten",
+  "z": 2.19
+ },
+ {
   "datum": "2026-10-05",
   "code": "BR",
   "land": "Brasilien",
