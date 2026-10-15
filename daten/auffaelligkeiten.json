@@ -7,6 +7,12 @@
  },
  {
   "datum": "2026-10-13",
+  "code": "UP",
+  "land": "Ukraine",
+  "z": 5.06
+ },
+ {
+  "datum": "2026-10-13",
   "code": "TW",
   "land": "Taiwan",
   "z": 4.9
@@ -37,6 +43,12 @@
  },
  {
   "datum": "2026-10-13",
+  "code": "RS",
+  "land": "Russland",
+  "z": 5.82
+ },
+ {
+  "datum": "2026-10-13",
   "code": "MY",
   "land": "Malaysia",
   "z": 3.45
@@ -58,6 +70,12 @@
   "code": "GM",
   "land": "Deutschland",
   "z": 6.35
+ },
+ {
+  "datum": "2026-10-13",
+  "code": "EG",
+  "land": "Ägypten",
+  "z": 4.25
  },
  {
   "datum": "2026-10-12",
