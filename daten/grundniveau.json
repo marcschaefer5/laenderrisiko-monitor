@@ -1,5 +1,5 @@
 {
- "stand": "2026-10-15",
+ "stand": "2026-10-16",
  "fenster_tage": 365,
  "groessen": {
   "gewalt": "Anteil Gewaltereignisse (CAMEO 18–20)",
@@ -24,9 +24,9 @@
     "markt": 71.4
    },
    "roh": {
-    "gewalt": 0.1554,
-    "zwang": 0.0541,
-    "tonlage": 4.1467,
+    "gewalt": 0.1557,
+    "zwang": 0.0543,
+    "tonlage": 4.1547,
     "waehrung": 0.0864,
     "markt": 0.1767
    },
@@ -48,9 +48,9 @@
    },
    "roh": {
     "gewalt": 0.1421,
-    "zwang": 0.0443,
-    "tonlage": 3.4188,
-    "waehrung": 0.1852,
+    "zwang": 0.0444,
+    "tonlage": 3.4207,
+    "waehrung": 0.1856,
     "markt": 0.1058
    },
    "von": 18
@@ -69,9 +69,9 @@
     "waehrung": 40.0
    },
    "roh": {
-    "gewalt": 0.1695,
-    "zwang": 0.0253,
-    "tonlage": 3.3418,
+    "gewalt": 0.1697,
+    "zwang": 0.0254,
+    "tonlage": 3.3461,
     "waehrung": 0.0566,
     "markt": null
    },
@@ -93,7 +93,7 @@
    "roh": {
     "gewalt": 0.0723,
     "zwang": 0.0447,
-    "tonlage": 1.4924,
+    "tonlage": 1.4956,
     "waehrung": 0.0484,
     "markt": null
    },
@@ -116,7 +116,7 @@
     "gewalt": 0.1014,
     "zwang": 0.0502,
     "tonlage": 2.803,
-    "waehrung": 0.0778,
+    "waehrung": 0.079,
     "markt": null
    },
    "von": 18
@@ -136,24 +136,24 @@
     "markt": 100.0
    },
    "roh": {
-    "gewalt": 0.041,
-    "zwang": 0.0356,
-    "tonlage": 1.0763,
-    "waehrung": 0.0474,
-    "markt": 0.2589
+    "gewalt": 0.0409,
+    "zwang": 0.0358,
+    "tonlage": 1.0802,
+    "waehrung": 0.0473,
+    "markt": 0.2592
    },
    "von": 18
   },
   "TU": {
-   "wert": 45.1,
+   "wert": 46.3,
    "stufe": "mittel",
    "viertel": "zweites Viertel",
    "unsicher": false,
    "anzahl_groessen": 5,
-   "rang": 12,
+   "rang": 11,
    "grundlagen": {
     "gewalt": 27.8,
-    "zwang": 50.0,
+    "zwang": 55.6,
     "tonlage": 55.6,
     "waehrung": 6.7,
     "markt": 85.7
@@ -163,7 +163,7 @@
     "zwang": 0.0525,
     "tonlage": 1.7731,
     "waehrung": 0.0148,
-    "markt": 0.2188
+    "markt": 0.219
    },
    "von": 18
   },
@@ -182,11 +182,11 @@
     "markt": 64.3
    },
    "roh": {
-    "gewalt": 0.0506,
-    "zwang": 0.065,
-    "tonlage": 1.4662,
-    "waehrung": 0.1127,
-    "markt": 0.1752
+    "gewalt": 0.0504,
+    "zwang": 0.0649,
+    "tonlage": 1.4702,
+    "waehrung": 0.1132,
+    "markt": 0.1761
    },
    "von": 18
   },
@@ -208,8 +208,8 @@
     "gewalt": 0.0889,
     "zwang": 0.0623,
     "tonlage": 2.8936,
-    "waehrung": 0.1096,
-    "markt": 0.1871
+    "waehrung": 0.1097,
+    "markt": 0.1869
    },
    "von": 18
   },
@@ -230,9 +230,9 @@
    "roh": {
     "gewalt": 0.0744,
     "zwang": 0.0629,
-    "tonlage": 1.8186,
-    "waehrung": 0.0701,
-    "markt": 0.1247
+    "tonlage": 1.8208,
+    "waehrung": 0.0702,
+    "markt": 0.1251
    },
    "von": 18
   },
@@ -251,11 +251,11 @@
     "markt": 57.1
    },
    "roh": {
-    "gewalt": 0.0957,
-    "zwang": 0.0821,
-    "tonlage": 2.5088,
-    "waehrung": 0.0761,
-    "markt": 0.1637
+    "gewalt": 0.096,
+    "zwang": 0.0819,
+    "tonlage": 2.5075,
+    "waehrung": 0.0764,
+    "markt": 0.1636
    },
    "von": 18
   },
@@ -276,7 +276,7 @@
     "gewalt": 0.056,
     "zwang": 0.0417,
     "tonlage": 1.1491,
-    "waehrung": 0.0953,
+    "waehrung": 0.0954,
     "markt": null
    },
    "von": 18
@@ -296,34 +296,34 @@
     "markt": 7.1
    },
    "roh": {
-    "gewalt": 0.0368,
-    "zwang": 0.0542,
-    "tonlage": 0.6298,
+    "gewalt": 0.0367,
+    "zwang": 0.0544,
+    "tonlage": 0.6344,
     "waehrung": 0.0521,
-    "markt": 0.0926
+    "markt": 0.0928
    },
    "von": 18
   },
   "ID": {
-   "wert": 45.7,
+   "wert": 44.6,
    "stufe": "mittel",
    "viertel": "zweites Viertel",
    "unsicher": false,
    "anzahl_groessen": 5,
-   "rang": 11,
+   "rang": 12,
    "grundlagen": {
     "gewalt": 16.7,
-    "zwang": 55.6,
+    "zwang": 50.0,
     "tonlage": 16.7,
     "waehrung": 46.7,
     "markt": 92.9
    },
    "roh": {
-    "gewalt": 0.0486,
-    "zwang": 0.0526,
-    "tonlage": 0.6992,
-    "waehrung": 0.0612,
-    "markt": 0.226
+    "gewalt": 0.0487,
+    "zwang": 0.0524,
+    "tonlage": 0.7016,
+    "waehrung": 0.061,
+    "markt": 0.2271
    },
    "von": 18
   },
@@ -343,9 +343,9 @@
    "roh": {
     "gewalt": 0.0848,
     "zwang": 0.0636,
-    "tonlage": 2.1967,
+    "tonlage": 2.1979,
     "waehrung": null,
-    "markt": 0.1233
+    "markt": 0.1232
    },
    "von": 18
   },
@@ -390,7 +390,7 @@
     "zwang": 0.0558,
     "tonlage": 1.598,
     "waehrung": null,
-    "markt": 0.1554
+    "markt": 0.1555
    },
    "von": 18
   },
@@ -408,11 +408,11 @@
     "markt": 35.7
    },
    "roh": {
-    "gewalt": 0.0724,
+    "gewalt": 0.0733,
     "zwang": 0.0242,
-    "tonlage": 0.5769,
+    "tonlage": 0.5993,
     "waehrung": null,
-    "markt": 0.1419
+    "markt": 0.142
    },
    "von": 18
   }
