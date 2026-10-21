@@ -6,6 +6,18 @@
   "z": 3.11
  },
  {
+  "datum": "2026-10-19",
+  "code": "RS",
+  "land": "Russland",
+  "z": 2.8
+ },
+ {
+  "datum": "2026-10-19",
+  "code": "NI",
+  "land": "Nigeria",
+  "z": 3.23
+ },
+ {
   "datum": "2026-10-13",
   "code": "US",
   "land": "USA",
