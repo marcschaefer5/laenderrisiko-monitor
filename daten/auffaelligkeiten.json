@@ -1,5 +1,11 @@
 [
  {
+  "datum": "2026-11-05",
+  "code": "US",
+  "land": "USA",
+  "z": 4.12
+ },
+ {
   "datum": "2026-10-27",
   "code": "UP",
   "land": "Ukraine",
